@@ -1,0 +1,28 @@
+Week 1
+
+David C and I discussed project ideas before class, and he introduced the 'Yavalath' game idea to me.
+We formed the group of 5 in class and presented the idea to the group.
+During class, we brainstormed some features, functionality and objectives for our project for the Custom Project Proposal.
+We distributed front-end, back-end and database responsibilities to each member in class.
+David and I reviewed and revised the Custom Project Proposal remotely.
+After several e-mail exchanges between David and the lecturer, our custom project idea was approved accepted.
+
+For next week:
+- Group meeting to solidify project functionality and features
+- UI & Database meeting
+- Programming stack (prototype)
+
+Week 2
+
+On Tuesday (after class), we had a group meeting to solidfy project functionality, features and goals.
+During this meeting, we had an extensive discussion to develop a simple 'project description'. Sage and I had some initial discussions related to database design for the project.
+On Thursday, I participated in the latter section of the UI meeting with David, Jacky X and Yirong and provided some light feedback.
+On Saturday, David, Sage and I had our database meeting. We discussed and began developing the database schema and created simple draft diagrams (ER & Relational).
+In particular, we went into great detail regarding the storage of a user's ELO and how we were going to represent this in the database.
+We have a good foundation for several tables such as Users, Friends, Matches, Games, Replays, Outcomes and ReplayComments.
+However, we still have yet to decide on specific details for some tables. For example, how to store move sequences (or board states) under Replays.
+
+For next week:
+- Set up and begin coding
+- Begin and progress on report writing
+- Elaborate on database design and queries
