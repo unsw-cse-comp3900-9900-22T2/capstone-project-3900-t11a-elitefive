@@ -1,0 +1,17 @@
+Week 1
+Yirong and I are in charge of frontend
+helped out with drafting the proposal dotpoints and discussing in depth what functionalities are required and narrowing
+down our main problem statement.
+
+Week 2
+During our meeting we noticed that we needed a bi-directional flow of data in the game which can not be achieved
+by the typical HTTP requests, and as a result started to explore the implementing of websockets in C++.
+However this is the first hurdle we faced, as we wanted to use C++ as our main backend language due to the speed benefits that it provides
+when creating an AI for the game. The Webserver is now as a result, more complex to build and configure.
+
+During Tuesday on to Wednesday I explored the uwebsockets C++ library and set up dockerfiles to try streamline and provide
+a centralised platform for the backend c++ development to reduce issues with linkage, installation and misconfiguation errors
+as well as removing the "it works on my machine" type errors.
+
+During Thursday Yirong, David and I worked on creating the initial figma ui mockups to plan out which UI components
+needed to be made, and what how it interacts with the backend etc. 
