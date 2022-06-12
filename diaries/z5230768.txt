@@ -1,10 +1,19 @@
 Week 1
-Formed our group of 5 and discussed what we all want to focus on programming wise; who wants to work on database/frontend/backend. I took on the role as scrum master and created the Jira page.
+Formed our group of 5 and discussed what we all want to focus on programming 
+wise; who wants to work on database/frontend/backend. I took on the role as 
+scrum master and created the Jira page.
 
-I suggested the idea of making a competitive "Yavalath" website. We wrote up the initial proposal as a group and discussed what extra features and functionality we want to contribute to individually. I made sure that everyone had something that they were excited to work on during the term. 
+I suggested the idea of making a competitive "Yavalath" website. We wrote up the
+initial proposal as a group and discussed what extra features and functionality
+we want to contribute to individually. I made sure that everyone had something
+that they were excited to work on during the term. 
 
-My week mainly consisted of revising, rewriting and emailing the draft proposal to the lecturer and lab assistant until it was approved. I got our custom project approved on Sunday.
-During this time we fleshed out what our project was going to deliver and we have a good understanding of what we want to build this term.
+My week mainly consisted of revising, rewriting and emailing the draft proposal 
+to the lecturer and lab assistant until it was approved. I got our custom 
+project approved on Sunday.
+
+During this time we fleshed out what our project was going to deliver and we 
+have a good understanding of what we want to build this term.
 
 These are the meetings we are planning for next week:
 - Group meeting (Finalise project design and functions)
@@ -14,15 +23,32 @@ These are the meetings we are planning for next week:
 
 
 Week 2
-I organised the group meetings this week and delegated tasks that need to be completed this week. I finished setting up the Github/Jira pages for our group and posted them in our group discord for everyone to access along with other helpful links to keep track of our design documents.
+I organised the group meetings this week and delegated tasks that need to be 
+completed this week. I finished setting up the Github/Jira pages for our group 
+and posted them in our group discord for everyone to access along with other 
+helpful links to keep track of our design documents.
 
-In the Tuesday group meeting I outlined everything we needed to achieve in the project and made sure we all understood what we were working on this term. Together we brainstormed the layout of the website and what functions we are going to provide. We also worked on 'explaining the project purpose' to make it clear what we will be delivering at the end of the term.
+In the Tuesday group meeting I outlined everything we needed to achieve in the 
+project and made sure we all understood what we were working on this term. 
+Together we brainstormed the layout of the website and what functions we are 
+going to provide. We also worked on 'explaining the project purpose' to make it 
+clear what we will be delivering at the end of the term.
 
-On Wednesday, I created a diagram to show the use cases of the website based on what we made on Tuesday. I also wrote descriptions to explain each function. I uploaded this document to our confluence. Jacky X worked on getting uwebsockets set up with C++ but was running into some problems. I helped with some of the linking issues and we will be trying to set this up on Docker later.
+On Wednesday, I created a diagram to show the use cases of the website based on 
+what we made on Tuesday. I also wrote descriptions to explain each function. 
+I uploaded this document to our confluence. Jacky X worked on getting uwebsockets 
+set up with C++ but was running into some problems. I helped with some of the 
+linking issues and we will be trying to set this up on Docker later.
 
-On Thursday I attended the UI meeting with Jacky X and Yirong. I suggested some ideas for some pages and gave feedback on the work they had already done. Overall what they have made looks good.
+On Thursday I attended the UI meeting with Jacky X and Yirong. I suggested some 
+ideas for some pages and gave feedback on the work they had already done. 
+Overall what they have made looks good.
 
-On Saturday we had our database meeting with Jacky J and Sage. We worked on creating some diagrams to show what tables we need and how they relate to each other. We discussed several approaches for retrieving data in different situations. We have made tables for User/friends/match/games/replay/outcomes/comments. We need to make a table that stores move sequences.
+On Saturday we had our database meeting with Jacky J and Sage. We worked on 
+creating some diagrams to show what tables we need and how they relate to each 
+other. We discussed several approaches for retrieving data in different 
+situations. We have made tables for User/friends/match/games/replay/outcomes/comments. 
+We need to make a table that stores move sequences.
 
 Next week we need to:
 - Setup the Jira Backlog 
