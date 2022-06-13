@@ -1,0 +1,12 @@
+Week 1
+
+This week we formed our group of 5. David and Jacky J came with an idea for a custom project to work on so we went with that. It was for a web interface for an existing boardgame but with additions to the game and added features to make the website a more fun/competitve enironment to play with friends. 
+
+We spend the tutorial organising roles for each member, working out availablility for meetings and brainstorming features.
+
+Week 2
+
+This week we had a group meeting on Tuesday to work on the final functionality of the project website and deliverables. We also went over the purpose of the project to come up with ideas for a pitch. While hashign out the functionality of the game we came up with a number of features inluding different ELOS based on different game types, representation of an ELO graph that showed change over time, replays and more. Jacky J & I started brainstorming how to represent these in a database, especially the sequence things.
+
+On Saturday I had a database meeting with Jacky K and David where we went over the best fitting ways to represent aspects of the game, and generated some ER and relational diagrams for the database.
+
