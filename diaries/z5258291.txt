@@ -1,0 +1,13 @@
+Week 1
+- We had our formation of groups and assigned roles within our team members. Jacky and I would focus on frontend and David Jacky and Sage will focus on backend.
+- We also discussed the project and decided to go with a game. 
+- We discussed features and functionality that our game site will use.
+- David and Jacky discussed with the tutor to get our custom proposal approved
+
+Week 2
+- We looked at the project in more detail to understand specific requirements we needed. 
+- We also looked at the goals of the project and understand what our project ambition was.
+- Jacky and Sage had a database discussion ot see how the data will be stored.
+- Jacky X and I had our UI meeting where we started our first initial UI discussion. We were able to come up with a draft prototype. 
+  - We came with a prototype that showed the main page, game, reviews etc.
+  - David and Jacky also later joined the meeting to discuss funtionality and other UI tweaks. 
