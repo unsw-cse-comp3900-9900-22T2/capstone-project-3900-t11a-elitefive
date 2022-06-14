@@ -1,0 +1,11 @@
+version: "3.9"
+services:
+  backend:
+    container_name: "cpp-backend"
+    build:
+      context: "./backend"
+    volumes:
+      - './backend:/app'
+    ports:
+      - 8080:8080
+    tty: true
