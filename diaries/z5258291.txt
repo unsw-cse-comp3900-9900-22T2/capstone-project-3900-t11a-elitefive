@@ -11,3 +11,12 @@ Week 2
 - Jacky X and I had our UI meeting where we started our first initial UI discussion. We were able to come up with a draft prototype. 
   - We came with a prototype that showed the main page, game, reviews etc.
   - David and Jacky also later joined the meeting to discuss funtionality and other UI tweaks. 
+  
+ Week 3
+ - We started and completed the proposal report.
+ - I had worked on finishing UI prototype with Jacky X.
+ - I had also started 3 of the flow charts for the Use Cases to show how each functionality worked.
+ - Jacky and Sage had started the User Story planning.
+ - I had completed the User Story content for Epics 2-8.
+ - Jacky X was working on the architectural framework.
+ - David completed the flowhcarts and the background and description for the report.
