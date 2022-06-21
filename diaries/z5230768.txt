@@ -56,3 +56,24 @@ Next week we need to:
 - Install code stack
 - Begin prototyping
 
+
+Week 3
+- Had a meeting on Tuesday after Class with Sage, Jacky X, Jacky J. 
+Jacky X and I finialised frontend design during this meeting.
+Together we decided on the final functionalities we would provide for our project.
+
+- During the week I tested Jacky X local setup of Docker containing backend/frontend.
+It works and will be the main code statck used by everyone in the group for development.
+
+- Talked to Sage and Jacky J about their database design and discussed approaches to implement and support out "snapshot feature"
+- Set up User Stories and Storypoints on Jira with Jacky X, Jacky J and Sage.
+
+Throughout the week I worked on various tasks for the report.
+- Created final ui interaction flow diagrams based on the frontent mockup design by Jacky X. 
+- Created node based UI interaction chart to show how all the webpages connect to each other
+- Had several meetings with Jacky J, Sage and Jacky X to go over User Stories.
+- Worked on report background, user stories and diagram formatting.
+- Finalised report with Jacky J, to make sure all objectives in the project were included.
+
+
+
