@@ -1,9 +1,12 @@
 import React from 'react'
+import HexCell from '../components/HexCell'
 
 type Props = {}
 
 export default function Homepage({}: Props) {
   return (
-    <div>Homepage hi</div>
+    <div>
+      <HexCell width={110} height={120}/>
+    </div>
   )
 }
