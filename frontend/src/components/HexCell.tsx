@@ -6,12 +6,13 @@ type Props = {
   stroke?: string;
   fill?: string;
   transform?: string;
+  onClick?: () => void;
 }
 
 const DEFAULT_WIDTH = 110;
 const DEFAULT_HEIGHT = 120;
-const DEFAULT_STROKE = "white"
-const DEFAULT_FILL = "black"
+const DEFAULT_STROKE = "#824ACB"
+const DEFAULT_FILL = "#404348"
 const DEFAULT_TRANSFORM = ""
 const DEFAULT_STROKE_WIDTH = 3;
 
@@ -22,6 +23,7 @@ export default function HexCell(props: Props) {
     stroke,
     fill,
     transform,
+    onClick,
   } = props;
 
   // generates path for a perfect hexagon
@@ -50,6 +52,7 @@ export default function HexCell(props: Props) {
     <svg 
       width={width? width: DEFAULT_WIDTH} 
       height={height? height: DEFAULT_HEIGHT}
+      onClick={onClick}
     >
       <polygon
         points={getPathCoords()}

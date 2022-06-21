@@ -42,16 +42,11 @@ const DEFAULT_BOARD_WIDTH = 2000;
 const DEFAULT_BOARD_HEIGHT = 1000;
 
 export default function Board({}: Props) {
-  const hexColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-dark');
-  const strokeColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-purple');
   const renderRow = (row: string[], x_offset: number, y_offset: number) => {
     return (
       <RowContainer x_offset={x_offset} y_offset={y_offset}>
         {row.map((hex) => (
-          <HexCell
-            fill={hexColor}
-            stroke={strokeColor}
-          />
+          <HexCell onClick={() => { console.log(hex)}}/>
         ))}
       </RowContainer>
     )
