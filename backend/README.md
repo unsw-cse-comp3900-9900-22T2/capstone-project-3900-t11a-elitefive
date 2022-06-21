@@ -1,7 +1,7 @@
 ## How to Run Backend Container
 ```
 make 
-docker exec -it backend /bin/bash -i
+docker exec -it cpp-backend /bin/bash -i
 ```
 this will spin up a shell into the backend docker container
 

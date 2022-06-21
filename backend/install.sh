@@ -1,6 +1,6 @@
 #!/bin/sh
 # only run this in the very beginning 
-if [[ -n "vcpkg" ]]; then
+if [ -n "vcpkg" ]; then
   echo "-=-=-=-=-=setting up=-=-=-=-=-=-"
   git clone https://github.com/Microsoft/vcpkg.git
   cd vcpkg
