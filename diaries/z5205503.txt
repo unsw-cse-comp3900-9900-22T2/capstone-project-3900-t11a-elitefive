@@ -26,3 +26,17 @@ For next week:
 - Set up and begin coding
 - Begin and progress on report writing
 - Elaborate on database design and queries
+
+Week 3
+
+During class on Tuesday, David C and Jacky X began developing UI design while Sage and I began developing User Stories for the proposal report.
+We established the project functionalities as Epic Stories and developed appropriate user stories for each. I also began writing up acceptance criteria for many user stories.
+Jacky X, Yirong and David worked on UI diagrams, Sage developed database ER diagrams, and Sage and I started on User Stories which were then added onto by everyone.
+During report writing, I assisted David C with working on the Background section of the report and reviewing/finalizing the User Stories.
+We established the appropriate user stories for our first sprint - we wanted to make sure we could get the basic game and features established for demonstration by the end of the first sprint.
+After all diagrams were completed, they were all added into the report. David and I went through the report thoroughly and finalized it.
+Jacky X and David C set up their coding environments. Unfortunately, I was unable to set up my coding environment or start coding as I was already very occupied with the Proposal Report and User Stories.
+
+For next week:
+- Set up coding environment and focus heavily on coding to ensure we have completed all tasks for the first sprint.
+- Establish database and corresponding SQL queries.
