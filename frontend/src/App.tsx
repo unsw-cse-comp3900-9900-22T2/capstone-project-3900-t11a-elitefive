@@ -5,20 +5,28 @@ import {
   Route
 } from 'react-router-dom';
 
-// local imports
+// global imports
 import GlobalStyles from './global/GlobalStyles';
+import { AuthProvider } from './global/GlobalAuth';
+
+// pages
+import PageContainer from './pages/PageContainer';
 import Homepage from "./pages/Homepage";
 
 
 function App() {
   return (
     <>
-      <GlobalStyles />
-      <Router>
-        <Routes>
-          <Route path="/" element={<Homepage/>}/>
-        </Routes>
-      </Router>
+      <AuthProvider>
+        <GlobalStyles />
+        <PageContainer>
+          <Router>
+            <Routes>
+              <Route path="/" element={<Homepage/>}/>
+            </Routes>
+          </Router>
+        </PageContainer>
+      </AuthProvider>
     </>
   );
 }

@@ -3,19 +3,14 @@ import { createGlobalStyle } from "styled-components";
 export default createGlobalStyle`
   :root {
     // add colours
+    --background-color: #4E5257;
+    
+    //text colours
+    --text-primary: white;
+    --text-secondary: #404348;
   }
   body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-      sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  code {
-    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-      monospace;
   }
 
 `;
