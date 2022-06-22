@@ -17,8 +17,12 @@ type StyledProps = {
   fill?: string;
 }
 
-const DEFAULT_WIDTH = 110;
-const DEFAULT_HEIGHT = 120;
+// const DEFAULT_WIDTH = 110;
+// const DEFAULT_HEIGHT = 120;
+
+const DEFAULT_WIDTH = 100;
+const DEFAULT_HEIGHT = 110;
+
 const DEFAULT_STROKE = "#824ACB"
 const DEFAULT_FILL = "#404348"
 const DEFAULT_TRANSFORM = ""

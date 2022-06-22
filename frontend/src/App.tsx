@@ -15,6 +15,7 @@ import Homepage from "./pages/Homepage";
 import Registerpage from './pages/Registerpage';
 import Dashboard from './pages/Dashboard';
 import Profilepage from './pages/Profilepage';
+import Gamepage from './pages/Gamepage';
 
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
               <Route path="/register" element={<Registerpage/>}/>
               <Route path="/dashboard" element={<Dashboard/>}/>
               <Route path="/profile:id" element={<Profilepage/>}/>
+              <Route path="/game" element={<Gamepage/>}/>
               <Route path="/" element={<Homepage/>}/>
             </Routes>
           </Router>

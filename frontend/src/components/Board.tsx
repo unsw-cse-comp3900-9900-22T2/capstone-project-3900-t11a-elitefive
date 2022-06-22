@@ -22,8 +22,7 @@ const defaultBoard = [
 ]
 
 const BoardContainer = styled.div`
-  padding-top: 80px;
-  padding-left: 50px;
+  padding: 50px;
 `;
 
 type RowStyleProps = {
@@ -38,18 +37,20 @@ const RowContainer = styled.span<RowStyleProps>`
 // vertical
 const ColumnContainer = styled.div`
   position: relative;
-  margin-top: -30px;
+  margin-top: -26px;
 `;
 
 const DEFAULT_BOARD_WIDTH = 2000;
-const DEFAULT_BOARD_HEIGHT = 1000;
+// const DEFAULT_BOARD_HEIGHT = 800;
 
 export default function Board({width, height}: Props) {
   const renderRow = (row: string[], x_offset: number) => {
     return (
       <RowContainer x_offset={x_offset}>
         {row.map((hex) => (
-          <HexCell onClick={() => { console.log(hex)}}/>
+          <HexCell
+            onClick={() => { console.log(hex)}}
+          />
         ))}
       </RowContainer>
     )
@@ -60,7 +61,7 @@ export default function Board({width, height}: Props) {
     // index is the row it is
     return defaultBoard.map((row, index) => {
       // it works
-      const x_offset = Math.abs((index+1)- 5) * w/37
+      const x_offset = Math.abs((index+1)- 5) * w/40
       const y_offset = index * 90;
       return (
         <ColumnContainer>
