@@ -12,6 +12,7 @@ import { AuthProvider } from './global/GlobalAuth';
 // pages
 import PageContainer from './pages/PageContainer';
 import Homepage from "./pages/Homepage";
+import Registerpage from './pages/Registerpage';
 
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
         <PageContainer>
           <Router>
             <Routes>
+              <Route path="/register" element={<Registerpage/>}/>
               <Route path="/" element={<Homepage/>}/>
             </Routes>
           </Router>
