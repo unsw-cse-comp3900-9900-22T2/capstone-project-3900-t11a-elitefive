@@ -8,6 +8,10 @@ export default createGlobalStyle`
     // accent colurs
     --accent-dark: #404348;
     --accent-purple: #824ACB;
+
+    // textbox colors
+    --textbox-light: #4E5257;
+    --textbox-dark: #404348;
     
     //text colours
     --text-primary: white;
@@ -16,5 +20,4 @@ export default createGlobalStyle`
   body {
     margin: 0;
   }
-
 `;

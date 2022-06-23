@@ -4,7 +4,10 @@ import styled from 'styled-components';
 // local
 import HexCell from './HexCell';
 
-type Props = {}
+type Props = {
+  width?: number;
+  height?: number;
+}
 
 const defaultBoard = [
   ['a1', 'a2', 'a3', 'a4', 'a5'],
@@ -19,48 +22,50 @@ const defaultBoard = [
 ]
 
 const BoardContainer = styled.div`
-  position: absolute;
+  padding: 50px;
 `;
 
 type RowStyleProps = {
   x_offset: number
-  y_offset: number
 }
 // horizontal
 const RowContainer = styled.span<RowStyleProps>`
-  position: absolute;
-  left: ${props => props.x_offset}px;
-  top: ${props => props.y_offset}px;
+  margin-left: ${props => props.x_offset}px;
   display: flex;
 `;
 
 // vertical
 const ColumnContainer = styled.div`
+  position: relative;
+  margin-top: -26px;
 `;
 
 const DEFAULT_BOARD_WIDTH = 2000;
-const DEFAULT_BOARD_HEIGHT = 1000;
+// const DEFAULT_BOARD_HEIGHT = 800;
 
-export default function Board({}: Props) {
-  const renderRow = (row: string[], x_offset: number, y_offset: number) => {
+export default function Board({width, height}: Props) {
+  const renderRow = (row: string[], x_offset: number) => {
     return (
-      <RowContainer x_offset={x_offset} y_offset={y_offset}>
+      <RowContainer x_offset={x_offset}>
         {row.map((hex) => (
-          <HexCell onClick={() => { console.log(hex)}}/>
+          <HexCell
+            onClick={() => { console.log(hex)}}
+          />
         ))}
       </RowContainer>
     )
   }
 
   const renderBoard = () => {
+    const w = width ? width : DEFAULT_BOARD_WIDTH;
     // index is the row it is
     return defaultBoard.map((row, index) => {
       // it works
-      const x_offset = Math.abs((index+1)- 5) * DEFAULT_BOARD_WIDTH/37
+      const x_offset = Math.abs((index+1)- 5) * w/40
       const y_offset = index * 90;
       return (
         <ColumnContainer>
-          {renderRow(row, x_offset, y_offset)}
+          {renderRow(row, x_offset)}
         </ColumnContainer>
       )
     })
