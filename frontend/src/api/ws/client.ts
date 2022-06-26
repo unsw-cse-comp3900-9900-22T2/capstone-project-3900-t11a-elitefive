@@ -21,7 +21,10 @@ export default class Client {
   }
 
   public emit(key: string, data?: any) {
-    this.socket.send(key);
+    this.socket.send(JSON.stringify({
+      "event": key,
+      "data": data
+    }));
   }
 
 }

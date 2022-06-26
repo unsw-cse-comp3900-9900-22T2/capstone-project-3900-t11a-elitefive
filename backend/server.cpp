@@ -25,10 +25,10 @@ void RelaySocket(){
 
     auto websocket = app.ws<SocketData>("/ws/david",uWS::TemplatedApp<false>::WebSocketBehavior<SocketData> {//I have to explicitly declare the type of this struct.
       .open = [](auto *ws) {
-        std::cout<< "test"<< std::endl;
-        std::cout << ws->getRemoteAddressAsText() << '\n';
+        // std::cout<< "test"<< std::endl;
+        // std::cout << ws->getRemoteAddressAsText() << '\n';
         ws->subscribe("moves");
-        std::cout << "subbed: " << ws->isSubscribed("moves") << '\n';
+        // std::cout << "subbed: " << ws->isSubscribed("moves") << '\n';
       },
       
       .message = [](auto *ws, std::string_view message, uWS::OpCode opCode){

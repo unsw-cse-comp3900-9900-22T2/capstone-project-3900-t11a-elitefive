@@ -23,7 +23,10 @@ export default function Gamepage({}: Props) {
       <YavalathButton/>
       <Board />
       <button onClick={() => {
-        WSRef.current?.emit("moves");
+        WSRef.current?.emit("moves", JSON.stringify({
+          'uid': "abcd",
+          'move': 'a1'
+        }));
       }}>click me</button>
     </Container> 
   )
