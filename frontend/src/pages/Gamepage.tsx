@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import styled from 'styled-components';
+import WSClient from '../api/ws/client';
 
 // local
 import Board from '../components/Board';
@@ -12,10 +13,18 @@ const Container = styled.div`
 `;
 
 export default function Gamepage({}: Props) {
+  const WSRef = useRef<WSClient | null>(null);
+  useEffect(() => {
+    WSRef.current = new WSClient();
+  },[])
+  // testing
   return (
     <Container>
       <YavalathButton/>
       <Board />
-    </Container>
+      <button onClick={() => {
+        WSRef.current?.emit("moves");
+      }}>click me</button>
+    </Container> 
   )
 }
