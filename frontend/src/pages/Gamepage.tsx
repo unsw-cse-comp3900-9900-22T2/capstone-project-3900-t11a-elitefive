@@ -13,11 +13,7 @@ const Container = styled.div`
 `;
 
 export default function Gamepage({}: Props) {
-  // const WSRef = useRef<WSClient | null>(null);
-  // useEffect(() => {
-  //   WSRef.current = new WSClient();
-  // },[])
-  // testing
+
   return (
     <WSProvider>
       <Container>

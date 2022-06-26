@@ -1,3 +1,4 @@
+import GameState from "../../classes/Gamestate";
 
 export type TerminationReason = "locked" | "terminating" | "error"
 
@@ -8,8 +9,10 @@ interface payload {
 
 export default class Client {
   socket: WebSocket;
+  gamestate: GameState;
 
-  constructor(initCallback?: (...args: any)=> void, terminatingCallback?: (...args: any) => void) {
+  constructor(gameState: GameState, initCallback?: (...args: any)=> void, terminatingCallback?: (...args: any) => void) {
+    this.gamestate = gameState;
     this.socket = new WebSocket(`ws://localhost:8080/ws/david`);
     this.socket.onmessage = (message) => {
       const data:payload = JSON.parse(message.data) as payload

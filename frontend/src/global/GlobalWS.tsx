@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import WSClient from '../api/ws/client';
+import GameState from '../classes/Gamestate';
 
 type Props = {
   children?: any;
@@ -17,7 +18,9 @@ export const WSProvider = ({ children }: Props) => {
   const [socket, setSocket] = useState<WSClient | null>(null);
 
   useEffect(() => {
-    setSocket(new WSClient());
+    // create blank gamestate
+    const gamestate = new GameState();
+    setSocket(new WSClient(gamestate));
   },[])
 
   return (
