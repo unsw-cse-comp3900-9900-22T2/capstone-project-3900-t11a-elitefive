@@ -10,7 +10,7 @@ const defaultBoard = [
   ['i1', 'i2', 'i3', 'i4', 'i5'],
 ]
 
-type TileState = {
+export type TileState = {
   user: string | null;
   color: string | null;
 }
@@ -30,5 +30,9 @@ export default class GameState {
         });
       }
     }
+  }
+
+  public setState(key: string, value: TileState) {
+    this.state.set(key, value);
   }
 }

@@ -36,7 +36,7 @@ void RelaySocket(){
         //The docs show how to send messages from this context, but no other method is demonstrated.
         // ws->send("Hello there boi");// This works fine enough.
         ws->publish("moves", 
-          "{\"turn\": \"whose turn\", \"last move\": \"here\"}", 
+          "{\"event\": \"move\", \"tile\": \"a3\"}",
           opCode);
       },
       .close = [](auto *ws, int x , std::string_view str) {

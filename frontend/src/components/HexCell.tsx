@@ -82,6 +82,8 @@ export default function HexCell(props: Props) {
       width={width} 
       height={height}
       onClick={onClick}
+      fill={fill}
+      stroke={stroke}
     >
       <polygon
         points={getPathCoords()}

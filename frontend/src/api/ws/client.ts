@@ -3,8 +3,10 @@ import GameState from "../../classes/Gamestate";
 export type TerminationReason = "locked" | "terminating" | "error"
 
 interface payload {
-    type: "init" | "terminating" | "acknowledged"
-    contents?: string
+  // type: "init" | "terminating" | "acknowledged"
+  event: "move" 
+  contents?: string
+  tile?: string;
 }
 
 export default class Client {
@@ -17,6 +19,17 @@ export default class Client {
     this.socket.onmessage = (message) => {
       const data:payload = JSON.parse(message.data) as payload
       console.log(data);
+      switch(data.event) {
+        case "move": {
+          // set gamestate tile to be red
+          const tile = data.tile;
+          if(tile) {
+            this.gamestate.setState(tile, { color: "red", user: null });
+          }
+          // console.log(this.gamestate);
+          break;
+        }
+      }
     }
     // handles violent termination
     // this.socket.close = (___, reason) => 
