@@ -4,8 +4,7 @@ import styled from 'styled-components';
 // local
 import HexCell from './HexCell';
 import { useSocket } from '../global/GlobalWS';
-import { TileState } from '../classes/Gamestate';
-import { stringify } from 'querystring';
+import { GameStateType, useGameState } from '../global/GlobalGameState';
 
 type Props = {
   width?: number;
@@ -15,11 +14,6 @@ type Props = {
 
 type RowStyleProps = {
   x_offset: number
-}
-
-type shadowBoardStateType = {
-  hexKey: string;
-  hexState?: TileState;
 }
 
 const defaultBoard = [
@@ -55,37 +49,22 @@ const DEFAULT_BOARD_WIDTH = 2000;
 
 export default function Board({ width, height, isStatic }: Props) {
 
-  const [shadowBoardState, setShadowBoardState] = useState<shadowBoardStateType[][] | null>(null);
-  const { socket: WS } = useSocket();
-
-  useEffect(() => {
-    setShadowBoardState(defaultBoard.map((col: string[]) => col.map(
-      (hexKey: string) => { 
-        const hState = WS?.gamestate.state.get(hexKey);
-        if(!hState) return { hexKey } as shadowBoardStateType;
-        return {
-          hexKey: hexKey,
-          hexState: hState,
-        }
-      }
-    )))
-
-    console.log(shadowBoardState);
-  },[WS?.gamestate.state])
+  const { gamestate: GS } = useGameState();
+  const { socket: WS, emit } = useSocket();
 
 
   
-  const renderRow = (row: shadowBoardStateType[], x_offset: number) => {
+  const renderRow = (row: GameStateType[], x_offset: number) => {
     return (
       <RowContainer x_offset={x_offset}>
-        {row.map(({ hexKey, hexState }: shadowBoardStateType) => {
+        {row.map(({ hexKey, hexState }: GameStateType) => {
           return (
             <HexCell
               fill={hexState?.color ? hexState?.color : "black"}
               onClick={() => {
                 // if isStatic does not do any of this Websocket stuff
                 if(!isStatic) {
-                  WS?.emit("moves", JSON.stringify({
+                  emit("moves", JSON.stringify({
                     'uid': "abcd",
                     'move': hexKey
                   }))
@@ -102,7 +81,7 @@ export default function Board({ width, height, isStatic }: Props) {
     const w = width ? width : DEFAULT_BOARD_WIDTH;
     // index is the row it is
 
-    return shadowBoardState?.map((row, index) => {
+    return GS?.map((row, index) => {
       // it works
       const x_offset = Math.abs((index+1)- 5) * w/40
       const y_offset = index * 90;
@@ -112,27 +91,6 @@ export default function Board({ width, height, isStatic }: Props) {
         </ColumnContainer>
       )
     })
-
-    // // guard 
-    // if(!WS || !WS.gamestate.state) {
-    //   return (<ColumnContainer></ColumnContainer>)
-    // }
-
-    // console.log(Array.from(WS.gamestate.state.values()))
-
-    // return Array.from(WS.gamestate.state.values()).map((row, index) => {
-    //   const x_offset = Math.abs((index+1)- 5) * w/40
-    //   const y_offset = index * 90;
-    //   console.log(row);
-    //   return (
-    //     // <ColumnContainer>
-    //     //   {renderRow(row, x_offset)}
-    //     // </ColumnContainer>
-    //     <></>
-    //   )
-    // })
-
-
   }
 
   return (
