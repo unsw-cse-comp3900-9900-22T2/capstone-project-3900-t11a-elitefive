@@ -33,10 +33,18 @@ const Container1  = styled.div`
 `
 
 export default function Dashboard({}: Props) {
+
+  const navigate = useNavigate();
+
+    const navigateToGamepage = () => {
+        // 👇️ navigate to /contacts
+        navigate('/game');
+    };
+
   return (
     <Container>
       <Container1>
-        <LargeButton>
+        <LargeButton onClick={navigateToGamepage}>
           <Typography variant="h3">{"Play AI"}</Typography>
         </LargeButton>
         <LargeButton>
