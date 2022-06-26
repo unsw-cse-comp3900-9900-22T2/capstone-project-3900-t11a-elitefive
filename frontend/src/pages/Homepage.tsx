@@ -44,7 +44,7 @@ const Container2  = styled.div`
 export default function Homepage({}: Props) {
   return (
     <Container>
-      <Board/>
+      <Board isStatic={true}/>
       <Container1>
         <Typography variant="h1">Yavalath</Typography>
         <Container2>

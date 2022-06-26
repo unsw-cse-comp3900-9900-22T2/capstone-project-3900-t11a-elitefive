@@ -3,10 +3,12 @@ import styled from 'styled-components';
 
 // local
 import HexCell from './HexCell';
+import { useSocket } from '../global/GlobalWS';
 
 type Props = {
   width?: number;
   height?: number;
+  isStatic?: boolean;
 }
 
 const defaultBoard = [
@@ -43,13 +45,24 @@ const ColumnContainer = styled.div`
 const DEFAULT_BOARD_WIDTH = 2000;
 // const DEFAULT_BOARD_HEIGHT = 800;
 
-export default function Board({width, height}: Props) {
+export default function Board({ width, height, isStatic }: Props) {
+
+  const { socket: WS } = useSocket();
+
   const renderRow = (row: string[], x_offset: number) => {
     return (
       <RowContainer x_offset={x_offset}>
         {row.map((hex) => (
           <HexCell
-            onClick={() => { console.log(hex)}}
+            onClick={() => {
+              // if isStatic does not do any of this Websocket stuff
+              if(!isStatic) {
+                WS?.emit("moves", JSON.stringify({
+                  'uid': "abcd",
+                  'move': hex
+                }))
+              }
+            }}
           />
         ))}
       </RowContainer>
