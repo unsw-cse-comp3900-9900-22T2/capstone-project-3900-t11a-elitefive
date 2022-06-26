@@ -1,7 +1,8 @@
 #ifndef YAVALATH_AXIAL_HPP
 #define YAVALATH_AXIAL_HPP
 
-#include <ostream>
+#include <iostream>
+#include <vector>
 
 namespace axial {
 	class vector {
@@ -17,8 +18,7 @@ namespace axial {
 			static auto uqr() -> vector;
 			static auto urs() -> vector;
 			static auto usq() -> vector;
-
-
+			static auto unit_directions() -> std::vector<vector> const;
 
 			// Constructors
 			vector(int q, int r, int s);					// Regular Constructors

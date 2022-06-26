@@ -83,28 +83,40 @@ namespace axial {
 		return vector{ 0, 1,-1};
 	}
 	auto vector::ur() -> vector {
-		return vector{-1, 1, 0};
+		return vector{-1, 0, 1};
 	} 
 	auto vector::us() -> vector {
-		return vector{-1, 0, 1};
+		return vector{ 1,-1, 0};
 	}
 	auto vector::uqr() -> vector {
-		return vector{ 0,-1, 1};
+		return vector{-1, 1, 0};
 	}
 	auto vector::urs() -> vector {
-		return vector{ 1,-1, 0};
+		return vector{ 0,-1, 1};
 	} 
 	auto vector::usq() -> vector {
 		return vector{ 1, 0,-1};
 	}
 
+	auto vector::unit_directions() -> std::vector<vector> const {
+		// Unit circle, anticlockwise directions
+		return std::vector<vector> {
+			axial::vector::uq(),
+			axial::vector::uqr(),
+			axial::vector::ur(),
+			axial::vector::urs(),
+			axial::vector::us(),
+			axial::vector::usq()
+		};
+	};
+
 	// Unit circle, anticlockwise directions
-	// axial::vector{ 0, 1,-1},
-	// axial::vector{-1, 1, 0},
-	// axial::vector{-1, 0, 1},
-	// axial::vector{ 0,-1, 1},
-	// axial::vector{ 1,-1, 0},
-	// axial::vector{ 1, 0,-1},
+	// axial::vector{ 0, 1,-1}, // q
+	// axial::vector{-1, 0, 1}, // r
+	// axial::vector{ 1,-1, 0}, // s
+	// axial::vector{-1, 1, 0}, // qr
+	// axial::vector{ 0,-1, 1}, // rs
+	// axial::vector{ 1, 0,-1}, // sq
 }
 
 
