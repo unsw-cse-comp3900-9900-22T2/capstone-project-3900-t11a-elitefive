@@ -110,6 +110,15 @@ namespace axial {
 		};
 	};
 
+	auto vector::basis_vectors() -> std::vector<vector> const {
+		return std::vector<vector> { 
+			axial::vector::uq(), 
+			axial::vector::ur(), 
+			axial::vector::us() 
+		};
+	}
+
+
 	// Unit circle, anticlockwise directions
 	// axial::vector{ 0, 1,-1}, // q
 	// axial::vector{-1, 0, 1}, // r

@@ -5,42 +5,42 @@
 
 #include "axial.hpp"
 #include "hexagon.hpp"
+
 auto convert_axial_to_2d_array(axial::vector const& position, int const& board_radius) -> int;
 auto generate_classic_board() -> std::vector<Hexagon>;
 auto draw_board(std::vector<Hexagon> tiles) -> void;
 auto check_outcome(std::vector<Hexagon> tiles, int move, int player) -> int;
 auto is_win(std::vector<Hexagon> tiles, int move, int player) -> bool;
 auto is_loss(std::vector<Hexagon> tiles, int move, int player) -> bool;
-auto is_connect(std::vector<Hexagon> tiles, int move, int player, int n) -> bool;
+auto is_connected(std::vector<Hexagon> tiles, int move, int player, int n) -> bool;
 auto check_connected_n(std::vector<Hexagon> tiles, int player, int n, axial::vector vec, axial::vector dir, bool pos, int &connected) -> bool;
 auto coord_to_index(std::string s) -> int;
 
 
-// Return the tile location
-// -1 indicates that the move is not valid
-auto move_converter(std::string move) -> int {
-	std::cout << move << '\n';
-	// TODO: Convert into a valid move to pass to the board
-}
+// // Return the tile location
+// // -1 indicates that the move is not valid
+// auto move_converter(std::string move) -> int {
+// 	std::cout << move << '\n';
+// 	// TODO: Convert into a valid move to pass to the board
+// }
 
 int main(void) {
 	auto board = generate_classic_board();
 	auto player = 0;
 	bool ongoing = true;
 	while (ongoing) {
-		draw_board(board);
+		// draw_board(board);
 		std::string coord;
-		std::cout << "Player Turn: " << player << " Move: ";
+		// std::cout << "Player Turn: " << player << " Move: \n";
 		std::cin >> coord;
 		auto move = coord_to_index(coord);
-		// auto index = move_converter(move);
 		board[move].used_ = player;
 		int o = check_outcome(board, move, player);
 		if (o == 0) {
 			player = (player + 1) % 2;
 		} else {
 			ongoing = false;
-			draw_board(board);
+			// draw_board(board);
 			std::cout << "Player " << player << " " << ((o > 0) ? "Wins" : "Loses") << "!" << std::endl;;
 		}
 	}
@@ -120,18 +120,18 @@ auto check_outcome(std::vector<Hexagon> tiles, int move, int player) -> int {
 }
 
 auto is_win(std::vector<Hexagon> tiles, int move, int player) -> bool {
-	return is_connect(tiles, move, player, 4);
+	return is_connected(tiles, move, player, 4);
 }
 
 auto is_loss(std::vector<Hexagon> tiles, int move, int player) -> bool {
-	return is_connect(tiles, move, player, 3);
+	return is_connected(tiles, move, player, 3);
 }
 
-auto is_connect(std::vector<Hexagon> tiles, int move, int player, int n) -> bool {
+auto is_connected(std::vector<Hexagon> tiles, int move, int player, int n) -> bool {
 	auto vec = tiles[move].getPosVec();
 	// For each axial direction
-	const auto dirs = std::vector<axial::vector>{ axial::vector::uq(), axial::vector::ur(), axial::vector::us() };
-	for (const auto &dir : dirs) {
+	auto const dirs = axial::vector::basis_vectors();
+	for (auto const& dir : dirs) {
 		int connected = 1;
 		if (check_connected_n(tiles, player, n, vec, dir, true, connected)) {
 			return true;
@@ -145,17 +145,17 @@ auto is_connect(std::vector<Hexagon> tiles, int move, int player, int n) -> bool
 
 auto check_connected_n(std::vector<Hexagon> tiles, int player, int n, axial::vector vec, axial::vector dir, bool pos, int &connected) -> bool {
 	for (int i = 1; i < n; ++i) {
-			auto v = vec + dir * (pos ? 1 : -1) * i;
-			auto index = convert_axial_to_2d_array(v);
-			if (index < 0 || index >= 81 || tiles[index].used_ != player) {
-				return false;
-			} else {
-				connected++;
-				if (connected == n) {
-					return true;
-				}
+		auto v = vec + dir * (pos ? 1 : -1) * i;
+		auto index = convert_axial_to_2d_array(v);
+		if (index < 0 || index >= 81 || tiles[index].used_ != player) {
+			return false;
+		} else {
+			connected++;
+			if (connected == n) {
+				return true;
 			}
 		}
+	}
 }
 
 auto coord_to_index(std::string s) -> int {

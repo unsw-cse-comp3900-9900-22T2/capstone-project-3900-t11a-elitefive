@@ -18,6 +18,7 @@ namespace axial {
 			static auto uqr() -> vector;
 			static auto urs() -> vector;
 			static auto usq() -> vector;
+			static auto basis_vectors() -> std::vector<vector> const;
 			static auto unit_directions() -> std::vector<vector> const;
 
 			// Constructors
