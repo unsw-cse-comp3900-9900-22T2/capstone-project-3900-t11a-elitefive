@@ -12,6 +12,7 @@ import { AuthProvider } from './global/GlobalAuth';
 // pages
 import PageContainer from './pages/PageContainer';
 import Homepage from "./pages/Homepage";
+import Loginpage from "./pages/Loginpage";
 import Registerpage from './pages/Registerpage';
 import Dashboard from './pages/Dashboard';
 import Profilepage from './pages/Profilepage';
@@ -27,6 +28,7 @@ function App() {
           <Router>
             <Routes>
               <Route path="/register" element={<Registerpage/>}/>
+              <Route path="/login" element={<Loginpage/>}/>
               <Route path="/dashboard" element={<Dashboard/>}/>
               <Route path="/profile:id" element={<Profilepage/>}/>
               <Route path="/game" element={<Gamepage/>}/>
