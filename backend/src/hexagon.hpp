@@ -8,8 +8,9 @@ class Hexagon {
 	private:
 		axial::vector position_;
 		int lookup_index_;
-		int used_; // What player is occupying
 	public:
+		// TODO, MOVE BACK TO PRIVATE
+		int used_; // What player is occupying
 		static int const EMPTY = -2;
 
 		Hexagon(axial::vector pos);
@@ -17,7 +18,7 @@ class Hexagon {
 		Hexagon(axial::vector pos, int index, int used);
 
 		// Checks whether this is a hexagon in play
-		auto valid() -> bool {
+		auto valid() const -> bool {
 			if (used_ == Hexagon::EMPTY) {
 				return false;
 			}

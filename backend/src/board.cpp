@@ -1,18 +1,24 @@
 #include <iostream>
 #include <vector>
+#include <assert.h>
 
 #include "axial.hpp"
 #include "hexagon.hpp"
-
 auto convert_axial_to_2d_array(axial::vector const& position, int const& board_radius) -> int;
 auto generate_classic_board() -> std::vector<Hexagon>;
+auto draw_board(std::vector<Hexagon> tiles) -> void;
 
 int main(void) {
 	auto board = generate_classic_board();
-	for (auto tile : board) {
-		if (!tile.valid()) continue;
-		std::cout << tile << '\n';
-	}
+	board[40].used_ = 1;
+	board[1].used_ = 0;
+	board[32].used_ = 1;
+	board[41].used_ = 0;
+	draw_board(board);
+	// for (auto tile : board) {
+	// 	if (!tile.valid()) continue;
+	// 	std::cout << tile << '\n';
+	// }
 	return 0;
 }
 
@@ -51,4 +57,29 @@ auto convert_axial_to_2d_array(axial::vector const& position, int const& board_r
 	};
 
 	return get_row(position) * board_length + get_column(position);
+}
+
+auto draw_board(std::vector<Hexagon> tiles) -> void {
+	auto const board_width = 9;
+	
+	auto tile_lookup = [tiles, board_width](int row, int col) {
+		auto position = row * board_width + col;
+		assert(tiles[position].valid());
+		if (tiles[position].used_ == 0) return 'x';
+		if (tiles[position].used_ == 1) return 'o';
+		return '-';
+	};
+
+	for (int row = -4; row <= 4 ; ++row) {
+		auto const spacing = (row < 0) ? -row : row;
+		for (int i = 0; i < spacing; ++i) {
+			std::cout << " ";
+		}
+		for (int i = 0; i < board_width - spacing; ++i) {
+			auto const col = (row < 0) ? 0 : row;
+			auto symbol = tile_lookup(row + 4, col + i);
+			std::cout << symbol << " ";
+		}
+		std::cout << '\n';
+	}
 }
