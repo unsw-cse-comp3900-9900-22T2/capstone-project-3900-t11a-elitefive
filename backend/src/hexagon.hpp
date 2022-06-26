@@ -17,6 +17,8 @@ class Hexagon {
 		Hexagon(axial::vector pos, int index);
 		Hexagon(axial::vector pos, int index, int used);
 
+		auto getPosVec() -> axial::vector;
+
 		// Checks whether this is a hexagon in play
 		auto valid() const -> bool {
 			if (used_ == Hexagon::EMPTY) {

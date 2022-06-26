@@ -11,3 +11,7 @@ Hexagon::Hexagon(axial::vector pos, int index, int used)
 , lookup_index_{index}
 , used_{used} 
 {}
+
+auto Hexagon::getPosVec() -> axial::vector {
+  return Hexagon::position_;
+}
