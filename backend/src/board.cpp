@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <assert.h>
+#include <string>
 
 #include "axial.hpp"
 #include "hexagon.hpp"
@@ -8,17 +9,26 @@ auto convert_axial_to_2d_array(axial::vector const& position, int const& board_r
 auto generate_classic_board() -> std::vector<Hexagon>;
 auto draw_board(std::vector<Hexagon> tiles) -> void;
 
+// Return the tile location
+// -1 indicates that the move is not valid
+auto move_converter(std::string move) -> int {
+	std::cout << move << '\n';
+	// TODO: Convert into a valid move to pass to the board
+}
+
 int main(void) {
 	auto board = generate_classic_board();
-	board[40].used_ = 1;
-	board[1].used_ = 0;
-	board[32].used_ = 1;
-	board[41].used_ = 0;
-	draw_board(board);
-	// for (auto tile : board) {
-	// 	if (!tile.valid()) continue;
-	// 	std::cout << tile << '\n';
-	// }
+	auto player = 0;
+	while (true) {
+		draw_board(board);
+		std::string move;
+		std::cout << "Player Turn: " << player << " Move: ";
+		std::cin >> move;
+		std::cout << move;
+		auto index = move_converter(move);
+		// board[move].used_ = player;
+		player = (player + 1) % 2;
+	}
 	return 0;
 }
 
