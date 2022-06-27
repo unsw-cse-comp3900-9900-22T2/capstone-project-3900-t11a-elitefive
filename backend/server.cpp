@@ -68,7 +68,7 @@ void RelaySocket(){
 			// 3. If the game's over, publish game end
 			if (board->game_status() != Board::state::ONGOING) {
 				std::cout << "Game Over" << std::endl;
-				ws->publish("end", );
+				// ws->publish("end", );
 			}
 		},
 		.close = [](auto *ws, int x , std::string_view str) {
