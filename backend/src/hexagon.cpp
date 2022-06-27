@@ -22,3 +22,4 @@ auto Hexagon::valid() const -> bool {
 auto Hexagon::setTile(int player) -> void {
 	used_ = player;
 }
+

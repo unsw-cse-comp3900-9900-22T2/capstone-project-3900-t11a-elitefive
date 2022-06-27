@@ -23,21 +23,79 @@ Board::Board(int nplayers, std::vector<int> uids)
 : nplayers_{nplayers}
 , player_turn_{0}	// Start with first player by default
 , nmoves_{0} 		// zero moves have been played by default
+, total_spaces_{61}
 , uids_{uids}
 , boardstate_{generate_classic_board()}
+, gamestate_{Board::state::ONGOING}
 {}
 
-auto Board::play_move(std::string tile) -> bool {
-	int tile_index = display_coord_to_flatten_index(tile);
+auto Board::find_tile(int index) -> Hexagon & {
+	return boardstate_[index];
+}
 
+auto Board::play_move(std::string move) -> bool {
+	// Retrieve hexagon
+	int tile_index = display_coord_to_flatten_index(move);
+	Hexagon &hex = find_tile(tile_index);
+	
+	// Place tile
+	int player = whose_turn();
+	hex.setTile(player);
+	end_turn(tile_index);
+	return true;
+}
 
+auto Board::end_turn(int move) -> void {
+	++nmoves_;	// Register that a move has been played
+
+	// See if player won/loss/draw
+	if (is_win(boardstate_, move, whose_turn())) {
+		gamestate_ = Board::state::WIN;
+		return;
+	}
+	else if (is_loss(boardstate_, move, whose_turn())) {
+		gamestate_ = Board::state::LOSS;
+		return;
+	}
+	else if (num_moves() == total_spaces_) {
+		gamestate_ = Board::state::DRAW;
+		return;
+	}
+
+	// Game still in play - Update game stats
+	player_turn_ = (player_turn_ + 1) % num_players();
 }
 
 
 auto main(void) -> int {
 	auto board = Board(2, std::vector{100, 300});
-	std::cout << board.num_players() << ' ' << board.whose_turn() << ' ' << board.num_moves() << '\n';
-	gameloop();
+	while (board.game_status() == Board::state::ONGOING) {
+		std::cout << board << "Player: " << board.whose_turn() << "\tMove: \n\n";
+		std::string coord;
+		std::cin >> coord;
+		board.play_move(coord);
+	}
+	std::cout << board << "\n";
+
+	auto result = board.game_status();
+	std::string output;
+	if (result == Board::state::WIN) output = std::string(" won!");
+	if (result == Board::state::LOSS) output = std::string(" lost!");
+	if (result == Board::state::DRAW) output = std::string(" drew!");
+
+	std::cout << "Player: " << board.whose_turn() << output << '\n';
+
+	// std::cout << board.num_players() << ' ' << board.whose_turn() << ' ' << board.num_moves() << '\n';
+	// std::cout << board << '\n';
+	// board.play_move("A1");
+	// std::cout << board.num_players() << ' ' << board.whose_turn() << ' ' << board.num_moves() << '\n';	
+	// std::cout << board << '\n';
+	
+	// board.play_move("C4");
+	// std::cout << board.num_players() << ' ' << board.whose_turn() << ' ' << board.num_moves() << '\n';
+	// std::cout << board << '\n';
+
+	// gameloop();
 	return 0;
 }
 
