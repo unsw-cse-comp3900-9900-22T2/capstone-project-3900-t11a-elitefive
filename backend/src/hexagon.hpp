@@ -18,10 +18,12 @@ class Hexagon {
 
 		// Determine whether this hexagon is in play
 		auto valid() const -> bool;
+		auto blank() const -> bool;
 
 		// Simple Geters
 		auto getPosVec() const -> axial::vector {return Hexagon::position_;};
 		auto getPlayer() const -> int {return used_;};
+		auto tileLocation() const -> int {return lookup_index_;};
 
 		// Setters
 		auto setTile(int player) -> void;

@@ -22,15 +22,41 @@ class Board {
 
 		// Game engine functions
 		auto play_move(std::string move) -> bool;
+		auto play_move(Hexagon &hex) -> bool;
+
 		auto game_status() -> Board::state const& {return gamestate_;};
+		auto view_available_tiles() const -> std::vector<Hexagon> const;
 
 		auto find_tile(int index) -> Hexagon &;
+		auto find_tile(Hexagon hex) -> Hexagon & {
+			// TODO -> Remove this dump stupid hack because of view_available_tiles()
+			return boardstate_[hex.tileLocation()];
+		}
 
 		// Simple getters
 		auto num_players() -> int {return nplayers_;};
 		auto whose_turn() -> int {return player_turn_;};
 		auto num_moves() -> int {return nmoves_;};
 		auto view_tile(int index) const -> Hexagon const& { return boardstate_[index];}
+
+		// TODO: Perhaps these two should be moved elsewhere. Perhaps static too?
+		static auto display_coord_to_flatten_index(std::string s) -> int {
+			int letter = s[0];
+			if (letter >= 'a' && letter <= 'i') {
+				int row = letter - 'a';
+				int column = stoi(s.substr(1)) - 1;
+				int index = (row <= 4 ? (row * 9) : (row - 4) * 10 + 36) + column;
+				return index;
+			}
+			return -1;
+		}
+
+		static auto flatten_index_to_display_coord(int i) -> std::string {
+			int row = i / 9;
+			int column = (i % 9) + 1 - ((i < 45) ? 0 : row - 4);
+			char letter = 'a' + row;
+			return letter + std::to_string(column);
+		}
 
 		friend auto operator<<(std::ostream& os, Board const& board) -> std::ostream& {
 			auto const board_width = 9;	// Static board size assumption
