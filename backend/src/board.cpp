@@ -28,10 +28,11 @@ int main(void) {
 	auto board = generate_classic_board();
 	auto player = 0;
 	bool ongoing = true;
-	while (ongoing) {
-		// draw_board(board);
+	auto moves = 0;
+	while (ongoing && moves < 61) {
+		draw_board(board);
 		std::string coord;
-		// std::cout << "Player Turn: " << player << " Move: \n";
+		std::cout << "Player Turn: " << player << " Move: \n";
 		std::cin >> coord;
 		auto move = coord_to_index(coord);
 		board[move].used_ = player;
@@ -40,10 +41,12 @@ int main(void) {
 			player = (player + 1) % 2;
 		} else {
 			ongoing = false;
-			// draw_board(board);
+			draw_board(board);
 			std::cout << "Player " << player << " " << ((o > 0) ? "Wins" : "Loses") << "!" << std::endl;;
 		}
+		moves++;
 	}
+	std::cout << "Draw\n";
 	return 0;
 }
 
