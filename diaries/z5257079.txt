@@ -15,3 +15,15 @@ as well as removing the "it works on my machine" type errors.
 
 During Thursday Yirong, David and I worked on creating the initial figma ui mockups to plan out which UI components
 needed to be made, and what how it interacts with the backend etc. 
+
+Week 3
+Worked on a lot of FE UI Mockups using figma and figjam, attended extended calls with everyone in the group to push out our report
+Furthermore, I worked on architecture diagrams as well as helping with the FE Userstories and breaking down user stories into tickets.
+Initial Frontend Setup was also done this week, such as React-router-dom, styled components and MUI setups, along with Auth Context setup.
+
+Week 4
+Worked on a lot of Global FE State tasks, as well as preliminary UI tickets, however the main focus was to work on the more networking and Global
+Context tasks as well as liasing with backend to work out a common REST api format for REST and Websocket communication. Helped out with Backend Websocket testing
+and dealt with Frontend Global Game States as well as Global Websocket States which were created using Context providers.
+Initially these states were stored using Classes, but the OOP approach came with re-rendering issues, which made it so that updates would not cause frontend elements to
+be repainted, thus had to refactor the code to utilise global state managers i.e. useContext hooks.
