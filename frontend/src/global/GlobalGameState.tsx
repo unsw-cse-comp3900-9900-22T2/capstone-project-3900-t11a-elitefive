@@ -16,12 +16,18 @@ type Props = {
   children?: any;
 }
 
+type WinnerType = {
+  winner: string | null;
+}
+
 type GSType = {
   gamestate: GameStateType[][] | null;
+  gameOverState: WinnerType;
   setHexTileState: (tile: string, tilestate: TileState) => void;
   playerJoin: (player: PlayerType) => void;
   getPlayerInfo: (uid: string) => PlayerType | null;
   playMove: (uid: string, move: string) => void;
+  setWinner: (user: string) => void;
 }
 
 type TileState = {
@@ -37,10 +43,12 @@ export type GameStateType = {
 
 export const GSContext = React.createContext<GSType>({
   gamestate: null,
+  gameOverState: {} as WinnerType,
   setHexTileState: () => {},
   playerJoin: () => {},
   getPlayerInfo: (uid: string) => ({uid: "", color: ""}),
-  playMove: () => {}
+  playMove: () => {},
+  setWinner: () => {},
 });
 
 export type PlayerType = {
@@ -61,7 +69,7 @@ export const GSProvider = ({ children }: Props) => {
       })
   ));
   const Players = useRef<PlayerType[]>([]);
-
+  const [GameOverState, setGameOverState] = useState<WinnerType>({} as WinnerType);
 
   const setHexTileState = (tile: string, tilestate: TileState) => {
     SetGameState(prev => prev.map((col: GameStateType[]) => col.map(
@@ -79,7 +87,6 @@ export const GSProvider = ({ children }: Props) => {
 
   const playerJoin = ({ uid, color}: PlayerType) => {
     if(Players.current.find(p => p.uid == uid)) return;
-
     Players.current.push({
       uid,
       color
@@ -97,22 +104,29 @@ export const GSProvider = ({ children }: Props) => {
     console.log(Players.current);
     const player = Players.current.find(p => p.uid == uid);
     if(!player) return;
-
     setHexTileState(move, {
       user: player.uid,
       color: player.color,
     })
+  }
 
+  const setWinner = (user: string) => {
+    console.log(user);
+    setGameOverState({
+      winner: user,
+    })
   }
 
   return (
     <GSContext.Provider
       value={{
         gamestate: GameState,
+        gameOverState: GameOverState,
         setHexTileState,
         playerJoin,
         getPlayerInfo,
         playMove,
+        setWinner,
       }}
     >
       {children}
