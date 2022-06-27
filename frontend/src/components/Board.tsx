@@ -49,25 +49,25 @@ const DEFAULT_BOARD_WIDTH = 2000;
 
 export default function Board({ width, height, isStatic }: Props) {
 
-  const { gamestate: GS } = useGameState();
+  const { gamestate: GS, playMove } = useGameState();
   const { socket: WS, emit } = useSocket();
-
-
   
-  const renderRow = (row: GameStateType[], x_offset: number) => {
+  const renderRow = (row: GameStateType[] , x_offset: number) => {
     return (
       <RowContainer x_offset={x_offset}>
         {row.map(({ hexKey, hexState }: GameStateType) => {
           return (
             <HexCell
-              fill={hexState?.color ? hexState?.color : "black"}
+              fill={hexState?.color ? hexState?.color : "var(--accent-darker)"}
               onClick={() => {
                 // if isStatic does not do any of this Websocket stuff
                 if(!isStatic) {
-                  emit("moves", JSON.stringify({
-                    'uid': "abcd",
-                    'move': hexKey
-                  }))
+                  playMove("abc", hexKey);
+                  // then sends WS emit method which will cause change
+                  emit("move", JSON.stringify({
+                    'uid': "abc",
+                    'move': hexKey,
+                  }));
                 }
               }}
             />
@@ -79,6 +79,22 @@ export default function Board({ width, height, isStatic }: Props) {
 
   const renderBoard = () => {
     const w = width ? width : DEFAULT_BOARD_WIDTH;
+
+    if(isStatic) {
+      return defaultBoard.map((row, index) => {
+        // it works
+        const x_offset = Math.abs((index+1)- 5) * w/40
+        const y_offset = index * 90;
+        return (
+          <ColumnContainer>
+            <RowContainer x_offset={x_offset}>
+              {row.map(() => {return (<HexCell/>)})}
+            </RowContainer>
+          </ColumnContainer>
+        )
+      })
+    }
+
     // index is the row it is
 
     return GS?.map((row, index) => {

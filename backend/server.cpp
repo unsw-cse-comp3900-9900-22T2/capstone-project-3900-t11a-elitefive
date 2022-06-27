@@ -42,17 +42,17 @@ void RelaySocket(){
 	auto websocket = app.ws<SocketData>("/ws/david",uWS::TemplatedApp<false>::WebSocketBehavior<SocketData> {
 		.open = [&board](auto *ws) {
 			// When client connects, subscribe them to the 'moves' notification board
-			ws->subscribe("moves");
+			ws->subscribe("ROOM1");
 			board = std::make_unique<Board>(2, std::vector<int>{100,0});
 		},
 		.message = [&board](auto *ws, std::string_view message, uWS::OpCode opCode){
 			std::cout << message << '\n';
 			board->play_move(std::string("a3"));
-			ws->publish("moves", "{\"event\": \"move\", \"tile\": \"a3\"}", opCode);
+			ws->publish("ROOM1", "{\"event\": \"move\", \"tile\": \"a3\"}", opCode);
 			std::cout << *board << '\n';
 		},
 		.close = [](auto *ws, int x , std::string_view str) {
-			ws->unsubscribe("moves");
+			ws->unsubscribe("ROOM1");
 			ws->close();
 		}
 	});

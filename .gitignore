@@ -4,6 +4,7 @@ backend/CMakeCache.txt
 backend/CMakeFiles/
 backend/build
 backend/out/
+backend/vcpkg
 .vs/
 .vscode/
 *.o
