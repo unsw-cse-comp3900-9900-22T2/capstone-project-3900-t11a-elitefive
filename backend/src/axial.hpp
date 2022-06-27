@@ -67,6 +67,7 @@ namespace axial {
 				if (v1.q_ != v2.q_) return false;
 				if (v1.r_ != v2.r_) return false;
 				if (v1.s_ != v2.s_) return false;
+				return true;
 			}
 
 			friend auto operator!=(vector const& v1, vector const& v2) -> bool {

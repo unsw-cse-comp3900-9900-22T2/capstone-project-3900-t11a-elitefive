@@ -62,7 +62,7 @@ export default function Board({ width, height, isStatic }: Props) {
               onClick={() => {
                 // if isStatic does not do any of this Websocket stuff
                 if(!isStatic) {
-                  playMove("abc", hexKey);
+                  // playMove("abc", hexKey);
                   // then sends WS emit method which will cause change
                   emit("move", JSON.stringify({
                     'uid': "abc",

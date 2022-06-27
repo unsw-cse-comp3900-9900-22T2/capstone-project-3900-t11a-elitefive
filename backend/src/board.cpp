@@ -37,14 +37,12 @@ auto Board::play_move(std::string move) -> bool {
 	int tile_index = display_coord_to_flatten_index(move);
 	Hexagon &hex = find_tile(tile_index);
 	return Board::play_move(hex);
-
 }
 
 auto Board::play_move(Hexagon &hex) -> bool {
 	int player = whose_turn();
 	// Check if the tile is available.
-	if (game_status() != Board::state::ONGOING || !is_available_tile(hex)) {
-		std::cout << "Unavailable" << std::endl;
+	if (!is_valid_move(hex)) {
 		return false;
 	}
 	hex.setTile(player);
@@ -52,6 +50,16 @@ auto Board::play_move(Hexagon &hex) -> bool {
 	return true;
 }
 
+auto Board::is_valid_move(std::string move) -> bool {
+	// Retrieve hexagon
+	int tile_index = display_coord_to_flatten_index(move);
+	Hexagon &hex = find_tile(tile_index);
+	return Board::is_valid_move(hex);
+}
+
+auto Board::is_valid_move(Hexagon &hex) -> bool {
+	return game_status() == Board::state::ONGOING && is_available_tile(hex);
+}
 
 auto Board::end_turn(int move) -> void {
 	++nmoves_;	// Register that a move has been played
