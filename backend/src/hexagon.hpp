@@ -8,24 +8,24 @@ class Hexagon {
 	private:
 		axial::vector position_;
 		int lookup_index_;
-	public:
-		// TODO, MOVE BACK TO PRIVATE
 		int used_; // What player is occupying
-		static int const EMPTY = -2;
+	public:
+		static int const EMPTY = -2; // Denotes tile is out of play
 
 		Hexagon(axial::vector pos);
 		Hexagon(axial::vector pos, int index);
 		Hexagon(axial::vector pos, int index, int used);
 
-		auto getPosVec() -> axial::vector;
+		// Determine whether this hexagon is in play
+		auto valid() const -> bool;
 
-		// Checks whether this is a hexagon in play
-		auto valid() const -> bool {
-			if (used_ == Hexagon::EMPTY) {
-				return false;
-			}
-			return true;
-		}
+		// Simple Geters
+		auto getPosVec() const -> axial::vector {return Hexagon::position_;};
+		auto getPlayer() const -> int {return used_;};
+
+		// Setters
+		auto setTile(int player) -> void;
+
 		
 		friend auto operator<<(std::ostream& os, Hexagon const& hex) -> std::ostream& {
 			os << "Hex Pos: [" << hex.position_ << "]\n\t" << "Index: " << hex.lookup_index_ << " Used: " << hex.used_;

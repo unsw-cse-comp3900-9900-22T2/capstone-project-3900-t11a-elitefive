@@ -12,6 +12,13 @@ Hexagon::Hexagon(axial::vector pos, int index, int used)
 , used_{used} 
 {}
 
-auto Hexagon::getPosVec() -> axial::vector {
-  return Hexagon::position_;
+auto Hexagon::valid() const -> bool {
+	if (used_ == Hexagon::EMPTY) {
+		return false;
+	}
+	return true;
+}
+
+auto Hexagon::setTile(int player) -> void {
+	used_ = player;
 }
