@@ -54,16 +54,20 @@ void RelaySocket(){
 			std::string datastring = json["data"];
 			auto data = nlohmann::json::parse(datastring);
 			std::string move = data["move"];
-			board->play_move(move);
+			if (!board->play_move(move)) {
+				return;
+			}
 
 			// 2. AI Move
 			// AI/Computer generate move and publish.
 			auto computer = Computer(*board);
-			Hexagon &hex = board->find_tile(computer.make_random_move());
-			board->play_move(hex);
-			int tile = hex.tileLocation();
-			std::string ai_move = board->flatten_index_to_display_coord(tile);
-			ws->publish("ROOM1", "{\"event\": \"move\", \"tile\": \"" + ai_move + "\"}", opCode);
+			if (board->game_status() == Board::state::ONGOING) {
+				Hexagon &hex = board->find_tile(computer.make_random_move());
+				board->play_move(hex);
+				int tile = hex.tileLocation();
+				std::string ai_move = board->flatten_index_to_display_coord(tile);
+				ws->publish("ROOM1", "{\"event\": \"move\", \"tile\": \"" + ai_move + "\"}", opCode);
+			}
 			std::cout << *board << '\n';
 			// 3. If the game's over, publish game end
 			Board::state state = board->game_status();
@@ -73,9 +77,9 @@ void RelaySocket(){
 					winner = "";
 				} else if (board->whose_turn() == 1 && state == Board::state::WIN
 						|| board->whose_turn() == 0 && state == Board::state::LOSS) {
-					winner = "PLAYER";
-				} else {
 					winner = "COMPUTER";
+				} else {
+					winner = "PLAYER";
 				}
 				ws->publish("ROOM1", "{\"event\": \"game_over\", \"winner\": \"" + winner + "\"}", opCode);
 			}
