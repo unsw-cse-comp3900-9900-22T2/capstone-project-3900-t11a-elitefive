@@ -1,6 +1,15 @@
 cmake_minimum_required(VERSION 3.13)  # CMake version check
 project(prototype)
 
+include_directories(
+        ${PROJECT_SOURCE_DIR}/src
+)
+
+file(GLOB all_SRCS
+        "${PROJECT_SOURCE_DIR}/src/*.cpp"
+        "${PROJECT_SOURCE_DIR}/src/*.hpp"
+        server.cpp
+)
 # link pqxx with classic flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpqxx -lpq")
 
@@ -20,7 +29,7 @@ include_directories(${UWEBSOCKETS_INCLUDE_DIRS})
 #find_package(libpqxx REQUIRED)
 
 # create server executable
-add_executable(server server.cpp db_functions.cpp)
+add_executable(server ${all_SRCS})
 
 target_link_libraries(server PRIVATE
   ZLIB::ZLIB
