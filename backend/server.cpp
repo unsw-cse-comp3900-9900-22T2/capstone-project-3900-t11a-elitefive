@@ -5,9 +5,11 @@
 // #include <uwebsockets/HttpContext.h>
 // #include <uwebsockets/AsyncSocket.h>
 #include <memory>
+#include <string>
 #include "src/board.hpp"
 #include "db_functions.hpp"
 // #include <pqxx/pqxx>
+#include <nlohmann/json.hpp>
 
 void RelaySocket(){
 	struct SocketData{
@@ -46,10 +48,23 @@ void RelaySocket(){
 			board = std::make_unique<Board>(2, std::vector<int>{100,0});
 		},
 		.message = [&board](auto *ws, std::string_view message, uWS::OpCode opCode){
-			std::cout << message << '\n';
-			board->play_move(std::string("a3"));
-			ws->publish("moves", "{\"event\": \"move\", \"tile\": \"a3\"}", opCode);
+			// 1. Parsing JSON to update board backend
+			auto json = nlohmann::json::parse(message);
+			std::string datastring = json["data"];
+			auto data = nlohmann::json::parse(datastring);
+			std::string move = data["move"];
+			board->play_move(move);
+
+			// 2. AI Move
+			// Replace next line with AI move function call.
+			std::string ai_move = "b3";
+			ws->publish("moves", "{\"event\": \"move\", \"tile\": \"" + ai_move + "\"}", opCode);
 			std::cout << *board << '\n';
+			// 3. If the game's over, publish game end
+			// if () {
+
+			// }
+			// ws->publish("end", );
 		},
 		.close = [](auto *ws, int x , std::string_view str) {
 			ws->unsubscribe("moves");
