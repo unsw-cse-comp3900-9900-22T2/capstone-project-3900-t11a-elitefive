@@ -67,37 +67,37 @@ auto Board::end_turn(int move) -> void {
 }
 
 
-auto main(void) -> int {
-	auto board = Board(2, std::vector{100, 300});
-	while (board.game_status() == Board::state::ONGOING) {
-		std::cout << board << "Player: " << board.whose_turn() << "\tMove: \n\n";
-		std::string coord;
-		std::cin >> coord;
-		board.play_move(coord);
-	}
-	std::cout << board << "\n";
+// auto main(void) -> int {
+// 	auto board = Board(2, std::vector{100, 300});
+// 	while (board.game_status() == Board::state::ONGOING) {
+// 		std::cout << board << "Player: " << board.whose_turn() << "\tMove: \n\n";
+// 		std::string coord;
+// 		std::cin >> coord;
+// 		board.play_move(coord);
+// 	}
+// 	std::cout << board << "\n";
 
-	auto result = board.game_status();
-	std::string output;
-	if (result == Board::state::WIN) output = std::string(" won!");
-	if (result == Board::state::LOSS) output = std::string(" lost!");
-	if (result == Board::state::DRAW) output = std::string(" drew!");
+// 	auto result = board.game_status();
+// 	std::string output;
+// 	if (result == Board::state::WIN) output = std::string(" won!");
+// 	if (result == Board::state::LOSS) output = std::string(" lost!");
+// 	if (result == Board::state::DRAW) output = std::string(" drew!");
 
-	std::cout << "Player: " << board.whose_turn() << output << '\n';
+// 	std::cout << "Player: " << board.whose_turn() << output << '\n';
 
-	// std::cout << board.num_players() << ' ' << board.whose_turn() << ' ' << board.num_moves() << '\n';
-	// std::cout << board << '\n';
-	// board.play_move("A1");
-	// std::cout << board.num_players() << ' ' << board.whose_turn() << ' ' << board.num_moves() << '\n';	
-	// std::cout << board << '\n';
+// 	// std::cout << board.num_players() << ' ' << board.whose_turn() << ' ' << board.num_moves() << '\n';
+// 	// std::cout << board << '\n';
+// 	// board.play_move("A1");
+// 	// std::cout << board.num_players() << ' ' << board.whose_turn() << ' ' << board.num_moves() << '\n';	
+// 	// std::cout << board << '\n';
 	
-	// board.play_move("C4");
-	// std::cout << board.num_players() << ' ' << board.whose_turn() << ' ' << board.num_moves() << '\n';
-	// std::cout << board << '\n';
+// 	// board.play_move("C4");
+// 	// std::cout << board.num_players() << ' ' << board.whose_turn() << ' ' << board.num_moves() << '\n';
+// 	// std::cout << board << '\n';
 
-	// gameloop();
-	return 0;
-}
+// 	// gameloop();
+// 	return 0;
+// }
 
 auto gameloop() -> void {
 	auto board = generate_classic_board();
@@ -238,8 +238,8 @@ auto check_connected_n(std::vector<Hexagon> tiles, int player, int n, axial::vec
 
 auto display_coord_to_flatten_index(std::string s) -> int {
 	int letter = s[0];
-	if (letter >= 'A' && letter <= 'I') {
-		int row = letter - 'A';
+	if (letter >= 'a' && letter <= 'i') {
+		int row = letter - 'a';
 		int column = stoi(s.substr(1)) - 1;
 		int index = (row <= 4 ? (row * 9) : (row - 4) * 10 + 36) + column;
 		return index;

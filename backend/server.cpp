@@ -4,55 +4,56 @@
 #include <libusockets.h>
 // #include <uwebsockets/HttpContext.h>
 // #include <uwebsockets/AsyncSocket.h>
+#include <memory>
+#include "src/board.hpp"
 
 void RelaySocket(){
-    struct SocketData{
-        //Empty because we don't need any currently.
-    };
-    
-    auto app = uWS::App();
-    
-    app.listen(8080, [](auto *listen_socket){
-        if(listen_socket){
-            std::cout<< "Listening on port" << 8080<< std::endl;
-        };
-    });
+	struct SocketData{
+		//Empty because we don't need any currently.
+	};
+	
+	auto app = uWS::App();
+	
+	app.listen(8080, [](auto *listen_socket){
+		if(listen_socket){
+			std::cout<< "Listening on port" << 8080<< std::endl;
+		};
+	});
 
-    app.get("/api/david", [&app](auto *res, auto *req) {
-      res->end("{\"name\": \"david\"}");
-    });
-
-
-    auto websocket = app.ws<SocketData>("/ws/david",uWS::TemplatedApp<false>::WebSocketBehavior<SocketData> {//I have to explicitly declare the type of this struct.
-      .open = [](auto *ws) {
-        // std::cout<< "test"<< std::endl;
-        // std::cout << ws->getRemoteAddressAsText() << '\n';
-        ws->subscribe("moves");
-        // std::cout << "subbed: " << ws->isSubscribed("moves") << '\n';
-      },
-      
-      .message = [](auto *ws, std::string_view message, uWS::OpCode opCode){
-        std::cout << message << '\n';
-        //The docs show how to send messages from this context, but no other method is demonstrated.
-        // ws->send("Hello there boi");// This works fine enough.
-        ws->publish("moves", 
-          "{\"event\": \"move\", \"tile\": \"a3\"}",
-          opCode);
-      },
-      .close = [](auto *ws, int x , std::string_view str) {
-        std::cout << "close occured" << '\n';
-        std::cout << x << ' ' << str << '\n';
-        ws->close();
-      }
+	app.get("/api/david", [&app](auto *res, auto *req) {
+		res->end("{\"name\": \"david\"}");
+	});
 
 
-    });
+	// Functions we have available to in socketing
+	// ws->isSubscribed("moves") // See who is subbed to the "moves" room
+	// ws->getRemoteAddressAsText() // Gets address of the person
+	// ws->send("Hello there boi"); // Option to send message back to client only
+	std::unique_ptr<Board> board = nullptr;
 
-    app.run();
+	auto websocket = app.ws<SocketData>("/ws/david",uWS::TemplatedApp<false>::WebSocketBehavior<SocketData> {
+		.open = [&board](auto *ws) {
+			// When client connects, subscribe them to the 'moves' notification board
+			ws->subscribe("moves");
+			board = std::make_unique<Board>(2, std::vector<int>{100,0});
+		},
+		.message = [&board](auto *ws, std::string_view message, uWS::OpCode opCode){
+			std::cout << message << '\n';
+			board->play_move(std::string("a3"));
+			ws->publish("moves", "{\"event\": \"move\", \"tile\": \"a3\"}", opCode);
+			std::cout << *board << '\n';
+		},
+		.close = [](auto *ws, int x , std::string_view str) {
+			ws->unsubscribe("moves");
+			ws->close();
+		}
+	});
+
+	app.run();
 }
 
 int main()
 {
-    RelaySocket();
-    return 0;
+	RelaySocket();
+	return 0;
 }
