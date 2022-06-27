@@ -68,9 +68,18 @@ void RelaySocket(){
 			}
 			std::cout << *board << '\n';
 			// 3. If the game's over, publish game end
-			if (board->game_status() != Board::state::ONGOING) {
-				std::cout << "Game Over" << std::endl;
-				// ws->publish("end", );
+			Board::state state = board->game_status();
+			if (state != Board::state::ONGOING) {
+				std::string winner;
+				if (state == Board::state::DRAW) {
+					winner = "";
+				} else if (board->whose_turn() == 1 && state == Board::state::WIN
+						|| board->whose_turn() == 0 && state == Board::state::LOSS) {
+					winner = "PLAYER";
+				} else {
+					winner = "COMPUTER";
+				}
+				ws->publish("ROOM1", "{\"event\": \"game_over\", \"winner\": \"" + winner + "\"}", opCode);
 			}
 		},
 		.close = [](auto *ws, int x , std::string_view str) {

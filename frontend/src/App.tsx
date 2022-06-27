@@ -16,7 +16,7 @@ import Loginpage from "./pages/Loginpage";
 import Registerpage from './pages/Registerpage';
 import Dashboard from './pages/Dashboard';
 import Profilepage from './pages/Profilepage';
-import Gamepage from './pages/Gamepage';
+import Gamepage from './pages/Gamepage/Gamepage';
 
 
 function App() {

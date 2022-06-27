@@ -10,6 +10,7 @@ const Container = styled.div`
   height: 500px;
   background: var(--accent-darker);
   border-radius: 10px;
+  border: 1px solid white;
 
   position: absolute;
   top: 50%;
