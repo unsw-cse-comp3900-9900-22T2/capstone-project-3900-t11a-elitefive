@@ -4,6 +4,7 @@ import { Typography } from '@mui/material';
 
 import StyledInput from '../components/StyledInput';
 import Button from '../components/ReusableButton';
+import {Routes, Route, useNavigate} from 'react-router-dom';
 
 type Props = {}
 
@@ -19,12 +20,19 @@ const Container = styled.div`
 `;
 
 export default function Loginpage({}: Props) {
+    const navigate = useNavigate();
+
+    const navigateToDashboard = () => {
+        // 👇️ navigate to /contacts
+        navigate('/dashboard');
+    };
+
   return (
     <Container>
       <Typography variant="h3">Login</Typography>
       <StyledInput label="username"/>
       <StyledInput label="password" password/>
-      <Button label="Login"></Button>
+      <Button onClick={navigateToDashboard}> Submit </Button>
     </Container>
   )
 }

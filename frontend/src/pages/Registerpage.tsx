@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import { Typography } from '@mui/material';
 
 import StyledInput from '../components/StyledInput';
+import Button from '../components/ReusableButton';
+import {Routes, Route, useNavigate} from 'react-router-dom';
 
 type Props = {}
 
@@ -18,14 +20,20 @@ const Container = styled.div`
 `;
 
 export default function Registerpage({}: Props) {
+  const navigate = useNavigate();
+
+  const navigateToDashboard = () => {
+    // 👇️ navigate to /contacts
+    navigate('/dashboard');
+  };
+
   return (
     <Container>
       <Typography variant="h3">Register</Typography>
       <StyledInput label="email"/>
       <StyledInput label="username"/>
       <StyledInput label="password" password/>
-      {/** to replace button with styled button */}
-      <button>register</button>
+      <Button onClick={navigateToDashboard}> Submit </Button>
     </Container>
   )
 }
