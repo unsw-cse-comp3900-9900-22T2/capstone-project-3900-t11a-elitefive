@@ -1,12 +1,19 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 // local
 import HexCell from './HexCell';
+import { useSocket } from '../global/GlobalWS';
+import { GameStateType, useGameState } from '../global/GlobalGameState';
 
 type Props = {
   width?: number;
   height?: number;
+  isStatic?: boolean;
+}
+
+type RowStyleProps = {
+  x_offset: number
 }
 
 const defaultBoard = [
@@ -25,9 +32,6 @@ const BoardContainer = styled.div`
   padding: 50px;
 `;
 
-type RowStyleProps = {
-  x_offset: number
-}
 // horizontal
 const RowContainer = styled.span<RowStyleProps>`
   margin-left: ${props => props.x_offset}px;
@@ -43,15 +47,32 @@ const ColumnContainer = styled.div`
 const DEFAULT_BOARD_WIDTH = 2000;
 // const DEFAULT_BOARD_HEIGHT = 800;
 
-export default function Board({width, height}: Props) {
-  const renderRow = (row: string[], x_offset: number) => {
+export default function Board({ width, height, isStatic }: Props) {
+
+  const { gamestate: GS } = useGameState();
+  const { socket: WS, emit } = useSocket();
+
+
+  
+  const renderRow = (row: GameStateType[], x_offset: number) => {
     return (
       <RowContainer x_offset={x_offset}>
-        {row.map((hex) => (
-          <HexCell
-            onClick={() => { console.log(hex)}}
-          />
-        ))}
+        {row.map(({ hexKey, hexState }: GameStateType) => {
+          return (
+            <HexCell
+              fill={hexState?.color ? hexState?.color : "black"}
+              onClick={() => {
+                // if isStatic does not do any of this Websocket stuff
+                if(!isStatic) {
+                  emit("moves", JSON.stringify({
+                    'uid': "abcd",
+                    'move': hexKey
+                  }))
+                }
+              }}
+            />
+          )
+        })}
       </RowContainer>
     )
   }
@@ -59,7 +80,8 @@ export default function Board({width, height}: Props) {
   const renderBoard = () => {
     const w = width ? width : DEFAULT_BOARD_WIDTH;
     // index is the row it is
-    return defaultBoard.map((row, index) => {
+
+    return GS?.map((row, index) => {
       // it works
       const x_offset = Math.abs((index+1)- 5) * w/40
       const y_offset = index * 90;

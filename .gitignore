@@ -1,1 +1,10 @@
 .DS_Store
+.gitignore
+backend/CMakeCache.txt
+backend/CMakeFiles/
+backend/build
+backend/out/
+.vs/
+.vscode/
+*.o
+board
