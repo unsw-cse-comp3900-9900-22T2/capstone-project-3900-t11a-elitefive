@@ -24,6 +24,12 @@ find_library(USOCKETS_LIB uSockets)
 find_path(UWEBSOCKETS_INCLUDE_DIRS "uwebsockets/App.h")
 include_directories(${UWEBSOCKETS_INCLUDE_DIRS})
 
+# linking nlohmann-json
+find_package(nlohmann_json CONFIG REQUIRED)
+set(nlohmann-json_IMPLICIT_CONVERSIONS OFF)
+# include_directories(${JSONCPP_INCLUDE_DIRS})
+# target_link_libraries(INTERFACE jsoncpp_object jsoncpp_static JsonCpp::JsonCpp)
+
 # linking pqxx
 #add_subdirectory(deps/pqxx build-pqxx)
 #find_package(libpqxx REQUIRED)
@@ -35,4 +41,5 @@ target_link_libraries(server PRIVATE
   ZLIB::ZLIB
   ${USOCKETS_LIB}
 #   pqxx
+  nlohmann_json::nlohmann_json
 )

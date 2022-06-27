@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 
 const defaultBoard = [
   ['a1', 'a2', 'a3', 'a4', 'a5'],
@@ -19,6 +19,9 @@ type Props = {
 type GSType = {
   gamestate: GameStateType[][] | null;
   setHexTileState: (tile: string, tilestate: TileState) => void;
+  playerJoin: (player: PlayerType) => void;
+  getPlayerInfo: (uid: string) => PlayerType | null;
+  playMove: (uid: string, move: string) => void;
 }
 
 type TileState = {
@@ -35,9 +38,19 @@ export type GameStateType = {
 export const GSContext = React.createContext<GSType>({
   gamestate: null,
   setHexTileState: () => {},
+  playerJoin: () => {},
+  getPlayerInfo: (uid: string) => ({uid: "", color: ""}),
+  playMove: () => {}
 });
 
+export type PlayerType = {
+  uid: string;
+  color: string;
+}
+
+
 export const GSProvider = ({ children }: Props) => {
+
   const [GameState, SetGameState] = useState<GameStateType[][]>(
     defaultBoard.map((col: string[]) => col.map(
       (hexKey: string) => { 
@@ -47,6 +60,8 @@ export const GSProvider = ({ children }: Props) => {
         }
       })
   ));
+  const Players = useRef<PlayerType[]>([]);
+
 
   const setHexTileState = (tile: string, tilestate: TileState) => {
     SetGameState(prev => prev.map((col: GameStateType[]) => col.map(
@@ -62,11 +77,42 @@ export const GSProvider = ({ children }: Props) => {
     )))
   }
 
+  const playerJoin = ({ uid, color}: PlayerType) => {
+    if(Players.current.find(p => p.uid == uid)) return;
+
+    Players.current.push({
+      uid,
+      color
+    });
+  }
+
+  const getPlayerInfo = (uid: string): PlayerType | null => {
+    const player = Players.current.find(p => p.uid == uid);
+    if(!player) return null;
+    return player
+  }
+
+  const playMove = (uid: string, move: string) => {
+    // first changes current square
+    console.log(Players.current);
+    const player = Players.current.find(p => p.uid == uid);
+    if(!player) return;
+
+    setHexTileState(move, {
+      user: player.uid,
+      color: player.color,
+    })
+
+  }
+
   return (
     <GSContext.Provider
       value={{
         gamestate: GameState,
-        setHexTileState
+        setHexTileState,
+        playerJoin,
+        getPlayerInfo,
+        playMove,
       }}
     >
       {children}
