@@ -3,9 +3,10 @@ import { useGameState, PlayerType } from './GlobalGameState';
 
 interface payload {
   // type: "init" | "terminating" | "acknowledged"
-  event: "move" 
-  contents?: string
+  event: "move" | "game_over"
+  contents?: string;
   tile?: string;
+  winner?: string;
 }
 
 type Props = {
@@ -28,7 +29,7 @@ export const WSProvider = ({ children }: Props) => {
   const [socket, setSocket] = useState<WebSocket| null>(null);
   const [socketConnected, setSocketConnected] = useState<boolean>(false);
   
-  const { setHexTileState, playerJoin, getPlayerInfo } = useGameState();
+  const { setHexTileState, playerJoin, getPlayerInfo, setWinner } = useGameState();
   
   useEffect(() => {
     const WS = new WebSocket(`ws://localhost:8080/ws/david`);
@@ -44,17 +45,23 @@ export const WSProvider = ({ children }: Props) => {
           // set gamestate tile to be red
           const move = payload.tile;
           if(move) {
-            
             // this is hardcoded for SINGLE PLAYER will need
             // backend player join broadcast to correctly work
-            playerJoin({uid: "BOT", color: "green"});
-            
+            playerJoin({uid: "BOT", color: "blue"});
             const playerColor = getPlayerInfo("BOT")?.color;
             if(!playerColor) break;
             setHexTileState(move, {
               user: "BOT",
               color: playerColor
             })
+          }
+          break;
+        }
+        case "game_over": {
+          const payload:payload = JSON.parse(message.data) as payload
+          const winner = payload.winner;
+          if(winner) {
+            setWinner(winner);
           }
           break;
         }
