@@ -37,13 +37,18 @@ auto Board::play_move(std::string move) -> bool {
 	// Retrieve hexagon
 	int tile_index = display_coord_to_flatten_index(move);
 	Hexagon &hex = find_tile(tile_index);
-	
+	return Board::play_move(hex);
+
+}
+
+auto Board::play_move(Hexagon &hex) -> bool {
 	// Place tile
 	int player = whose_turn();
 	hex.setTile(player);
-	end_turn(tile_index);
+	end_turn(hex.tileLocation());
 	return true;
 }
+
 
 auto Board::end_turn(int move) -> void {
 	++nmoves_;	// Register that a move has been played
@@ -64,6 +69,20 @@ auto Board::end_turn(int move) -> void {
 
 	// Game still in play - Update game stats
 	player_turn_ = (player_turn_ + 1) % num_players();
+}
+
+auto Board::view_available_tiles() const -> std::vector<Hexagon> const {
+	// TODO: THIS IS WRONG AND MAKES COPIES OF HEXAGON INSTEAD OF REFERENCES
+	// TODO: REPLACE WITH STL ALGO INSTEAD
+	auto tiles = std::vector<Hexagon>{};
+	for (auto const& tile : boardstate_) {
+		if (!tile.valid()) continue;
+		if (!tile.blank()) continue;
+		tiles.push_back(tile);
+	}
+
+	// auto const all_tiles = std::move(tiles);
+	return tiles;
 }
 
 

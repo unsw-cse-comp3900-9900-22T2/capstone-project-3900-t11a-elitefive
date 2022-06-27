@@ -22,9 +22,16 @@ class Board {
 
 		// Game engine functions
 		auto play_move(std::string move) -> bool;
+		auto play_move(Hexagon &hex) -> bool;
+
 		auto game_status() -> Board::state const& {return gamestate_;};
+		auto view_available_tiles() const -> std::vector<Hexagon> const;
 
 		auto find_tile(int index) -> Hexagon &;
+		auto find_tile(Hexagon hex) -> Hexagon & {
+			// TODO -> Remove this dump stupid hack because of view_available_tiles()
+			return boardstate_[hex.tileLocation()];
+		}
 
 		// Simple getters
 		auto num_players() -> int {return nplayers_;};
