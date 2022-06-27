@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components';
 import {Routes, Route, useNavigate} from 'react-router-dom';
+import { Box } from '@mui/material';
 
 // local
 import { GSProvider } from '../global/GlobalGameState';
@@ -10,6 +11,8 @@ import YavalathButton from '../components/YavalathButton';
 import BasicCard, {Card2, Card3} from '../components/ReusableCard';
 import Typography from '@mui/material/Typography';
 import Button, {Button2} from '../components/ReusableButton';
+import PopupContainer from '../components/PopupContainer';
+import ReusableButton from '../components/ReusableButton';
 
 type Props = {}
 
@@ -36,11 +39,19 @@ const Container3 = styled.div`
 `;
 
 export default function Gamepage({}: Props) {
+  const [popUp, setPopUp] = useState(false);
   const navigate = useNavigate();
-  const navigateToDashboard = () => {
+
+
+  const handleRetire = () => {
     // 👇️ navigate to /contacts
-    navigate('/dashboard');
+    // navigate('/dashboard');
+    setPopUp(true);
   };
+
+  const handleReturn = () => {
+    navigate('/dashboard');
+  }
 
   return (
     <GSProvider>
@@ -75,12 +86,33 @@ export default function Gamepage({}: Props) {
                 width={350} 
                 height={40}
                 background="red"
-                onClick={navigateToDashboard}
+                onClick={handleRetire}
               >
                 Retire
               </Button>
             </Container3>
           </Container2>
+          {popUp && (
+            <PopupContainer>
+              <Box
+                width="100%" 
+                height="100%" 
+                display="flex" 
+                flexDirection="column" 
+                justifyContent="center" 
+                alignItems="center"
+                gap="30px"
+              >
+                <Typography variant="h3">Game Over</Typography>
+                <ReusableButton 
+                  onClick={handleReturn}
+                  background="var(--accent-dark)"
+                >
+                  to dashboard
+                </ReusableButton>
+              </Box>
+            </PopupContainer>
+          )}
         </Container>
       </WSProvider>
     </GSProvider>
