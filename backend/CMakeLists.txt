@@ -11,7 +11,7 @@ file(GLOB all_SRCS
         server.cpp
 )
 # link pqxx with classic flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpqxx -lpq")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpqxx -lpq")
 
 # Create project "simple_example"
 set(CMAKE_CXX_STANDARD 17)  # Enable c++17 standard
@@ -34,5 +34,5 @@ add_executable(server ${all_SRCS})
 target_link_libraries(server PRIVATE
   ZLIB::ZLIB
   ${USOCKETS_LIB}
-  pqxx
+#   pqxx
 )

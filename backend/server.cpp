@@ -7,7 +7,7 @@
 #include <memory>
 #include "src/board.hpp"
 #include "db_functions.hpp"
-#include <pqxx/pqxx>
+// #include <pqxx/pqxx>
 
 void RelaySocket(){
 	struct SocketData{
@@ -26,11 +26,11 @@ void RelaySocket(){
 		res->end("{\"name\": \"david\"}");
 	});
 
-	app.get("/db", [](auto *res, auto *req) {
-    // test inserting into db
-    db_insert_user("jessie" ,"jessie@jessie.com", "meowth");
-    res->end("pgg");
-  })
+	// app.get("/db", [](auto *res, auto *req) {
+  //   // test inserting into db
+  //   db_insert_user("jessie" ,"jessie@jessie.com", "meowth");
+  //   res->end("pgg");
+  // })
 
 
 	// Functions we have available to in socketing
