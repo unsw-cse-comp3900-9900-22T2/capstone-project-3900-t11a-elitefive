@@ -7,6 +7,7 @@ import {StyledButton} from '../components/ReusableButton-styled';
 import Button, {Button2, LargeButton} from '../components/ReusableButton';
 import {Routes, Route, useNavigate} from 'react-router-dom';
 import YavalathButton from '../components/YavalathButton';
+import ProfileWidget from '../components/ProfileWidget';
 
 type Props = {}
 
@@ -43,6 +44,7 @@ export default function Dashboard({}: Props) {
 
   return (
     <Container>
+      <ProfileWidget name="name"/>
       <Container1>
         <LargeButton onClick={navigateToGamepage}>
           <Typography variant="h3">{"Play AI"}</Typography>
