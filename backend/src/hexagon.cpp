@@ -19,6 +19,11 @@ auto Hexagon::valid() const -> bool {
 	return true;
 }
 
+auto Hexagon::blank() const -> bool {
+	if (used_ != -1) return false;
+	return true;
+}
+
 auto Hexagon::setTile(int player) -> void {
 	used_ = player;
 }
