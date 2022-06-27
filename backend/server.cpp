@@ -6,6 +6,8 @@
 // #include <uwebsockets/AsyncSocket.h>
 #include <memory>
 #include "src/board.hpp"
+#include "db_functions.hpp"
+#include <pqxx/pqxx>
 
 void RelaySocket(){
 	struct SocketData{

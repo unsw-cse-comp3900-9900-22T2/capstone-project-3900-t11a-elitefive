@@ -1,13 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
-import { StyledButton, buttonProps } from './ReusableButton-styled';
+import { StyledButton, StyledLargeButton, buttonProps } from './ReusableButton-styled';
 import { TextField, Typography } from '@mui/material'; 
+
 
 
 type Props = {
   children?: React.ReactElement | any;
   onClick?: (...args: any) => void;
-  label: string;
 } & buttonProps;
 
 const Container = styled.div`
@@ -15,19 +15,41 @@ const Container = styled.div`
   flex-direction: column;
 `;
 
-const StyledTextField = styled(TextField)`
-  background: var(--textbox-dark);
-  width: 400px;
-`;
+ 
 
-export default function Button({ label, children, onClick, ...styleProps }: Props) {
+export default function Button({ children, onClick, ...styleProps }: Props) {
   return (
     <StyledButton
       onClick={onClick}
       {...styleProps}
     >
-      {children}
-      <Typography variant="subtitle1">{label}</Typography>
+      <Typography variant="subtitle1">{children}</Typography>
     </StyledButton>
   );
+}
+
+export function Button2({ children, onClick, ...styleProps }: Props) {
+    return (
+      <StyledButton
+        onClick={onClick}
+        {...styleProps}
+      >
+        <Container>
+            {children}
+        </Container>
+      </StyledButton>
+    );
+}
+
+export function LargeButton({ children, onClick, ...styleProps }: Props) {
+    return (
+      <StyledLargeButton
+        onClick={onClick}
+        {...styleProps}
+      >
+        <Container>
+            {children}
+        </Container>
+      </StyledLargeButton>
+    );
 }

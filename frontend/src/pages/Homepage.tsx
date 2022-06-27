@@ -4,7 +4,8 @@ import Board from '../components/Board';
 import { Typography } from '@mui/material';
 import StyledInput from '../components/StyledInput';
 import {StyledButton} from '../components/ReusableButton-styled';
-import Button from '../components/ReusableButton';
+import Button, {Button2} from '../components/ReusableButton';
+import {Routes, Route, useNavigate} from 'react-router-dom';
 
 type Props = {}
 
@@ -27,7 +28,7 @@ flex-direction: column;
 
 justify-content: center;
 align-items: center;
-grid-gap: 30px;
+grid-gap: 15px;
 `
 
 const Container2  = styled.div`
@@ -41,17 +42,39 @@ const Container2  = styled.div`
   grid-gap: 30px;
 `
 
+
+
 export default function Homepage({}: Props) {
+  const navigate = useNavigate();
+
+  const navigateToLogin = () => {
+    // 👇️ navigate to /contacts
+    navigate('/login');
+  };
+
+  const navigateToRegister = () => {
+    // 👇️ navigate to /contacts
+    navigate('/register');
+  };
+
+  const navigateToDashboard = () => {
+    // 👇️ navigate to /contacts
+    navigate('/dashboard');
+  };
+
   return (
     <Container>
       <Board isStatic={true}/>
       <Container1>
         <Typography variant="h1">Yavalath</Typography>
         <Container2>
-          <Button label="Login"></Button>
-          <Button label="Register"></Button>
+          <Button onClick={navigateToLogin}>Login</Button>
+          <Button onClick={navigateToRegister}>Register</Button>
         </Container2>
-        <Button label="Play Now"></Button>
+        <Button2 width={270} height={100} onClick={navigateToDashboard}>
+          <Typography variant="caption">{"Already logged in?"}</Typography>
+          <Typography variant="h4">{"Play Now!"}</Typography>
+        </Button2>
       </Container1>
       
     </Container> 

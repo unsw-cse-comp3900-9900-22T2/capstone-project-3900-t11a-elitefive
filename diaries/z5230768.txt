@@ -77,3 +77,21 @@ Throughout the week I worked on various tasks for the report.
 
 
 
+Week 4
+Team meeting on Tuesday - Everyone is official setup using docker and can access frontend and backend.
+Tickets and tasks have been distributed amongst all of us.
+- Jacky X and Yirong are doing frontend work.
+- Sage and Jacky J are doing Database work.
+- I am doing game logic backend work.
+
+I mainly worked on backend logic this week. I created the yavalath board logic which stores which player
+has placed a hex on the tile. I also set up some vector math to aid in quickly navigating the board to check
+for game win/loss conditions. Jacky J used this system to write the game over logic. This system will be useful
+for AI work.
+
+I worked on setting up socketing between client and server. This will need to be used during the game to give
+live updates to all clients who are participating.
+
+Throughout the week, we all participated in many discord calls to go over what needed to be done.
+
+Next week we need to demo and will be working more on functionality to do with networking and AI.
