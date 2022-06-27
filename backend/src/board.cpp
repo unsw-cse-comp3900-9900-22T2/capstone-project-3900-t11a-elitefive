@@ -15,16 +15,14 @@ auto is_loss(std::vector<Hexagon> tiles, int move, int player) -> bool;
 auto is_connected(std::vector<Hexagon> tiles, int move, int player, int n) -> bool;
 auto check_connected_n(std::vector<Hexagon> tiles, int player, int n, axial::vector vec, axial::vector dir, bool pos, int &connected) -> bool;
 auto coord_to_index(std::string s) -> int;
+auto gameloop() -> void;
 
+auto main(void) -> int {
+	gameloop();
+	return 0;
+}
 
-// // Return the tile location
-// // -1 indicates that the move is not valid
-// auto move_converter(std::string move) -> int {
-// 	std::cout << move << '\n';
-// 	// TODO: Convert into a valid move to pass to the board
-// }
-
-int main(void) {
+auto gameloop() -> void {
 	auto board = generate_classic_board();
 	auto player = 0;
 	bool ongoing = true;
@@ -47,7 +45,7 @@ int main(void) {
 		moves++;
 	}
 	std::cout << "Draw\n";
-	return 0;
+	return;
 }
 
 auto generate_classic_board() -> std::vector<Hexagon> {
