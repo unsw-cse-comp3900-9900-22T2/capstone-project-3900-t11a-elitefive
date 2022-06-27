@@ -16,7 +16,6 @@ auto is_win(std::vector<Hexagon> tiles, int move, int player) -> bool;
 auto is_loss(std::vector<Hexagon> tiles, int move, int player) -> bool;
 auto is_connected(std::vector<Hexagon> tiles, int move, int player, int n) -> bool;
 auto check_connected_n(std::vector<Hexagon> tiles, int player, int n, axial::vector vec, axial::vector dir, bool pos, int &connected) -> bool;
-auto display_coord_to_flatten_index(std::string s) -> int;
 auto gameloop() -> void;
 
 Board::Board(int nplayers, std::vector<int> uids)
@@ -83,6 +82,24 @@ auto Board::view_available_tiles() const -> std::vector<Hexagon> const {
 
 	// auto const all_tiles = std::move(tiles);
 	return tiles;
+}
+
+static auto display_coord_to_flatten_index(std::string s) -> int {
+	int letter = s[0];
+	if (letter >= 'a' && letter <= 'i') {
+		int row = letter - 'a';
+		int column = stoi(s.substr(1)) - 1;
+		int index = (row <= 4 ? (row * 9) : (row - 4) * 10 + 36) + column;
+		return index;
+	}
+	return -1;
+}
+
+static auto flatten_index_to_display_coord(int i) -> std::string {
+	int row = i / 9;
+	int column = (i % 9) + 1 - ((i < 45) ? 0 : row - 4);
+	char letter = 'a' + row;
+	return letter + std::to_string(column);
 }
 
 
@@ -253,15 +270,4 @@ auto check_connected_n(std::vector<Hexagon> tiles, int player, int n, axial::vec
 			}
 		}
 	}
-}
-
-auto display_coord_to_flatten_index(std::string s) -> int {
-	int letter = s[0];
-	if (letter >= 'a' && letter <= 'i') {
-		int row = letter - 'a';
-		int column = stoi(s.substr(1)) - 1;
-		int index = (row <= 4 ? (row * 9) : (row - 4) * 10 + 36) + column;
-		return index;
-	}
-	return -1;
 }
