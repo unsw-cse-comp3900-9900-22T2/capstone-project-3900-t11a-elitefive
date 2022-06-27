@@ -20,3 +20,16 @@ Week 2
  - I had completed the User Story content for Epics 2-8.
  - Jacky X was working on the architectural framework.
  - David completed the flowhcarts and the background and description for the report.
+
+Week 4
+- I have completed the basic UI for the following pages:
+  - Home/Welcome
+  - Login
+  - Register
+  - Dashboard
+  - Game
+- I have also created reusable Button and Card components with other components needed in the UI
+- Jacky X had taught me the React language and how to start the UI
+  - Jacky X has been working on the Network as well as the connectivity across the full stack
+- David and Jacky is working on the backend including game logic
+- Sage has been working on the Database and Authorisation/Authentication
