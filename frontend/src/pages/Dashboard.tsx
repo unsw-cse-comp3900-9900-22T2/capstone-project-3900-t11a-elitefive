@@ -8,6 +8,7 @@ import Button, {Button2, LargeButton} from '../components/ReusableButton';
 import {Routes, Route, useNavigate} from 'react-router-dom';
 import YavalathButton from '../components/YavalathButton';
 import ProfileWidget from '../components/ProfileWidget';
+import ScrollWidget from '../components/ScrollWidget';
 
 type Props = {}
 
@@ -56,6 +57,7 @@ export default function Dashboard({}: Props) {
           <Typography variant="h3">{"Replays"}</Typography>
         </LargeButton>
       </Container1>
+      <ScrollWidget variant="bottom"/>
     </Container>
   )
 }
