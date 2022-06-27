@@ -41,8 +41,11 @@ auto Board::play_move(std::string move) -> bool {
 }
 
 auto Board::play_move(Hexagon &hex) -> bool {
-	// Place tile
 	int player = whose_turn();
+	// Check if the tile is available.
+	if (!is_available_tile(hex)) {
+		return false;
+	}
 	hex.setTile(player);
 	end_turn(hex.tileLocation());
 	return true;
@@ -82,6 +85,16 @@ auto Board::view_available_tiles() const -> std::vector<Hexagon> const {
 
 	// auto const all_tiles = std::move(tiles);
 	return tiles;
+}
+
+auto Board::is_available_tile(Hexagon &hex) -> bool {
+	auto available = view_available_tiles();
+	for (auto const &h : available) {
+		if (h.tileLocation() == hex.tileLocation()) {
+			return true;
+		}
+	}
+	return false;
 }
 
 static auto display_coord_to_flatten_index(std::string s) -> int {
@@ -270,4 +283,5 @@ auto check_connected_n(std::vector<Hexagon> tiles, int player, int n, axial::vec
 			}
 		}
 	}
+	return false;
 }

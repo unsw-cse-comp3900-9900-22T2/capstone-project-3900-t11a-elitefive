@@ -26,6 +26,7 @@ class Board {
 
 		auto game_status() -> Board::state const& {return gamestate_;};
 		auto view_available_tiles() const -> std::vector<Hexagon> const;
+		auto is_available_tile(Hexagon &hex) -> bool;
 
 		auto find_tile(int index) -> Hexagon &;
 		auto find_tile(Hexagon hex) -> Hexagon & {
