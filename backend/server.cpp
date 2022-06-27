@@ -54,7 +54,9 @@ void RelaySocket(){
 			std::string datastring = json["data"];
 			auto data = nlohmann::json::parse(datastring);
 			std::string move = data["move"];
-			board->play_move(move);
+			if (!board->play_move(move)) {
+				return;
+			}
 
 			// 2. AI Move
 			// AI/Computer generate move and publish.
@@ -75,9 +77,9 @@ void RelaySocket(){
 					winner = "";
 				} else if (board->whose_turn() == 1 && state == Board::state::WIN
 						|| board->whose_turn() == 0 && state == Board::state::LOSS) {
-					winner = "PLAYER";
-				} else {
 					winner = "COMPUTER";
+				} else {
+					winner = "PLAYER";
 				}
 				ws->publish("ROOM1", "{\"event\": \"game_over\", \"winner\": \"" + winner + "\"}", opCode);
 			}

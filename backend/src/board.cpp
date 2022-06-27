@@ -43,7 +43,8 @@ auto Board::play_move(std::string move) -> bool {
 auto Board::play_move(Hexagon &hex) -> bool {
 	int player = whose_turn();
 	// Check if the tile is available.
-	if (!is_available_tile(hex)) {
+	if (game_status() != Board::state::ONGOING || !is_available_tile(hex)) {
+		std::cout << "Unavailable" << std::endl;
 		return false;
 	}
 	hex.setTile(player);
