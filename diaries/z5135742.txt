@@ -10,3 +10,22 @@ This week we had a group meeting on Tuesday to work on the final functionality o
 
 On Saturday I had a database meeting with Jacky K and David where we went over the best fitting ways to represent aspects of the game, and generated some ER and relational diagrams for the database.
 
+Week 3
+
+Next week the proposal is due which is worth 10% so we spent a good chunk of time working on that. Me & Jackie J worked on the initial epic stories and user stories in the tutorial. 
+
+Later in the week I made ER and relational database diagrams for the systems architecture part of the report, and wrote a description. I also made a schema for the database
+
+Over the weekeend we had a number of meetings to complete and edit the report, and hand it in on Sunday night.
+
+
+Week 4
+
+The first sprint is due next week so we all spent a lot of time coding and collaboratig in our discord. 
+
+I wrote come c++ files containing functions to connect to a postrgres instance, insert & retrieve data using the schema from the previous week, and perform a password hash.
+
+Jackie X had made a docker container system for the frontent & backing & I added a postrgres databse to the system & added it into the dockerfile. I loaded the schema from earlier and moved my code into the backend. I found that the hashing library I used for the password wasn't effective, so that needs to be changed. 
+
+finally, I wrote some code to accept post requests in json format from the frontend, parse them and pipe them to the database, which is the link betwee nthe 3 docker containers.
+
