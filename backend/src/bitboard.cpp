@@ -30,7 +30,7 @@ auto BitBoard::isSet(int index) -> bool {
 auto main(void) -> int {
 	auto const board_width = 9;
 	auto row = 8;
-	auto col = 8;
+	auto col = 0;
 	auto res = (row == 0) ? col : ((row * board_width) + col - ((row < 4) ? 10 - (4-row)*(5-row)/2 : (10 + ((row - 4)*(row - 3)/2))));
 	
 	std::cout << res << '\n';

@@ -1,8 +1,8 @@
-// #include <vector>
-// #include <iostream>
+#include <vector>
+#include <iostream>
 
-// #include "board.hpp"
-// #include "computer.hpp"
+#include "board.hpp"
+#include "computer.hpp"
 
 // auto main(void) -> int {
 // 	auto uids = std::vector<int>{100, 200};
@@ -31,3 +31,10 @@
 
 // 	return 0;
 // }
+
+auto main(void) -> int {
+	auto vec = axial::vector{-4,0,4};
+	std::cout << axial::vector::index(vec) << '\n';
+	auto board = Board(2, uids);
+	
+}

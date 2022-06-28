@@ -6,6 +6,16 @@
 
 namespace axial {
 	class vector {
+		public:
+			// Gives you the flatten hex index when given a vector
+			static auto index(vector const& vec) -> int {
+				auto const row = vec.q() + 4;
+				auto const col = -vec.s() + 4;
+				// Flatten the hex board in a straight line
+				// Essentially used n*(n+1)/2 formula to work of triangle offset for upper and lower half of hex board
+				return (row == 0) ? col : ((row * 9) + col - ((row < 4) ? 10 - (4-row)*(5-row)/2 : (10 + ((row - 4)*(row - 3)/2))));
+			}
+
 		private:
 			int q_;
 			int r_;
