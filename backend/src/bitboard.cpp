@@ -28,22 +28,28 @@ auto BitBoard::isSet(int index) -> bool {
 }
 
 auto main(void) -> int {
-	auto p1 = BitBoard();
-	auto p2 = BitBoard();
-	// p1.set(1);
-	// p1.set(63);
-	p1.set(10);
-	p2.set(0);
-	std::cout << p1.isSet(10) << '\n';
-	std::cout << p2.isSet(10) << '\n';
+	auto const board_width = 9;
+	auto row = 8;
+	auto col = 8;
+	auto res = (row == 0) ? col : ((row * board_width) + col - ((row < 4) ? 10 - (4-row)*(5-row)/2 : (10 + ((row - 4)*(row - 3)/2))));
+	
+	std::cout << res << '\n';
+	// auto p1 = BitBoard();
+	// auto p2 = BitBoard();
+	// // p1.set(1);
+	// // p1.set(63);
+	// p1.set(10);
+	// p2.set(0);
+	// std::cout << p1.isSet(10) << '\n';
+	// std::cout << p2.isSet(10) << '\n';
 
-	auto available = ~(p1 ^ p2);
-	std::cout << available << '\n';
-	std::cout << available.isSet(5) << '\n';
+	// auto available = ~(p1 ^ p2);
+	// std::cout << available << '\n';
+	// std::cout << available.isSet(5) << '\n';
 
-	for (int i = 0; i < 64; ++i) {
-		std::cout << i << ": " << available.isSet(i) << '\n';
-	}
+	// for (int i = 0; i < 64; ++i) {
+	// 	std::cout << i << ": " << available.isSet(i) << '\n';
+	// }
 
 
 	return 0;
