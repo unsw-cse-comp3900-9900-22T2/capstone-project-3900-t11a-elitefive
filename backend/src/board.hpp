@@ -11,6 +11,10 @@
 class Board {
 	public:
 		// enum class state { ONGOING, WIN, LOSS, DRAW };
+		auto static axis(int tile, axial::vector unit_direction) -> BitBoard;
+		auto static axis(axial::vector anchor_point, axial::vector unit_direction) -> BitBoard;
+		auto static check_n(BitBoard tiles, BitBoard diagonal, int n) -> bool;
+
 	private:
 		int nplayers_;
 		std::vector<BitBoard> player_boards_;
@@ -19,14 +23,14 @@ class Board {
 
 		auto set(int location, int player) -> void;
 		auto unset(int location, int player) -> void;
-		
+
 		auto player_at(int location) const -> int;
 		auto player_tiles(int player) const -> BitBoard;
 		auto free_tiles() -> BitBoard;
 		auto free_tiles(int tile, axial::vector unit_direction) -> BitBoard;
 		auto free_tiles(axial::vector anchor_point, axial::vector unit_direction) -> BitBoard;
 
-
+		auto num_players() -> int;
 
 		friend auto operator<<(std::ostream& os, Board const& board) -> std::ostream& {
 			auto const board_width = 9;	// Static board size assumption

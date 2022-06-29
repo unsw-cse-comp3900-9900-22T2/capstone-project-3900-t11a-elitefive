@@ -39,6 +39,7 @@ auto BitBoard::binary_to_vector() const -> std::vector<int> {
 auto BitBoard::binary_to_vector(BitBoard const& mask) const -> std::vector<int> {
 	auto set_tiles = std::vector<int>{};
 	auto tiles_to_check = *this & mask;
+	
 	for (int i = 0; i < 64; ++i) {
 		if (tiles_to_check.isSet(i)) set_tiles.push_back(i);
 	}

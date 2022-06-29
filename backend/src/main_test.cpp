@@ -3,6 +3,8 @@
 
 #include "board.hpp"
 #include "computer.hpp"
+#include "game.hpp"
+
 // auto main(void) -> int {
 // 	auto uids = std::vector<int>{100, 200};
 // 	auto board = Board(2, uids);
@@ -32,22 +34,56 @@
 // }
 
 auto main(void) -> int {
-	auto vec = axial::vector{-1,0,1};
-	std::cout << "Index: " << axial::vector::index(vec) << '\n';
-	auto board = Board(2);
-	board.set(30, 1);
-	board.set(15, 0);
-	board.set(45, 1);
-	board.set(41, 0);
-	board.set(4, 1);
+	// auto vec = axial::vector{-1,0,1};
+	// std::cout << "Index: " << axial::vector::index(vec) << '\n';
+	// auto board = Board(2);
+	// board.set(30, 1);
+	// board.set(15, 0);
+	// board.set(45, 1);
+	// board.set(41, 0);
+	// board.set(4, 1);
+	// board.set(38, 1);
 
-	std::cout << board << '\n';	
-	std::cout << board.free_tiles() << '\n';	
 
-	std::cout << board.free_tiles(30, axial::vector::uqr()) << '\n';
+	// auto p1 = board.player_tiles(1);
+	// auto diagonal = Board::axis(4, axial::vector::us());
+	// std::cout << "Three: " << Board::check_n(p1, diagonal, 3) << '\n';
 
-	for (auto i : board.free_tiles(15, axial::vector::ur()).binary_to_vector()) {
-		std::cout << "i: " << i << '\n';
-	}
+
+	auto game = Game(2);
+	std::cout << game << '\n';
+	game.play(4);
+	std::cout << game << '\n';
+	game.play(2);
+	std::cout << game << '\n';
+	game.play(12);
+	std::cout << game << '\n';
+	game.play(0);
+	std::cout << game << '\n';
+	game.play(25);
+	std::cout << game << '\n';
+	game.play(3);
+	std::cout << game << '\n';
+	game.play(26);
+	std::cout << game << '\n';
+	game.play(1);
+	std::cout << game << '\n';
+	std::cout << (game.status() == Game::state::WIN) << '\n';
+
+
+
+	// std::cout << p1 << '\n';
+	// std::cout << diagonal << '\n';
+	// std::cout << (p1 & diagonal) << '\n';
+
+
+	// std::cout << board << '\n';	
+	// std::cout << board.free_tiles() << '\n';	
+
+	// std::cout << board.free_tiles(30, axial::vector::uqr()) << '\n';
+
+	// for (auto i : board.free_tiles(15, axial::vector::ur()).binary_to_vector()) {
+	// 	std::cout << "i: " << i << '\n';
+	// }
 
 }
