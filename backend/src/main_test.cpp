@@ -3,7 +3,6 @@
 
 #include "board.hpp"
 #include "computer.hpp"
-
 // auto main(void) -> int {
 // 	auto uids = std::vector<int>{100, 200};
 // 	auto board = Board(2, uids);
@@ -33,8 +32,22 @@
 // }
 
 auto main(void) -> int {
-	auto vec = axial::vector{-4,0,4};
-	std::cout << axial::vector::index(vec) << '\n';
-	auto board = Board(2, uids);
-	
+	auto vec = axial::vector{-1,0,1};
+	std::cout << "Index: " << axial::vector::index(vec) << '\n';
+	auto board = Board(2);
+	board.set(30, 1);
+	board.set(15, 0);
+	board.set(45, 1);
+	board.set(41, 0);
+	board.set(4, 1);
+
+	std::cout << board << '\n';	
+	std::cout << board.free_tiles() << '\n';	
+
+	std::cout << board.free_tiles(30, axial::vector::uqr()) << '\n';
+
+	for (auto i : board.free_tiles(15, axial::vector::ur()).binary_to_vector()) {
+		std::cout << "i: " << i << '\n';
+	}
+
 }

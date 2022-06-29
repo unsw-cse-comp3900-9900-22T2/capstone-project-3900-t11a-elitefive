@@ -9,11 +9,7 @@ namespace axial {
 		public:
 			// Gives you the flatten hex index when given a vector
 			static auto index(vector const& vec) -> int {
-				auto const row = vec.q() + 4;
-				auto const col = -vec.s() + 4;
-				// Flatten the hex board in a straight line
-				// Essentially used n*(n+1)/2 formula to work of triangle offset for upper and lower half of hex board
-				return (row == 0) ? col : ((row * 9) + col - ((row < 4) ? 10 - (4-row)*(5-row)/2 : (10 + ((row - 4)*(row - 3)/2))));
+				return (((vec.q() + 8)*(vec.q() + 9)) / 2) - (6 + vec.s()) - ((vec.q() > 0) ? vec.q() * vec.q() : 0);
 			}
 
 		private:
@@ -33,6 +29,7 @@ namespace axial {
 
 			// Constructors
 			vector(int q, int r, int s);					// Regular Constructors
+			vector(int flatten_index);						// 
 			vector(vector const& vec);						// Copy Constructor
 			vector(vector&& vec);							// Move construtor
 			auto operator=(vector const& vec) -> vector&;	// Copy Assignment
@@ -41,6 +38,7 @@ namespace axial {
 			auto q() const& -> int;
 			auto r() const& -> int;
 			auto s() const& -> int;
+			auto distance() const& -> int;
 
 			~vector() = default;
 
@@ -77,6 +75,7 @@ namespace axial {
 				if (v1.q_ != v2.q_) return false;
 				if (v1.r_ != v2.r_) return false;
 				if (v1.s_ != v2.s_) return false;
+				return true;
 			}
 
 			friend auto operator!=(vector const& v1, vector const& v2) -> bool {
