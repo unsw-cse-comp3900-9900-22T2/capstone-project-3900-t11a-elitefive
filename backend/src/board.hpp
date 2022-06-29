@@ -23,6 +23,8 @@ class Board {
 		// Game engine functions
 		auto play_move(std::string move) -> bool;
 		auto play_move(Hexagon &hex) -> bool;
+		auto is_valid_move(std::string move) -> bool;
+		auto is_valid_move(Hexagon &hex) -> bool;
 
 		auto game_status() -> Board::state const& {return gamestate_;};
 		auto view_available_tiles() const -> std::vector<Hexagon> const;
