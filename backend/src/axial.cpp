@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <algorithm> 	// For std::swap()
 #include <utility>		// For std::exchange()
+#include <cmath>		// For std::abs()
 
 #include "axial.hpp"
 
@@ -13,10 +14,32 @@ namespace axial {
 	, r_{r}
 	, s_{s}
 	{
-		assert(q + r + s == 0); // REMOVE
+		assert(q + r + s == 0); // TODO: REMOVE
 	}
 
-	// Paperwork momement - IE RULE OF 5
+	vector::vector(int flatten_index)
+	:q_{5}
+	,r_{5}
+	,s_{5}
+	{
+		auto calculate_q = [](int index) {
+			if (index <=  4) return -4;
+			if (index <= 10) return -3;
+			if (index <= 17) return -2;
+			if (index <= 25) return -1;
+			if (index <= 34) return  0;
+			if (index <= 42) return  1;
+			if (index <= 49) return  2;
+			if (index <= 55) return  3;
+							 return  4;
+		};
+		q_ = calculate_q(flatten_index);
+		s_ = ((q_ + 8) * (q_ + 9)) / 2 - 6 - flatten_index - ((q_ > 0) ? q_ * q_ : 0);
+		r_ = -q_-s_;
+	}
+
+
+	// Paperwork moment - IE RULE OF 5
 	vector::vector(vector const& vec)				// Copy Constructor
 	: vector::vector(vec.q(), vec.r(), vec.s())
 	{}
@@ -70,14 +93,19 @@ namespace axial {
 
 	// Helper functions
 	auto vector::q() const& -> int {
-		return this->q_;
+		return q_;
 	}
 	auto vector::r() const& -> int {
-		return this->r_;
+		return r_;
 	}
 	auto vector::s() const& -> int {
-		return this->s_;
+		return s_;
 	}
+
+	auto vector::distance() const& -> int {
+		return (std::abs(q_) + std::abs(r_) + std::abs(s_)) / 2;
+	}
+
 
 	auto vector::uq() -> vector {
 		return vector{ 0, 1,-1};

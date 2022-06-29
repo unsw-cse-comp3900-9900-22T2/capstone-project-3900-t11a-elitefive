@@ -3,16 +3,16 @@
 #include <random>
 
 #include "computer.hpp"
-#include "board.hpp"
+#include "game.hpp"
 
-Computer::Computer(Board board)
-: board_{board}
+Computer::Computer(Game game)
+: game_{game}
 {}
 
-auto Computer::make_random_move() -> Hexagon& {
-	auto const selections = board_.view_available_tiles();
+auto Computer::make_random_move() -> int {
 	
-	auto random_selection = std::vector<Hexagon>{};
+	auto const selections = game_.free_tiles().binary_to_vector();
+	auto random_selection = std::vector<int>{};
 	std::sample(
 		selections.begin(),
 		selections.end(),
@@ -20,7 +20,6 @@ auto Computer::make_random_move() -> Hexagon& {
 		1,
 		std::mt19937{std::random_device{}()}
 	);
-	// std::cout << random_selection.front() << '\n';
-	// TODO: This is broken Broken
-	return board_.find_tile(random_selection.front());
+	// std::cout << "Random selection: " << random_selection.front() << '\n';
+	return random_selection.front();
 }

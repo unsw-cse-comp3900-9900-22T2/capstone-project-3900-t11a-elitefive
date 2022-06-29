@@ -40,46 +40,56 @@ void RelaySocket(){
 	// ws->isSubscribed("moves") // See who is subbed to the "moves" room
 	// ws->getRemoteAddressAsText() // Gets address of the person
 	// ws->send("Hello there boi"); // Option to send message back to client only
-	std::unique_ptr<Board> board = nullptr;
+	std::unique_ptr<Game> game = nullptr;
 
 	auto websocket = app.ws<SocketData>("/ws/david",uWS::TemplatedApp<false>::WebSocketBehavior<SocketData> {
-		.open = [&board](auto *ws) {
-			// When client connects, subscribe them to the 'moves' notification board
+		.open = [&game](auto *ws) {
+			// When client connects, subscribe them to the 'moves' notification game
 			ws->subscribe("ROOM1");
-			board = std::make_unique<Board>(2, std::vector<int>{100,0});
+			game = std::make_unique<Game>(2);
 		},
-		.message = [&board](auto *ws, std::string_view message, uWS::OpCode opCode){
+		.message = [&game](auto *ws, std::string_view message, uWS::OpCode opCode){
 			// 1. Parsing JSON to update board backend
 			auto json = nlohmann::json::parse(message);
-			std::string event = json["event"];
-			if (event == "move") {
-				std::string datastring = json["data"];
-				auto data = nlohmann::json::parse(datastring);
-				std::string move = data["move"];
-				if (!board->is_valid_move(move)) {
-					return;
+			std::string datastring = json["data"];
+			auto data = nlohmann::json::parse(datastring);
+			std::string move = data["move"];
+			if (!game->play(move)) {
+				return;
+			}
+			ws->publish("ROOM1", "{\"event\": \"moveconfirm\", \"tile\": \"" + move + "\"}", opCode);
+
+			// 2. AI Move
+			// AI/Computer generate move and publish.
+			auto computer = Computer(*game);
+			if (game->status() == Game::state::ONGOING) {
+				auto move = computer.make_random_move();
+				game->play(move);
+				std::string ai_move = Game::indexToCoord(move);
+				ws->publish("ROOM1", "{\"event\": \"move\", \"tile\": \"" + ai_move + "\"}", opCode);
+			}
+			std::cout << *game << '\n';
+			// 3. If the game's over, publish game end
+			Game::state state = game->status();
+			if (state != Game::state::ONGOING) {
+				std::string winner;
+				if (state == Game::state::DRAW) {
+					winner = "";
+				} else if (game->whose_turn() == 1 && state == Game::state::WIN
+						|| game->whose_turn() == 0 && state == Game::state::LOSS) {
+					winner = "COMPUTER";
+				} else {
+					winner = "PLAYER";
 				}
-				board->play_move(move);
-				ws->publish("ROOM1", "{\"event\": \"moveconfirm\", \"tile\": \"" + move + "\"}", opCode);
-				// 2. AI Move
-				// AI/Computer generate move and publish.
-				auto computer = Computer(*board);
-				if (board->game_status() == Board::state::ONGOING) {
-					Hexagon &hex = board->find_tile(computer.make_random_move());
-					board->play_move(hex);
-					int tile = hex.tileLocation();
-					std::string ai_move = board->flatten_index_to_display_coord(tile);
-					ws->publish("ROOM1", "{\"event\": \"move\", \"tile\": \"" + ai_move + "\"}", opCode);
-				}
-				std::cout << *board << '\n';
+				std::cout << *game << '\n';
 				// 3. If the game's over, publish game end
-				Board::state state = board->game_status();
-				if (state != Board::state::ONGOING) {
+				Game::state state = game->status();
+				if (state != Game::state::ONGOING) {
 					std::string winner;
-					if (state == Board::state::DRAW) {
+					if (state == Game::state::DRAW) {
 						winner = "";
-					} else if (board->whose_turn() == 1 && state == Board::state::WIN
-							|| board->whose_turn() == 0 && state == Board::state::LOSS) {
+					} else if (game->whose_turn() == 1 && state == Game::state::WIN
+							|| game->whose_turn() == 0 && state == Game::state::LOSS) {
 						winner = "COMPUTER";
 					} else {
 						winner = "PLAYER";

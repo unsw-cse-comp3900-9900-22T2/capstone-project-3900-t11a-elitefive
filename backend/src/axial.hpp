@@ -6,6 +6,12 @@
 
 namespace axial {
 	class vector {
+		public:
+			// Gives you the flatten hex index when given a vector
+			static auto index(vector const& vec) -> int {
+				return (((vec.q() + 8)*(vec.q() + 9)) / 2) - (6 + vec.s()) - ((vec.q() > 0) ? vec.q() * vec.q() : 0);
+			}
+
 		private:
 			int q_;
 			int r_;
@@ -23,6 +29,7 @@ namespace axial {
 
 			// Constructors
 			vector(int q, int r, int s);					// Regular Constructors
+			vector(int flatten_index);						// 
 			vector(vector const& vec);						// Copy Constructor
 			vector(vector&& vec);							// Move construtor
 			auto operator=(vector const& vec) -> vector&;	// Copy Assignment
@@ -31,6 +38,7 @@ namespace axial {
 			auto q() const& -> int;
 			auto r() const& -> int;
 			auto s() const& -> int;
+			auto distance() const& -> int;
 
 			~vector() = default;
 

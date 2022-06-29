@@ -4,73 +4,46 @@
 #include <vector>
 #include <string>
 
-#include "hexagon.hpp"
+#include "bitboard.hpp"
+#include "axial.hpp"
 
 class Board {
 	public:
-		enum class state { ONGOING, WIN, LOSS, DRAW };
+		auto static axis(int tile, axial::vector unit_direction) -> BitBoard;
+		auto static axis(axial::vector anchor_point, axial::vector unit_direction) -> BitBoard;
+		auto static check_n(BitBoard tiles, BitBoard diagonal, int n) -> bool;
+
 	private:
-		int nplayers_;			// How many players in match
-		int player_turn_;		// Current player's turn
-		int nmoves_; 			// Total number of moves played
-		int total_spaces_;		// Total number available hexes from start
-		std::vector<int> uids_; // User IDs
-		std::vector<Hexagon> boardstate_;
-		Board::state gamestate_;
+		int nplayers_;
+		std::vector<BitBoard> player_boards_;
+
 	public:
-		Board(int nplayers, std::vector<int> uids);
+		Board(int nplayers);
 
-		// Game engine functions
-		auto play_move(std::string move) -> bool;
-		auto play_move(Hexagon &hex) -> bool;
-		auto is_valid_move(std::string move) -> bool;
-		auto is_valid_move(Hexagon &hex) -> bool;
+		auto set(int location, int player) -> void;
+		auto unset(int location, int player) -> void;
 
-		auto game_status() -> Board::state const& {return gamestate_;};
-		auto view_available_tiles() const -> std::vector<Hexagon> const;
-		auto is_available_tile(Hexagon &hex) -> bool;
+		auto player_at(int location) const -> int;
+		auto player_tiles(int player) const -> BitBoard;
+		auto free_tiles() -> BitBoard;
+		auto free_tiles(int tile, axial::vector unit_direction) -> BitBoard;
+		auto free_tiles(axial::vector anchor_point, axial::vector unit_direction) -> BitBoard;
 
-		auto find_tile(int index) -> Hexagon &;
-		auto find_tile(Hexagon hex) -> Hexagon & {
-			// TODO -> Remove this dump stupid hack because of view_available_tiles()
-			return boardstate_[hex.tileLocation()];
-		}
-
-		// Simple getters
-		auto num_players() -> int {return nplayers_;};
-		auto whose_turn() -> int {return player_turn_;};
-		auto num_moves() -> int {return nmoves_;};
-		auto view_tile(int index) const -> Hexagon const& { return boardstate_[index];}
-
-		// TODO: Perhaps these two should be moved elsewhere. Perhaps static too?
-		static auto display_coord_to_flatten_index(std::string s) -> int {
-			int letter = s[0];
-			if (letter >= 'a' && letter <= 'i') {
-				int row = letter - 'a';
-				int column = stoi(s.substr(1)) - 1;
-				int index = (row <= 4 ? (row * 9) : (row - 4) * 10 + 36) + column;
-				return index;
-			}
-			return -1;
-		}
-
-		static auto flatten_index_to_display_coord(int i) -> std::string {
-			int row = i / 9;
-			int column = (i % 9) + 1 - ((i < 45) ? 0 : row - 4);
-			char letter = 'a' + row;
-			return letter + std::to_string(column);
-		}
+		auto num_players() -> int;
 
 		friend auto operator<<(std::ostream& os, Board const& board) -> std::ostream& {
 			auto const board_width = 9;	// Static board size assumption
 
-			auto tile_lookup = [board, board_width](int row, int col) {
-				auto position = row * board_width + col;
-				if (board.view_tile(position).getPlayer() == 0) return 'o';
-				if (board.view_tile(position).getPlayer() == 1) return 'x';
+			auto tile_lookup = [board, board_width](int row, int col, int triangle_offset) {
+				auto position = row * 9 + col - triangle_offset;	// Where 9 is the board with
+				auto player = board.player_at(position);
+				if (player == 0) return 'o';
+				if (player == 1) return 'x';
 				return '-';
 			};
 
+
+			auto triangle_offset = 0;
 			for (int row = -4; row <= 4 ; ++row) {
 				auto const spacing = (row < 0) ? -row : row;
 				for (int i = 0; i < spacing; ++i) {
@@ -78,18 +51,15 @@ class Board {
 				}
 				for (int i = 0; i < board_width - spacing; ++i) {
 					auto const col = (row < 0) ? 0 : row;
-					auto symbol = tile_lookup(row + 4, col + i);
+					auto symbol = tile_lookup(row + 4, col + i, triangle_offset);
 					os << symbol << " ";
 				}
 				os << '\n';
+				triangle_offset += (row < 0) ? spacing : row + 1;
 			}
 
 			return os;
 		}
-
-	private:
-		// Updates the state of the game and checks if game is over
-		auto end_turn(int move) -> void; // Called by play_move
 };
 
 
