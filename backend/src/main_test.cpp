@@ -50,26 +50,14 @@ auto main(void) -> int {
 	// std::cout << "Three: " << Board::check_n(p1, diagonal, 3) << '\n';
 
 
-	auto game = Game(2);
-	std::cout << game << '\n';
-	game.play(4);
-	std::cout << game << '\n';
-	game.play(2);
-	std::cout << game << '\n';
-	game.play(12);
-	std::cout << game << '\n';
-	game.play(0);
-	std::cout << game << '\n';
-	game.play(25);
-	std::cout << game << '\n';
-	game.play(3);
-	std::cout << game << '\n';
-	game.play(26);
-	std::cout << game << '\n';
-	game.play(1);
-	std::cout << game << '\n';
-	std::cout << (game.status() == Game::state::WIN) << '\n';
+	for (int i = 0; i < 61; i++) {
+		auto game = Game(2);
+		game.play(i);
 
+		std::cout << game << '\n';
+		std::cout << Game::indexToCoord(i) << '\n';
+		std::cout << Game::coordToIndex(Game::indexToCoord(i)) << '\n';
+	}
 
 
 	// std::cout << p1 << '\n';

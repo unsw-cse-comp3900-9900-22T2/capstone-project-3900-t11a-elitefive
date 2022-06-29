@@ -1,6 +1,7 @@
+#include <string.h>
+
 #include "game.hpp"
 #include "axial.hpp"
-
 
 auto end_turn(int index) -> void;
 auto is_win(int move, int player) -> bool;
@@ -14,6 +15,16 @@ Game::Game(int nplayers)
 , gamestate_{Game::state::ONGOING}
 {}
 
+
+auto Game::play(std::string move) -> bool{
+	int letter = move[0];
+	if (letter >= 'a' && letter <= 'i') {
+		auto position = Game::coordToIndex(move);
+		if (free_tiles().isSet(position)) return false;
+		return play(position);
+	}
+	return false;
+}
 
 auto Game::play(int index) -> bool {
 	set(index, player_turn_);
