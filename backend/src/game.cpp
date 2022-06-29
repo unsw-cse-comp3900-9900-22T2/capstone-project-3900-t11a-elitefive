@@ -17,6 +17,7 @@ Game::Game(int nplayers)
 
 
 auto Game::play(std::string move) -> bool{
+	if (gamestate_ != Game::state::ONGOING) return false;
 	int letter = move[0];
 	if (letter >= 'a' && letter <= 'i') {
 		auto position = Game::coordToIndex(move);

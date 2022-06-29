@@ -57,6 +57,7 @@ void RelaySocket(){
 			if (!game->play(move)) {
 				return;
 			}
+			ws->publish("ROOM1", "{\"event\": \"moveconfirm\", \"tile\": \"" + move + "\"}", opCode);
 
 			// 2. AI Move
 			// AI/Computer generate move and publish.
@@ -80,7 +81,21 @@ void RelaySocket(){
 				} else {
 					winner = "PLAYER";
 				}
-				ws->publish("ROOM1", "{\"event\": \"game_over\", \"winner\": \"" + winner + "\"}", opCode);
+				std::cout << *game << '\n';
+				// 3. If the game's over, publish game end
+				Game::state state = game->status();
+				if (state != Game::state::ONGOING) {
+					std::string winner;
+					if (state == Game::state::DRAW) {
+						winner = "";
+					} else if (game->whose_turn() == 1 && state == Game::state::WIN
+							|| game->whose_turn() == 0 && state == Game::state::LOSS) {
+						winner = "COMPUTER";
+					} else {
+						winner = "PLAYER";
+					}
+					ws->publish("ROOM1", "{\"event\": \"game_over\", \"winner\": \"" + winner + "\"}", opCode);
+				}	
 			}
 		},
 		.close = [](auto *ws, int x , std::string_view str) {
