@@ -16,21 +16,12 @@ class Game : public Board {
 		}
 
 		auto static coordToIndex(std::string coord) -> int {
-			int letter = coord[0];
-			auto calculate_pos = [](char letter) {
-				if (letter == 'a') return  0;
-				if (letter == 'b') return  5;
-				if (letter == 'c') return 11;
-				if (letter == 'd') return 18;
-				if (letter == 'e') return 26;
-				if (letter == 'f') return 35;
-				if (letter == 'g') return 43;
-				if (letter == 'h') return 50;
-								   return 56;
-			};
-			
-			return calculate_pos(letter) + stoi(coord.substr(1)) - 1;
-		}
+            int letter = coord[0];
+            if (letter >= 'a' && letter <= 'i') {
+                return floor_index(letter - 'a' - 4) + stoi(coord.substr(1)) - 1;
+            }
+            return -1;
+        }
 
 	private:
 		int player_turn_;

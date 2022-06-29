@@ -20,9 +20,10 @@ auto Game::play(std::string move) -> bool{
 	int letter = move[0];
 	if (letter >= 'a' && letter <= 'i') {
 		auto position = Game::coordToIndex(move);
-		if (free_tiles().isSet(position)) return false;
+		if (!free_tiles().isSet(position)) return false;
 		return play(position);
 	}
+	std::cout << "Was given: " << move << " ... Failed";
 	return false;
 }
 

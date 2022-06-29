@@ -33,14 +33,6 @@ namespace axial {
 			if (index <= 55) return  3;
 							 return  4;
 		};
-		// auto calculate_q = [](int index) {
-		// 	for (int q = -4; q < 5; ++q) {
-		// 		if (index < (((q + 9) * (q + 10) / 2) - 10 - (q > 0 ? q * (q + 1) : 0))) {
-		// 		  return q;
-		// 		}
-		// 	}
-		// 	return -1;
-		// };
 		q_ = calculate_q(flatten_index);
 		s_ = ((q_ + 8) * (q_ + 9)) / 2 - 6 - flatten_index - ((q_ > 0) ? q_ * q_ : 0);
 		r_ = -q_-s_;

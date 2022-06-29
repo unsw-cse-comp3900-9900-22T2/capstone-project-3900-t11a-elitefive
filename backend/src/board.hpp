@@ -4,13 +4,11 @@
 #include <vector>
 #include <string>
 
-#include "hexagon.hpp"
 #include "bitboard.hpp"
 #include "axial.hpp"
 
 class Board {
 	public:
-		// enum class state { ONGOING, WIN, LOSS, DRAW };
 		auto static axis(int tile, axial::vector unit_direction) -> BitBoard;
 		auto static axis(axial::vector anchor_point, axial::vector unit_direction) -> BitBoard;
 		auto static check_n(BitBoard tiles, BitBoard diagonal, int n) -> bool;
@@ -18,6 +16,7 @@ class Board {
 	private:
 		int nplayers_;
 		std::vector<BitBoard> player_boards_;
+
 	public:
 		Board(int nplayers);
 
