@@ -1,16 +1,18 @@
 #include <iostream>
 #include <uwebsockets/App.h>
 #include <uwebsockets/WebSocket.h>
-#include <libusockets.h>
-// #include <uwebsockets/HttpContext.h>
-// #include <uwebsockets/AsyncSocket.h>
+// #include <libusockets.h>
+#include <nlohmann/json.hpp>
+
+// #include <pqxx/pqxx>
 #include <memory>
 #include <string>
-#include "src/board.hpp"
-#include "src/computer.hpp"
+
+// TODO - Change the relative paths... Not really that good
+// https://stackoverflow.com/questions/8304190/cmake-with-include-and-source-paths-basic-setup
+#include "board.hpp"
+#include "computer.hpp"
 #include "db_functions.hpp"
-// #include <pqxx/pqxx>
-#include <nlohmann/json.hpp>
 
 void RelaySocket(){
 	struct SocketData{

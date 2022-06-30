@@ -3,13 +3,20 @@ project(prototype)
 
 include_directories(
         ${PROJECT_SOURCE_DIR}/src
+        ${PROJECT_SOURCE_DIR}/src/game/include/  # Note: Need to say where to find the headers
+        ${PROJECT_SOURCE_DIR}/src/server/include/  # Note: Need to say where to find the headers
+        ${PROJECT_SOURCE_DIR}/src/database/include/  # Note: Need to say where to find the headers
+
 )
 
 file(GLOB all_SRCS
-        "${PROJECT_SOURCE_DIR}/src/*.cpp"
-        "${PROJECT_SOURCE_DIR}/src/*.hpp"
-        server.cpp
+        "${PROJECT_SOURCE_DIR}/src/server/server.cpp"
+        "${PROJECT_SOURCE_DIR}/src/game/*.cpp"
+        # "${PROJECT_SOURCE_DIR}/src/database/*.cpp"  // TODO: Please fix lpqxx so we can uncomment this
+
 )
+list(REMOVE_ITEM all_SRCS "${PROJECT_SOURCE_DIR}/src/game/main_test.cpp") # Note: This file is just for local testing
+
 # link pqxx with classic flags
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpqxx -lpq")
 
@@ -27,8 +34,6 @@ include_directories(${UWEBSOCKETS_INCLUDE_DIRS})
 # linking nlohmann-json
 find_package(nlohmann_json CONFIG REQUIRED)
 set(nlohmann-json_IMPLICIT_CONVERSIONS OFF)
-# include_directories(${JSONCPP_INCLUDE_DIRS})
-# target_link_libraries(INTERFACE jsoncpp_object jsoncpp_static JsonCpp::JsonCpp)
 
 # linking pqxx
 #add_subdirectory(deps/pqxx build-pqxx)
