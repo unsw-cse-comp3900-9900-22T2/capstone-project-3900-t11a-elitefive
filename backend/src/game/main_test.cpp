@@ -1,9 +1,26 @@
-// #include <vector>
-// #include <iostream>
+#include <vector>
+#include <iostream>
 
-// #include "board.hpp"
-// #include "computer.hpp"
-// #include "game.hpp"
+#include "board.hpp"
+#include "computer.hpp"
+#include "game.hpp"
+
+
+auto main(void) -> int {
+	auto board = Board(2);
+	board.set(10, 0);
+	board.set(3, 1);
+	board.set(25, 0);
+	board.set(40, 1);
+	std::cout << board << '\n';
+
+	auto p1 = board.player_tiles(0);
+	auto p2 = board.player_tiles(1);
+
+	std::cout << (p1 ^ p2) << '\n';
+
+	return 0;
+}
 
 // // // auto main(void) -> int {
 // // // 	auto uids = std::vector<int>{100, 200};
@@ -75,20 +92,3 @@
 // // 	// }
 
 // // }
-
-// auto main(void) -> int {
-// 	auto board = Board(2);
-// 	board.set(10, 0);
-// 	board.set(3, 1);
-// 	board.set(25, 0);
-// 	board.set(40, 1);
-// 	std::cout << board << '\n';
-
-// 	auto p1 = board.player_tiles(0);
-// 	auto p2 = board.player_tiles(1);
-
-// 	std::cout << (p1 ^ p2) << '\n';
-
-
-// 	return 0;
-// }
