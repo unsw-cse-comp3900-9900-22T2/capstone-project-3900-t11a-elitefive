@@ -6,6 +6,7 @@
 
 Board::Board(int nplayers)
 : nplayers_{nplayers}
+, nspaces_{61} // Assume that it is a classic board
 , player_boards_{std::vector<BitBoard>{}}
 {
 	for (int i = 0; i < nplayers; i++) {
@@ -57,6 +58,9 @@ auto Board::num_players() -> int {
 	return nplayers_;
 }
 
+auto Board::num_spaces() -> int {
+	return nspaces_;
+}
 
 // Static functions
 auto Board::axis(int tile, axial::vector unit_direction) -> BitBoard {

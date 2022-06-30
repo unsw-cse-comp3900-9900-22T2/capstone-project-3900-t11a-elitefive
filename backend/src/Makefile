@@ -153,6 +153,30 @@ game/axial.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/board.dir/build.make CMakeFiles/board.dir/game/axial.cpp.s
 .PHONY : game/axial.cpp.s
 
+game/basegame.o: game/basegame.cpp.o
+.PHONY : game/basegame.o
+
+# target to build an object file
+game/basegame.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/board.dir/build.make CMakeFiles/board.dir/game/basegame.cpp.o
+.PHONY : game/basegame.cpp.o
+
+game/basegame.i: game/basegame.cpp.i
+.PHONY : game/basegame.i
+
+# target to preprocess a source file
+game/basegame.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/board.dir/build.make CMakeFiles/board.dir/game/basegame.cpp.i
+.PHONY : game/basegame.cpp.i
+
+game/basegame.s: game/basegame.cpp.s
+.PHONY : game/basegame.s
+
+# target to generate assembly for a file
+game/basegame.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/board.dir/build.make CMakeFiles/board.dir/game/basegame.cpp.s
+.PHONY : game/basegame.cpp.s
+
 game/bitboard.o: game/bitboard.cpp.o
 .PHONY : game/bitboard.o
 
@@ -285,6 +309,9 @@ help:
 	@echo "... game/axial.o"
 	@echo "... game/axial.i"
 	@echo "... game/axial.s"
+	@echo "... game/basegame.o"
+	@echo "... game/basegame.i"
+	@echo "... game/basegame.s"
 	@echo "... game/bitboard.o"
 	@echo "... game/bitboard.i"
 	@echo "... game/bitboard.s"
