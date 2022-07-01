@@ -2,8 +2,6 @@
 #define YAVALATH_GAME_HPP
 
 #include <string.h>
-
-#include "Board.hpp"
 #include "basegame.hpp"
 
 class Game : public BaseGame {

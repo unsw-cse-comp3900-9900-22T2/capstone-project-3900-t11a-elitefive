@@ -26,7 +26,11 @@ class BaseGame {
 
 		// auto status() -> Game::state;
 		auto increase_move() -> void;
+		auto decrease_move() -> void;
+
 		auto pass_turn() -> void;
+		auto unpass_turn() -> void;
+
 
 		auto check() -> bool; // Valid move?
 		auto over() -> bool; // Has the game ended?

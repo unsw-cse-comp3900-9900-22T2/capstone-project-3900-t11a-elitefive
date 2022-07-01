@@ -1,3 +1,4 @@
+#include <assert.h> // TODO: REMOVE
 #include "basegame.hpp"
 
 BaseGame::BaseGame(int players)
@@ -27,6 +28,15 @@ auto BaseGame::increase_move() -> void {
 
 auto BaseGame::pass_turn() -> void {
 	player_turn_ = (player_turn_ + 1) % board().num_players();
+}
+
+auto BaseGame::decrease_move() -> void {
+	--nmoves_;
+}
+
+auto BaseGame::unpass_turn() -> void {
+	player_turn_ = (player_turn_ == 0) ? board().num_players() - 1 : player_turn_ - 1;
+	assert(player_turn_ >= 0); // TODO: REMOVE
 }
 
 

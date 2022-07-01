@@ -129,6 +129,30 @@ board/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/board.dir/build.make CMakeFiles/board.dir/build
 .PHONY : board/fast
 
+game/aigame.o: game/aigame.cpp.o
+.PHONY : game/aigame.o
+
+# target to build an object file
+game/aigame.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/board.dir/build.make CMakeFiles/board.dir/game/aigame.cpp.o
+.PHONY : game/aigame.cpp.o
+
+game/aigame.i: game/aigame.cpp.i
+.PHONY : game/aigame.i
+
+# target to preprocess a source file
+game/aigame.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/board.dir/build.make CMakeFiles/board.dir/game/aigame.cpp.i
+.PHONY : game/aigame.cpp.i
+
+game/aigame.s: game/aigame.cpp.s
+.PHONY : game/aigame.s
+
+# target to generate assembly for a file
+game/aigame.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/board.dir/build.make CMakeFiles/board.dir/game/aigame.cpp.s
+.PHONY : game/aigame.cpp.s
+
 game/axial.o: game/axial.cpp.o
 .PHONY : game/axial.o
 
@@ -306,6 +330,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... board"
+	@echo "... game/aigame.o"
+	@echo "... game/aigame.i"
+	@echo "... game/aigame.s"
 	@echo "... game/axial.o"
 	@echo "... game/axial.i"
 	@echo "... game/axial.s"
