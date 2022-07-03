@@ -20,6 +20,7 @@ class Board {
 
 	public:
 		Board(int nplayers);
+		Board(Board const& board);
 		
 		auto set(int location, int player) -> void;
 		auto unset(int location, int player) -> void;
@@ -30,8 +31,8 @@ class Board {
 		auto free_tiles(int tile, axial::vector unit_direction) -> BitBoard;
 		auto free_tiles(axial::vector anchor_point, axial::vector unit_direction) -> BitBoard;
 
-		auto num_players() -> int;
-		auto num_spaces() -> int;
+		auto num_players() const -> int;
+		auto num_spaces() const -> int;
 
 		friend auto operator<<(std::ostream& os, Board const& board) -> std::ostream& {
 			auto const board_width = 9;	// Static board size assumption

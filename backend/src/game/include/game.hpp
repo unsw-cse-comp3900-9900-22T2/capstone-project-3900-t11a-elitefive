@@ -23,8 +23,6 @@ class Game : public BaseGame {
 
 	private:
 		auto end_turn(int index) -> void;
-		auto won(int move, int player) -> bool;
-		auto loss(int move, int player) -> bool;
 };
 
 #endif

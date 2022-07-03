@@ -7,10 +7,16 @@ BaseGame::BaseGame(int players)
 , nmoves_{0}
 {}
 
-auto BaseGame::whose_turn() -> int {
+BaseGame::BaseGame(Board const& board, int turn, int moves)
+: board_{Board(board)}
+, player_turn_{turn}
+, nmoves_{moves}
+{}
+
+auto BaseGame::whose_turn() const -> int {
 	return player_turn_;
 }
-auto BaseGame::num_moves() -> int {
+auto BaseGame::num_moves() const -> int {
 	return nmoves_;
 }
 
@@ -67,4 +73,23 @@ int BaseGame::calculate_q(int index) {
 		}
 	}
 	return -1;
+}
+
+// Private functions
+auto BaseGame::won(int move, int player) -> bool {
+	auto pieces = board().player_tiles(player);
+	for (auto const& unit_dir : axial::vector::basis_vectors()){
+		auto axis = Board::axis(move, unit_dir);
+		if (Board::check_n(pieces, axis, 4)) return true;
+	}
+	return false;
+}
+
+auto BaseGame::loss(int move, int player) -> bool {
+	auto pieces = board().player_tiles(player); 
+	for (auto const& unit_dir : axial::vector::basis_vectors()){
+		auto axis = Board::axis(move, unit_dir);
+		if (Board::check_n(pieces, axis, 3)) return true;
+	}
+	return false;
 }

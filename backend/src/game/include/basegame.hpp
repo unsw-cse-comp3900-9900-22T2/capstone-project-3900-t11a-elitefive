@@ -13,13 +13,14 @@ class BaseGame {
 		int nmoves_;
 	public:
 		BaseGame(int players);
+		BaseGame(Board const& board, int turn, int moves);
 		virtual ~BaseGame() = default;
 
 		auto virtual play(std::string move) -> bool = 0;
 		auto virtual play(int index) -> bool = 0;
 		
-		auto whose_turn() -> int;
-		auto num_moves() -> int;
+		auto whose_turn() const -> int;
+		auto num_moves() const -> int;
 		auto board() -> Board &;             // Normally you can just change the board
 		auto board() const -> Board const&;  // Needed for the '<<' operator
 
@@ -44,6 +45,10 @@ class BaseGame {
 		// Helper static functions that facilate the public static functions
 		auto static floor_index(int q) -> int;
 		auto static calculate_q(int index) -> int;
+
+	protected:
+		auto won(int move, int player) -> bool;
+		auto loss(int move, int player) -> bool;
 
 	public:
 		auto static indexToCoord(int index) -> std::string;

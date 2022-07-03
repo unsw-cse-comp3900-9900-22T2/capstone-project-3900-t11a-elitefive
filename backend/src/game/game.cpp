@@ -55,22 +55,3 @@ auto Game::end_turn(int index) -> void {
 	pass_turn();
 }
 
-auto Game::won(int move, int player) -> bool {
-	auto pieces = board().player_tiles(player);
-	for (auto const& unit_dir : axial::vector::basis_vectors()){
-		auto axis = Board::axis(move, unit_dir);
-		if (Board::check_n(pieces, axis, 4)) return true;
-	}
-	return false;
-}
-
-auto Game::loss(int move, int player) -> bool {
-	auto pieces = board().player_tiles(player);
-	for (auto const& unit_dir : axial::vector::basis_vectors()){
-		auto axis = Board::axis(move, unit_dir);
-		if (Board::check_n(pieces, axis, 3)) return true;
-	}
-	return false;
-}
-
-

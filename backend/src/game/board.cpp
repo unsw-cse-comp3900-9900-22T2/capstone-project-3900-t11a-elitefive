@@ -14,6 +14,18 @@ Board::Board(int nplayers)
 	}
 }
 
+Board::Board(Board const& board)
+: nplayers_{board.num_players()}
+, nspaces_{board.num_spaces()}
+, player_boards_{std::vector<BitBoard>{}}
+{
+	for (int i = 0; i < nplayers_; i++) {
+		player_boards_.push_back(board.player_tiles(i)); // Every player current board
+	}
+}
+
+
+
 auto Board::set(int location, int player) -> void {
 	player_boards_[player].set(location);
 }
@@ -54,11 +66,11 @@ auto Board::free_tiles(axial::vector anchor_point, axial::vector unit_direction)
 	return candidate_tiles & free_spaces;
 }
 
-auto Board::num_players() -> int {
+auto Board::num_players() const -> int {
 	return nplayers_;
 }
 
-auto Board::num_spaces() -> int {
+auto Board::num_spaces() const -> int {
 	return nspaces_;
 }
 
