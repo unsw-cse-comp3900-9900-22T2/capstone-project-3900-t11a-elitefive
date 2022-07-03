@@ -143,7 +143,7 @@ class AIGame : public BaseGame {
 					
 					// Doesn't land on target
 					auto const target_location = axial::vector::index(vec_location);
-					// if (!std::binary_search(placed.begin(), placed.end(), target_location)) continue;
+					if (!std::binary_search(placed.begin(), placed.end(), target_location)) continue;
 					
 					// auto const space_1 = axial::vector::index(axial::vector::index(dir * 2));
 					// if (!std::binary_search(free_spaces.begin(), free_spaces.end(), space_1)) continue;

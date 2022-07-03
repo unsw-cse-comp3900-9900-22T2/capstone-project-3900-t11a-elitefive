@@ -31,15 +31,8 @@ auto main(void) -> int {
 
 
 
-	// game.play(1);
-	// game.play(14);
-	// game.play(3);
-	// game.play(11);
-	// game.play(4);
-	// game.play(13);
-	// game.play(5);
-
-	// game.play(30);
+	// auto game = AIGame(2);
+	// game.play(31);
 	// game.play(15);
 	// game.play(45);
 	// game.play(41);
@@ -47,11 +40,11 @@ auto main(void) -> int {
 	// game.play(32);
 	// game.play(0);
 
+	// std::cout << game << '\n';
 
 
 	
 	// auto depth = 3;
-	// std::cout << game << '\n';
 	// std::cout << "Generating moves ...\n";
 	// game.generate_to_depth(depth);
 	// std::cout << "Minmax" << '\n';
