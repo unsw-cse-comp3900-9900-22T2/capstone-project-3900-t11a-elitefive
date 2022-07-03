@@ -87,3 +87,17 @@ auto AIGame::undo_turn() -> void {
 	terminal_ = false;
 	score_ = 0;
 }
+
+auto AIGame::states() const -> std::vector<AIGame> const& {
+	return states_;
+}
+
+auto AIGame::find_best() -> AIGame& {
+	// TODO: If it's all a tie, pick from the bucket of ties instead of defaulting to start
+	auto const &index = std::max_element(states().begin(), states().end(), [](AIGame const& a1, AIGame const& a2) {
+		return a1.score_ < a2.score_;
+	});
+	std::cout << *index << '\n';
+	// return index->score_;
+	return *index;
+}

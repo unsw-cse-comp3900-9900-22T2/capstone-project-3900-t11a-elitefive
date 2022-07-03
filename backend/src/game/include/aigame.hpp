@@ -30,10 +30,14 @@ class AIGame : public BaseGame {
 		auto store_game(AIGame game) -> void;
 		auto generate_all_moves() -> void;
 		
+		auto find_best() -> AIGame&;
+
 		auto move() const -> int;
 		auto terminal() const -> bool;
 		auto score() const -> int;
 		auto states() -> std::vector<AIGame>&;
+		auto states() const -> std::vector<AIGame> const&;
+
 
 		auto clear() -> void {
 			states_ = std::vector<AIGame>{};
@@ -57,15 +61,15 @@ class AIGame : public BaseGame {
 		}
 
 		auto minmax(int depth) -> int {
-			auto const selections = this->board().free_tiles().binary_to_vector();
-			auto random_selection = std::vector<int>{};
-			std::sample(
-				selections.begin(),
-				selections.end(),
-				std::back_inserter(random_selection),
-				1,
-				std::mt19937{std::random_device{}()}
-			);
+			// auto const selections = this->board().free_tiles().binary_to_vector();
+			// auto random_selection = std::vector<int>{};
+			// std::sample(
+			// 	selections.begin(),
+			// 	selections.end(),
+			// 	std::back_inserter(random_selection),
+			// 	1,
+			// 	std::mt19937{std::random_device{}()}
+			// );
 			// std::cout << "Random selection: " << random_selection.front() << '\n';
 
 			auto &best = this->states()[0];
@@ -79,10 +83,14 @@ class AIGame : public BaseGame {
 				}
 			}
 
-			if (best.move() == 0) {
-				std::cout << "\tMade a random move\n"; 
-				return random_selection.front();
-			}
+			// auto score = this->run_minmax(depth, this->whose_turn());
+			// AIGame &best = this->find_best();
+			// std::cout << "score GENERATED: " << score << '\n';
+
+			// if (best.move() == 0) {
+			// 	std::cout << "\tMade a random move\n"; 
+			// 	return random_selection.front();
+			// }
 
 			return best.move();
 		}
@@ -97,7 +105,7 @@ class AIGame : public BaseGame {
 				if (whose_turn() == player) return -this->score();
 				return this->score();
 			}
-
+			
 			if (player == this->whose_turn()) {
 				auto score = AIGame::MINSCORE;
 				for (auto &position : this->states()) {
@@ -106,6 +114,7 @@ class AIGame : public BaseGame {
 						score = eval;
 					}
 				}
+				this->score_ = score;
 				return score;
 			}
 			else {
@@ -116,35 +125,57 @@ class AIGame : public BaseGame {
 						score = eval;
 					}
 				}
+				this->score_ = score;
 				return score;
 			}
 		}
 
-		auto heuristic() -> int {
-			return 100;
-			// Assume current player is trying to win
-			Board &board = this->board();
-			auto const player = whose_turn();
-			auto const free_spaces = board.free_tiles().binary_to_vector();
+		auto isSet(BitBoard const& board, axial::vector const& vec) const -> bool {
+			auto const tile = axial::vector::index(vec);
+			if (board.isSet(tile)) return true;
+			return false;
+		}
 
+		auto heuristic() -> int {
+			// Assume current player is trying to win
+			Board const &board = this->board();
+			auto const player = this->previous_player();
+			auto const free_spaces = board.free_tiles();
+			auto const player_tiles = board.player_tiles(player);
+			auto const opponent_tiles = board.opponent_tiles(player);
+			// std::cout << board << '\n';
+			// std::cout << opponent_tiles << '\n';
+			// for (auto t : opponent_tiles.binary_to_vector()) {
+			// 	std::cout << t << '\n';
+			// }
+			// exit(1);
 			// auto tri = axial::vector::unit_directions();
 			// for (auto &i : tri) { i *= 3; }
 
 			auto const units = axial::vector::unit_directions();
 			auto count = 0;
 
-			std::vector<int> const& placed = (board.player_tiles(player)).binary_to_vector();
-			for (auto const& tile : placed) {
+			std::vector<int> const& tiles = player_tiles.binary_to_vector();
+			for (auto const& tile : tiles) {
+				// std::cout << tile << '\n';
 				for (auto const& dir : units) {
 					// Make sure tile is INBOUNDS
 					auto const target_vec = dir * 3;
-					auto const vec_location = tile + target_vec;
+					auto const vec_location = axial::vector(tile) + target_vec;
+					// Doesn't land on target
 					if (vec_location.distance() > 4) continue; // Ignore tiles outside the board
 					
-					// Doesn't land on target
-					auto const target_location = axial::vector::index(vec_location);
-					if (!std::binary_search(placed.begin(), placed.end(), target_location)) continue;
+					// std::cout << "\ttarvec: " << target_vec << "  :" << axial::vector::index(target_vec) << '\n';
+					// std::cout << "\tvecloc: " << vec_location << "  :" << axial::vector::index(vec_location) << '\n';
+
+					if (!isSet(player_tiles, vec_location)) 		continue; // You don't have a tile here
+					// std::cout << "\tHERE " << axial::vector::index(vec_location) << '\n';
+					if (isSet(opponent_tiles, (tile + dir))) 		continue; // Opponent tile blocks
+					if (isSet(opponent_tiles, tile + (dir * 2))) 	continue; // Opponent tile blocks
 					
+					if (isSet(player_tiles, vec_location)) ++count; // Weight progress higher
+					if (isSet(player_tiles, vec_location)) ++count; // Weight progress higher
+
 					// auto const space_1 = axial::vector::index(axial::vector::index(dir * 2));
 					// if (!std::binary_search(free_spaces.begin(), free_spaces.end(), space_1)) continue;
 					// auto const space_2 = axial::vector::index(axial::vector::index(dir * 3));
@@ -153,18 +184,10 @@ class AIGame : public BaseGame {
 					++count; // Potential for a connect 4
 				}
 			}
-
+			// std::cout << count/2 << "\n\n";
 			return count/2;
 		}
 
-		auto find_best() -> int {
-			// TODO: If it's all a tie, pick from the bucket of ties instead of defaulting to start
-			auto index = std::max_element(states().begin(), states().end(), [](AIGame const& a1, AIGame const& a2) {
-				return a1.score_ < a2.score_;
-			});
-			std::cout << *index << '\n';
-			return index->score_;
-		}
 
 	private:
 		auto end_turn() -> void;

@@ -32,8 +32,16 @@ auto BaseGame::increase_move() -> void {
 	++nmoves_;
 }
 
+auto BaseGame::next_player() const -> int {
+	return (player_turn_ + 1) % board().num_players();
+}
+
+auto BaseGame::previous_player() const -> int {
+	return (player_turn_ == 0) ? board().num_players() - 1 : player_turn_ - 1;
+}
+
 auto BaseGame::pass_turn() -> void {
-	player_turn_ = (player_turn_ + 1) % board().num_players();
+	player_turn_ = next_player();
 }
 
 auto BaseGame::decrease_move() -> void {
@@ -41,27 +49,29 @@ auto BaseGame::decrease_move() -> void {
 }
 
 auto BaseGame::unpass_turn() -> void {
-	player_turn_ = (player_turn_ == 0) ? board().num_players() - 1 : player_turn_ - 1;
+	player_turn_ = previous_player();
 	assert(player_turn_ >= 0); // TODO: REMOVE
 }
 
 
-auto BaseGame::indexToCoord(int index) -> std::string {
-	int q = calculate_q(index);
-	char letter = 'a' + q + 4;
-	int column = index - floor_index(q) + 1;
+// =================
+// Static functions
+// =================
+auto BaseGame::indexToCoord(int index) -> const std::string {
+	int const q = calculate_q(index);
+	char const letter = 'a' + q + 4;
+	int const column = index - floor_index(q) + 1;
 	return letter + std::to_string(column);
 }
 
 auto BaseGame::coordToIndex(std::string coord) -> int {
-	int letter = coord[0];
+	int const letter = coord[0];
 	if (letter >= 'a' && letter <= 'i') {
 		return floor_index(letter - 'a' - 4) + stoi(coord.substr(1)) - 1;
 	}
 	return -1;
 }
 
-// Private static functions
 auto BaseGame::floor_index(int q) -> int {
 	return ((q + 8) * (q + 9) / 2) - 10 - ((q > 1) ? q * (q - 1) : 0);
 }
@@ -76,19 +86,19 @@ int BaseGame::calculate_q(int index) {
 }
 
 // Private functions
-auto BaseGame::won(int move, int player) -> bool {
-	auto pieces = board().player_tiles(player);
-	for (auto const& unit_dir : axial::vector::basis_vectors()){
-		auto axis = Board::axis(move, unit_dir);
+auto BaseGame::won(int move, int player) const -> bool {
+	auto const& pieces = board().player_tiles(player);
+	for (auto const& unit_dir : axial::vector::basis_vectors()) {
+		auto const axis = Board::axis(move, unit_dir);
 		if (Board::check_n(pieces, axis, 4)) return true;
 	}
 	return false;
 }
 
-auto BaseGame::loss(int move, int player) -> bool {
-	auto pieces = board().player_tiles(player); 
-	for (auto const& unit_dir : axial::vector::basis_vectors()){
-		auto axis = Board::axis(move, unit_dir);
+auto BaseGame::loss(int move, int player) const -> bool {
+	auto const& pieces = board().player_tiles(player); 
+	for (auto const& unit_dir : axial::vector::basis_vectors()) {
+		auto const axis = Board::axis(move, unit_dir);
 		if (Board::check_n(pieces, axis, 3)) return true;
 	}
 	return false;

@@ -23,7 +23,8 @@ class BaseGame {
 		auto num_moves() const -> int;
 		auto board() -> Board &;             // Normally you can just change the board
 		auto board() const -> Board const&;  // Needed for the '<<' operator
-
+		auto next_player() const -> int;
+		auto previous_player() const -> int;
 
 		// auto status() -> Game::state;
 		auto increase_move() -> void;
@@ -43,15 +44,15 @@ class BaseGame {
 
 	private:
 		// Helper static functions that facilate the public static functions
-		auto static floor_index(int q) -> int;
-		auto static calculate_q(int index) -> int;
+		auto static floor_index(int const q) -> int;
+		auto static calculate_q(int const index) -> int;
 
 	protected:
-		auto won(int move, int player) -> bool;
-		auto loss(int move, int player) -> bool;
+		auto won(int move, int player) const -> bool;
+		auto loss(int move, int player) const -> bool;
 
 	public:
-		auto static indexToCoord(int index) -> std::string;
+		auto static indexToCoord(int index) -> const std::string;
 		auto static coordToIndex(std::string coord) -> int;
 };
 

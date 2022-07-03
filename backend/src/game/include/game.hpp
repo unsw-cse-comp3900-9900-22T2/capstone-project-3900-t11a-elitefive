@@ -16,10 +16,11 @@ class Game : public BaseGame {
 		auto play(std::string move) -> bool override;	// Does provide error checking
 		auto play(int index) -> bool override;			// Does NOT provide error checking
 
-		auto status() -> Game::state;					// Tells you whether the game is over or not
+		auto ongoing() const -> bool;
+		auto status() const -> Game::state const;		// Tells you whether the game is over or not
 
-		auto check() -> bool; 							// TODO: IMPLEMENT -> Valid move?
-		auto over() -> bool; 							// TODO: IMPLEMENT -> Has the game ended?
+		// auto check() -> bool; 							// TODO: IMPLEMENT -> Valid move?
+		// auto over() -> bool; 							// TODO: IMPLEMENT -> Has the game ended?
 
 	private:
 		auto end_turn(int index) -> void;

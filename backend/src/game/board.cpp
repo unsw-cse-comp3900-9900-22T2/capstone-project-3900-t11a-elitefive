@@ -24,8 +24,7 @@ Board::Board(Board const& board)
 	}
 }
 
-
-
+// MODIFYING ACTIONS
 auto Board::set(int location, int player) -> void {
 	player_boards_[player].set(location);
 }
@@ -34,36 +33,20 @@ auto Board::unset(int location, int player) -> void {
 	player_boards_[player].unset(location);
 }
 
-auto Board::player_at(int location) const -> int {
+
+// CONST QUERY ACTIONS
+auto Board::player_at_location(int player, int location) const -> bool {
+	auto const& board = player_tiles(player);
+	return board.isSet(location);
+}
+
+auto Board::which_player_at(int location) const -> int {
 	for (int player = 0; player < nplayers_; player++) {
-		auto board = player_tiles(player);
+		auto const &board = player_tiles(player);
 		if (board.isSet(location)) return player;
 	}
+
 	return -1;
-}
-
-auto Board::player_tiles(int player) const -> BitBoard {
-	return player_boards_[player];
-}
-
-auto Board::free_tiles() -> BitBoard {
-	auto taken_spaces = BitBoard();
-	for (auto const& player : player_boards_) {
-		taken_spaces = taken_spaces ^ player;
-	}
-	return ~taken_spaces;	// Negate to get free spaces
-}
-
-
-auto Board::free_tiles(int tile, axial::vector unit_direction) -> BitBoard {
-	return free_tiles(axial::vector(tile), unit_direction);
-}
-
-auto Board::free_tiles(axial::vector anchor_point, axial::vector unit_direction) -> BitBoard {
-	auto candidate_tiles = Board::axis(anchor_point, unit_direction);
-	auto free_spaces = free_tiles();
-
-	return candidate_tiles & free_spaces;
 }
 
 auto Board::num_players() const -> int {
@@ -74,12 +57,43 @@ auto Board::num_spaces() const -> int {
 	return nspaces_;
 }
 
+auto Board::player_tiles(int player) const -> BitBoard {
+	return player_boards_[player];
+}
+
+auto Board::opponent_tiles(int player) const -> BitBoard {
+	auto const& player_tiles = this->player_tiles(player);
+	auto const& free_tiles = this->free_tiles();
+	return (~free_tiles) ^ player_tiles;
+}
+
+auto Board::free_tiles() const -> BitBoard {
+	auto taken_spaces = BitBoard();
+	for (auto const& player : player_boards_) {
+		taken_spaces = taken_spaces ^ player;
+	}
+	return ~taken_spaces;	// Negate to get free spaces
+}
+
+
+auto Board::free_tiles(int tile, axial::vector const& unit_direction) const -> BitBoard {
+	return free_tiles(axial::vector(tile), unit_direction);
+}
+
+auto Board::free_tiles(axial::vector const& anchor_point, axial::vector const& unit_direction) const -> BitBoard {
+	auto const candidate_tiles = Board::axis(anchor_point, unit_direction);
+	auto const free_spaces = free_tiles();
+
+	return candidate_tiles & free_spaces;
+}
+
+
 // Static functions
-auto Board::axis(int tile, axial::vector unit_direction) -> BitBoard {
+auto Board::axis(int tile, axial::vector const& unit_direction) -> BitBoard {
 	return axis(axial::vector(tile), unit_direction);
 }
 
-auto Board::axis(axial::vector anchor_point, axial::vector unit_direction) -> BitBoard {
+auto Board::axis(axial::vector const& anchor_point, axial::vector const& unit_direction) -> BitBoard {
 	auto spaces = BitBoard();
 	// Go along axis in unit vector direction
 	axial::vector pos = anchor_point;
@@ -98,7 +112,7 @@ auto Board::axis(axial::vector anchor_point, axial::vector unit_direction) -> Bi
 	return spaces;
 }
 
-auto Board::check_n(BitBoard tiles, BitBoard diagonal, int n) -> bool {
+auto Board::check_n(BitBoard const& tiles, BitBoard const& diagonal, int n) -> bool {
 	auto const placed = tiles.binary_to_vector(diagonal);
 	auto const check_along = diagonal.binary_to_vector();
 

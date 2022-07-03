@@ -21,7 +21,7 @@ auto Board::unset(int location, int player) -> void {
 	player_boards_[player].unset(location);
 }
 
-auto Board::player_at(int location) const -> int {
+auto Board::which_player_at(int location) const -> int {
 	for (int player = 0; player < nplayers_; player++) {
 		auto board = player_tiles(player);
 		if (board.isSet(location)) return player;

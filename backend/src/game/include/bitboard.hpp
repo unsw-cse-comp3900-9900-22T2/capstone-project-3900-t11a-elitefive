@@ -10,14 +10,14 @@ class BitBoard {
 		uint64_t board_;
 	public:
 		BitBoard();
-		BitBoard(std::bitset<64> board);
+		BitBoard(std::bitset<64> const& board);
 		// BitBoard(uint64_t state);
 
 
 		auto binary() const -> std::bitset<64>;		// Gives binary representation
 		auto set(int index) -> void;				// Set bit  : Index right to left
 		auto unset(int index) -> void;				// Unset bit: Index right to left
-		auto isSet(int index) -> bool;
+		auto isSet(int index) const -> bool;
 
 		auto binary_to_vector() const -> std::vector<int>;
 		auto binary_to_vector(BitBoard const& mask) const -> std::vector<int>;

@@ -28,8 +28,12 @@ auto Game::play(int index) -> bool {
 	return true;
 }
 
+auto Game::ongoing() const -> bool {
+	return this->status() == Game::state::ONGOING;
+}
 
-auto Game::status() -> Game::state {
+
+auto Game::status() const -> Game::state const {
 	return gamestate_;
 }
 
@@ -39,11 +43,11 @@ auto Game::end_turn(int index) -> void {
 	this->increase_move();
 
 	// See if the current player won/loss/draw
-	if (won(index, whose_turn())) {
+	if (std::as_const(*this).won(index, whose_turn())) {
 		gamestate_ = Game::state::WIN;
 		return;
 	}
-	if (loss(index, whose_turn())) {
+	if (std::as_const(*this).loss(index, whose_turn())) {
 		gamestate_ = Game::state::LOSS;
 		return;
 	}
