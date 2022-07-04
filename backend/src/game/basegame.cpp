@@ -36,6 +36,10 @@ auto BaseGame::next_player() const -> int {
 	return (player_turn_ + 1) % board().num_players();
 }
 
+auto BaseGame::player_after(int curr_player) const -> int {
+	return (curr_player + 1) % board().num_players();
+}
+
 auto BaseGame::previous_player() const -> int {
 	return (player_turn_ == 0) ? board().num_players() - 1 : player_turn_ - 1;
 }

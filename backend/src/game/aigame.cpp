@@ -37,14 +37,20 @@ auto AIGame::generate_all_moves() -> void {
 	score_ = previous_score;
 }
 
+auto set_end_state(int player) {
+	if (player == 0) return AIGame::PLAYER0;
+	if (player == 1) return -AIGame::PLAYER1;
+}
+
 auto AIGame::play(int index) -> bool {
-	board().set(index, this->whose_turn());
-	if (won(index, this->whose_turn())) {
+	auto const curr_player = this->whose_turn();
+	board().set(index, curr_player);
+	if (won(index, curr_player)) {
 		terminal_ = true;
-		score_ = AIGame::MAXSCORE;
-	} else if (loss(index, this->whose_turn())) {
+		score_ = set_end_state(curr_player);
+	} else if (loss(index, curr_player)) {
 		terminal_ = true;
-		score_ = AIGame::MINSCORE;
+		score_ = -set_end_state(curr_player);
 	}
 	end_turn();
 	return true;
@@ -97,7 +103,17 @@ auto AIGame::find_best() -> AIGame& {
 	auto const &index = std::max_element(states().begin(), states().end(), [](AIGame const& a1, AIGame const& a2) {
 		return a1.score_ < a2.score_;
 	});
-	std::cout << *index << '\n';
+	// std::cout << *index << '\n';
+	// return index->score_;
+	return *index;
+}
+
+auto AIGame::find_worst() -> AIGame& {
+	// TODO: If it's all a tie, pick from the bucket of ties instead of defaulting to start
+	auto const &index = std::min_element(states().begin(), states().end(), [](AIGame const& a1, AIGame const& a2) {
+		return a1.score_ < a2.score_;
+	});
+	// std::cout << *index << '\n';
 	// return index->score_;
 	return *index;
 }

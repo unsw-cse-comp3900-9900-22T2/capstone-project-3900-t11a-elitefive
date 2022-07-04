@@ -24,6 +24,7 @@ class BaseGame {
 		auto board() -> Board &;             // Normally you can just change the board
 		auto board() const -> Board const&;  // Needed for the '<<' operator
 		auto next_player() const -> int;
+		auto player_after(int curr_player) const -> int;
 		auto previous_player() const -> int;
 
 		// auto status() -> Game::state;

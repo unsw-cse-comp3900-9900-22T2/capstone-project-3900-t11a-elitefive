@@ -12,6 +12,9 @@ class AIGame : public BaseGame {
 	public:
 		static int const MAXSCORE = 999;
 		static int const MINSCORE = -999;
+		static int const PLAYER0 = 1000;	// WINNER
+		static int const PLAYER1 = 1001;	// WINNER
+
 	private:
 		int move_;
 		bool terminal_;
@@ -31,6 +34,7 @@ class AIGame : public BaseGame {
 		auto generate_all_moves() -> void;
 		
 		auto find_best() -> AIGame&;
+		auto find_worst() -> AIGame&;
 
 		auto move() const -> int;
 		auto terminal() const -> bool;
@@ -43,90 +47,78 @@ class AIGame : public BaseGame {
 			states_ = std::vector<AIGame>{};
 		}
 
-		auto generate_to_depth(int depth) -> void {
-			if (this->terminal()) return; // Do not expand this node
+		// auto generate_to_depth(int depth) -> void {
+		// 	if (this->terminal()) return; // Do not expand this node
 		
-			if (depth == 0) {
-				// std::cout << *this << '\n';
-				this->score_ = this->heuristic();
-				return;
-			}
+		// 	if (depth == 0) {
+		// 		// std::cout << *this << '\n';
+		// 		this->score_ = this->heuristic();
+		// 		return;
+		// 	}
 
-			this->generate_all_moves();
-			for (auto &state : states_) {
-				state.generate_to_depth(depth - 1);
-			}
+		// 	this->generate_all_moves();
+		// 	for (auto &state : states_) {
+		// 		state.generate_to_depth(depth - 1);
+		// 	}
 
-			return;
-		}
+		// 	return;
+		// }
 
 		auto minmax(int depth) -> int {
-			// auto const selections = this->board().free_tiles().binary_to_vector();
-			// auto random_selection = std::vector<int>{};
-			// std::sample(
-			// 	selections.begin(),
-			// 	selections.end(),
-			// 	std::back_inserter(random_selection),
-			// 	1,
-			// 	std::mt19937{std::random_device{}()}
-			// );
-			// std::cout << "Random selection: " << random_selection.front() << '\n';
+			return run_minmax(depth, this->whose_turn());
+			// auto &best = this->states()[0];
+			// auto score = AIGame::MINSCORE;
 
-			auto &best = this->states()[0];
-			auto score = AIGame::MINSCORE;
-
-			for (auto &position : this->states()) {
-				auto eval = position.run_minmax(depth - 1, this->whose_turn());
-				if (eval > score) {
-					score = eval;
-					best = position;
-				}
-			}
-
-			// auto score = this->run_minmax(depth, this->whose_turn());
-			// AIGame &best = this->find_best();
-			// std::cout << "score GENERATED: " << score << '\n';
-
-			// if (best.move() == 0) {
-			// 	std::cout << "\tMade a random move\n"; 
-			// 	return random_selection.front();
+			// for (auto &position : this->states()) {
+			// 	auto eval = position.run_minmax(depth - 1, this->whose_turn());
+			// 	if (eval > score) {
+			// 		score = eval;
+			// 		best = position;
+			// 	}
 			// }
 
-			return best.move();
+			// // auto score = this->run_minmax(depth, this->whose_turn());
+			// // AIGame &best = this->find_best();
+			// // std::cout << "score GENERATED: " << score << '\n';
+			// return best.move();
 		}
 
-		auto run_minmax(int depth, int player) -> int {
-			if (depth == 0 || this->terminal()) {
-				// std::cout << "\nWHOSE TURN " << this->whose_turn() << " Player: " << player << '\n';
-				// std::cout << *this << score() << " Heuristic: " << this->heuristic() << '\n';
-				// if (score_ == AIGame::MAXSCORE) {
-				// 	exit(1);
-				// }
-				if (whose_turn() == player) return -this->score();
+		auto run_minmax(int depth, int for_player) -> int {
+			if (this->terminal()) {
+				auto const player_end = (PLAYER0 == score_ || PLAYER0 == -score_) ? 0 : 1;
+				if (player_end != for_player) return -score_;
+				return score_;
+			}
+			if (depth == 0) {
+				// Generate heuristic
+				auto curr = heuristic(for_player);
+				auto other = heuristic(this->player_after(for_player));
+				score_ = curr - other;
+				// if (whose_turn() == for_player) return -this->score();
 				return this->score();
 			}
 			
-			if (player == this->whose_turn()) {
-				auto score = AIGame::MINSCORE;
+			this->generate_all_moves();
+
+			if (for_player == this->whose_turn()) {
+				// WANT TO MAXIMIZE
 				for (auto &position : this->states()) {
-					auto eval = position.run_minmax(depth - 1, player);
-					if (eval > score) {
-						score = eval;
-					}
+					auto eval = position.run_minmax(depth - 1, for_player);
 				}
-				this->score_ = score;
-				return score;
+				auto const& best = this->find_best();
+				this->score_ = best.score();
+				// this->move_ = best.move();
+				return best.move_;
 			}
 			else {
-				auto score = AIGame::MAXSCORE;
+				// WANT TO MINIMIZE
 				for (auto &position : this->states()) {
-					auto eval = position.run_minmax(depth - 1, player);
-					if (eval < score) {
-						score = eval;
-					}
+					auto eval = position.run_minmax(depth - 1, for_player);
 				}
-				this->score_ = score;
-				return score;
+				auto const& worst = this->find_worst();
+				this->score_ = worst.score();
+				// this->move_ = worst.move();
+				return worst.move_;
 			}
 		}
 
@@ -136,21 +128,12 @@ class AIGame : public BaseGame {
 			return false;
 		}
 
-		auto heuristic() -> int {
+		auto heuristic(int const player) -> int {
 			// Assume current player is trying to win
 			Board const &board = this->board();
-			auto const player = this->previous_player();
 			auto const free_spaces = board.free_tiles();
 			auto const player_tiles = board.player_tiles(player);
 			auto const opponent_tiles = board.opponent_tiles(player);
-			// std::cout << board << '\n';
-			// std::cout << opponent_tiles << '\n';
-			// for (auto t : opponent_tiles.binary_to_vector()) {
-			// 	std::cout << t << '\n';
-			// }
-			// exit(1);
-			// auto tri = axial::vector::unit_directions();
-			// for (auto &i : tri) { i *= 3; }
 
 			auto const units = axial::vector::unit_directions();
 			auto count = 0;
@@ -173,8 +156,8 @@ class AIGame : public BaseGame {
 					if (isSet(opponent_tiles, (tile + dir))) 		continue; // Opponent tile blocks
 					if (isSet(opponent_tiles, tile + (dir * 2))) 	continue; // Opponent tile blocks
 					
-					if (isSet(player_tiles, vec_location)) ++count; // Weight progress higher
-					if (isSet(player_tiles, vec_location)) ++count; // Weight progress higher
+					if (isSet(player_tiles, (tile + dir))) ++count; // Weight progress higher
+					if (isSet(player_tiles, tile + (dir * 2))) ++count; // Weight progress higher
 
 					// auto const space_1 = axial::vector::index(axial::vector::index(dir * 2));
 					// if (!std::binary_search(free_spaces.begin(), free_spaces.end(), space_1)) continue;
