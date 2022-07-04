@@ -31,7 +31,7 @@ auto main(void) -> int {
 	// game.play(0);
 	std::cout << game << "\nStarting board\n";
 
-	auto depth = 5;
+	auto depth = 3;
 	while (game.terminal() == false) {
 		// int player_move;
 		// std::cin >> player_move;
