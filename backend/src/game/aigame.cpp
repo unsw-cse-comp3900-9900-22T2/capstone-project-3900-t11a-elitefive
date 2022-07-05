@@ -1,6 +1,6 @@
 #include <string.h>
 #include <vector>
-
+#include <assert.h> // TODO: DELETE
 #include "aigame.hpp"
 #include "basegame.hpp"
 
@@ -12,6 +12,7 @@ AIGame::AIGame(int nplayers)
 , move_{-1}
 , terminal_{false}
 , score_{0}		// TODO: CHANGE TO UNSET
+, eval_{false}
 , states_{}
 {}
 
@@ -20,6 +21,7 @@ AIGame::AIGame(AIGame const& position, int move)
 , move_{move}
 , terminal_{position.terminal()}
 , score_{position.score()}		// TODO: CHANGE FOR NO SCORE
+, eval_{false}
 , states_{}
 {}
 
@@ -28,12 +30,13 @@ auto AIGame::play(std::string move) -> bool {
 	return play(position);
 }
 
-auto AIGame::generate_all_moves() -> void {
+auto AIGame::generate_all_moves(Memo &memo) -> void {
 	auto const previous_score = score();
 	auto const nplayers = board().num_players();
 	for (auto const& move : board().free_tiles().binary_to_vector()) {
 		play(move);
-		store_game(AIGame(*this, move));
+		store_game(this->board().all_boards());
+		memo.insert_if_not_stored(*this, move);
 		unplay(move);
 	}
 
@@ -72,12 +75,12 @@ auto AIGame::score() const -> int {
 	return score_;
 }
 
-auto AIGame::states() -> std::vector<AIGame>& {
+auto AIGame::states() -> std::vector<std::vector<BitBoard>>& {
 	return states_;
 }
 
-auto AIGame::store_game(AIGame game) -> void {
-	states_.push_back(game);
+auto AIGame::store_game(std::vector<BitBoard> const& board) -> void {
+	states_.push_back(board);
 }
 
 auto AIGame::end_turn() -> void {
@@ -97,67 +100,104 @@ auto AIGame::undo_turn() -> void {
 	score_ = 0;
 }
 
-auto AIGame::states() const -> std::vector<AIGame> const& {
+auto AIGame::states() const -> std::vector<std::vector<BitBoard>> const& {
 	return states_;
 }
 
-auto AIGame::find_best() -> AIGame& {
-	// TODO: If it's all a tie, pick from the bucket of ties instead of defaulting to start
-	auto const &index = std::max_element(states().begin(), states().end(), [](AIGame const& a1, AIGame const& a2) {
-		return a1.score_ < a2.score_;
-	});
-	return *index;
-}
+// auto AIGame::find_best() -> AIGame& {
+// 	// TODO: If it's all a tie, pick from the bucket of ties instead of defaulting to start
+// 	auto const &index = std::max_element(states().begin(), states().end(), [](AIGame const& a1, AIGame const& a2) {
+// 		return a1.score_ < a2.score_;
+// 	});
+// 	return *index;
+// }
 
-auto AIGame::find_worst() -> AIGame& {
-	// TODO: If it's all a tie, pick from the bucket of ties instead of defaulting to start
-	auto const &index = std::min_element(states().begin(), states().end(), [](AIGame const& a1, AIGame const& a2) {
-		return a1.score_ < a2.score_;
-	});
-	return *index;
-}
+// auto AIGame::find_worst() -> AIGame& {
+// 	// TODO: If it's all a tie, pick from the bucket of ties instead of defaulting to start
+// 	auto const &index = std::min_element(states().begin(), states().end(), [](AIGame const& a1, AIGame const& a2) {
+// 		return a1.score_ < a2.score_;
+// 	});
+// 	return *index;
+// }
 
 auto AIGame::minmax(int depth) -> int {
-	
-	return run_minmax(depth, this->whose_turn());
+	auto memo = Memo();
+	auto const move = run_minmax(depth, this->whose_turn(), memo);
+	return move;
 }
 
-auto AIGame::run_minmax(int depth, int for_player) -> int {
+auto AIGame::run_minmax(int depth, int for_player, Memo &memo) -> int {
 	if (this->terminal()) {
 		auto const player_end = (PLAYER0 == score_ || PLAYER0 == -score_) ? 0 : 1;
 		score_ += depth;	// TODO: HACK to avoid BMing the other player. Will take a win at earlier depths
+		
+
 		if (player_end != for_player) return -score_;
 		return score_;
 	}
+	// if (this->eval()) {
+	// 	// We evaluated a transposition of this position earlier.
+	// 	std::cout << "Evaluated already. Depth: " << depth << "\tScore: " << this->score() << '\n';
+	// 	return this->score();
+	// }
 	if (depth == 0) {
 		// Generate heuristic
 		auto curr = heuristic(for_player);
 		auto other = heuristic(this->player_after(for_player));
+		
+		this->setEval();
+		
 		// TODO: This needs to change for three player
 		score_ = curr - other;		// Get different between both players for eval
 		return this->score();
 	}
 	
-	this->generate_all_moves();
+	this->generate_all_moves(memo);
 
 	// Player 0 is trying to maximize scores (+ve values)
 	if (for_player == 0) {
 		// WANT TO MAXIMIZE
-		for (auto &position : this->states()) {
-			auto eval = position.run_minmax(depth - 1, player_after(for_player));
+		auto scores = std::vector<AIGame>{};
+		for (auto &state : this->states()) {
+			auto &position = memo.find(state);
+			if (position.eval()) {
+				// std::cout << "Evaluated already. Depth: " << depth << "\tScore: " << position.score() << '\n';
+			}
+			else {
+				auto eval = position.run_minmax(depth - 1, player_after(for_player), memo);
+			}
+			scores.push_back(position);
 		}
-		auto const& best = this->find_best();
-		this->score_ = best.score();
-		return best.move_;
+		auto const& best = std::max_element(scores.begin(), scores.end(), [](AIGame const& a1, AIGame const& a2) {
+			return a1.score_ < a2.score_;
+		});
+		// auto const& best = this->find_best();
+		this->score_ = best->score();
+		return best->move_;
+		// return -1;
 	}
 	else { // Player 1 is trying to minimize scores (-ve values)
 		// WANT TO MINIMIZE
-		for (auto &position : this->states()) {
-			auto eval = position.run_minmax(depth - 1, player_after(for_player));
+		auto scores = std::vector<AIGame>{};
+		for (auto &state : this->states()) {
+			auto &position = memo.find(state);
+			if (position.eval()) {
+				// std::cout << "Evaluated already. Depth: " << depth << "\tScore: " << position.score() << '\n';
+			}
+			else {
+				auto eval = position.run_minmax(depth - 1, player_after(for_player), memo);
+			}
+			scores.push_back(position);
 		}
-		auto const& worst = this->find_worst();
-		this->score_ = worst.score();
-		return worst.move_;
+
+		// TODO: If it's all a tie, pick from the bucket of ties instead of defaulting to start
+		auto const& worst = std::min_element(scores.begin(), scores.end(), [](AIGame const& a1, AIGame const& a2) {
+			return a1.score_ < a2.score_;
+		});
+
+		// auto const& worst = this->find_worst();
+		this->score_ = worst->score();
+		return worst->move_;
 	}
 }
 

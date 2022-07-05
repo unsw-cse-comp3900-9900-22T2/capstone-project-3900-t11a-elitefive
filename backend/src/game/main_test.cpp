@@ -117,6 +117,6 @@ auto ai_play_game(AIGame &game) -> void {
 		game.play(move);
 		game.clear();
 		std::cout << game << '\n'; 
-		// break;
+		break;
 	}
 }

@@ -25,9 +25,10 @@ class AIGame : public BaseGame {
 		int move_;
 		bool terminal_;
 		int score_;
-		std::vector<AIGame> states_;
+		bool eval_;
+		std::vector<std::vector<BitBoard>> states_;
 	public:
-		AIGame(): BaseGame{2}, move_{-1}, terminal_{false}, score_{0}, states_{}{}	// For the memo class
+		AIGame(): BaseGame{2}, move_{-1}, terminal_{false}, score_{0}, eval_{}, states_{}{}	// For the memo class
 		AIGame(int nplayers);
 		AIGame(AIGame const& position, int move);
 
@@ -36,28 +37,32 @@ class AIGame : public BaseGame {
 		auto play(std::string move) -> bool override;	// Does NOT provide error checking
 		auto play(int index) -> bool override;			// Does NOT provide error checking
 		auto unplay(int index) -> void;
+
+		auto setEval() -> void {eval_ = true;}
+		auto eval() -> bool {return eval_;}
+
+
+		auto store_game(std::vector<BitBoard> const& board) -> void;
+		auto generate_all_moves(Memo &memo) -> void;
 		
-		auto store_game(AIGame game) -> void;
-		auto generate_all_moves() -> void;
-		
-		auto find_best() -> AIGame&;
-		auto find_worst() -> AIGame&;
+		// auto find_best() -> AIGame&;
+		// auto find_worst() -> AIGame&;
 
 		auto move() const -> int;
 		auto terminal() const -> bool;
 		auto score() const -> int;
-		auto states() -> std::vector<AIGame>&;
-		auto states() const -> std::vector<AIGame> const&;
+		auto states() -> std::vector<std::vector<BitBoard>>&;
+		auto states() const -> std::vector<std::vector<BitBoard>> const&;
 
 
 		auto clear() -> void {
-			states_ = std::vector<AIGame>{};
+			states_ = std::vector<std::vector<BitBoard>>{};
 		}
 
 		auto minmax(int depth) -> int;
 
 	private:
-		auto run_minmax(int depth, int for_player) -> int;
+		auto run_minmax(int depth, int for_player, Memo &memo) -> int;
 		auto heuristic(int const player) -> int;
 
 		auto end_turn() -> void;
@@ -87,6 +92,14 @@ class Memo {
 		Memo() 
 		: map_{} 
 		{}
+
+		auto insert_if_not_stored(AIGame const& game, int move) -> void {
+			if (this->contains(game.board().all_boards())) {
+				// ALREADY INSERTED
+				return;
+			}
+			this->insert(game, move);
+		}
 
 		auto insert(AIGame const& game, int move) -> void {
 			map_.insert({
