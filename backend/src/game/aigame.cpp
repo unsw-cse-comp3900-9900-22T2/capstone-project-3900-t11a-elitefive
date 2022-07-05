@@ -7,7 +7,6 @@
 // Helper functions
 auto isSet(BitBoard const& board, axial::vector const& vec) -> bool;
 
-
 AIGame::AIGame(int nplayers)
 : BaseGame{nplayers}
 , move_{-1}
@@ -116,6 +115,11 @@ auto AIGame::find_worst() -> AIGame& {
 		return a1.score_ < a2.score_;
 	});
 	return *index;
+}
+
+auto AIGame::minmax(int depth) -> int {
+	
+	return run_minmax(depth, this->whose_turn());
 }
 
 auto AIGame::run_minmax(int depth, int for_player) -> int {

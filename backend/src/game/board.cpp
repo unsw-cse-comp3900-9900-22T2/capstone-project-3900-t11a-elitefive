@@ -87,6 +87,11 @@ auto Board::free_tiles(axial::vector const& anchor_point, axial::vector const& u
 	return candidate_tiles & free_spaces;
 }
 
+auto Board::all_boards() const -> std::vector<BitBoard> {
+	return player_boards_;
+}
+
+
 
 // Static functions
 auto Board::axis(int tile, axial::vector const& unit_direction) -> BitBoard {

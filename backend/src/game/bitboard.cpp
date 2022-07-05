@@ -16,6 +16,10 @@ BitBoard::BitBoard(std::bitset<64> const& board)
 // : board_{state}
 // {}
 
+auto BitBoard::value() const -> uint64_t {
+	return board_;
+}
+
 auto BitBoard::binary() const -> std::bitset<64> {
 	return std::bitset<64>(board_);
 }

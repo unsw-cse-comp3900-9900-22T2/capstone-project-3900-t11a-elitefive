@@ -38,7 +38,7 @@ class Board {
 		auto free_tiles() const -> BitBoard;															// Gives all available free tiles on board
 		auto free_tiles(int tile, axial::vector const& unit_direction) const -> BitBoard;						// Gives all free tiles along a direction
 		auto free_tiles(axial::vector const& anchor_point, axial::vector const& unit_direction) const -> BitBoard;	// Gives all free tiles along a direction
-
+		auto all_boards() const -> std::vector<BitBoard>;
 
 		friend auto operator<<(std::ostream& os, Board const& board) -> std::ostream& {
 			auto const board_width = 9;	// Static board size assumption
