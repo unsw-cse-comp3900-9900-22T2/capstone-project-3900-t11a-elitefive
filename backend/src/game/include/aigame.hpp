@@ -100,7 +100,8 @@ class AIGame : public BaseGame {
 			
 			this->generate_all_moves();
 
-			if (for_player == this->whose_turn()) {
+			// if (for_player == this->whose_turn()) {
+			if (for_player == 0) {
 				// WANT TO MAXIMIZE
 				for (auto &position : this->states()) {
 					auto eval = position.run_minmax(depth - 1, for_player);

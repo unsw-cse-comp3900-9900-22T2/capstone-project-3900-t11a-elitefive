@@ -85,7 +85,7 @@ auto main(void) -> int {
 	game.play(55);
 	game.pass_turn();
 
-	game.play(42);
+	// game.play(42);
 
 
 
@@ -95,7 +95,7 @@ auto main(void) -> int {
 		// std::cout << i << '\n';
 	// }
 	// std::cout << game.ongoing() << '\n';
-	auto depth = 1;
+	auto depth = 2;
 	while (game.terminal() == false) {
 		// int player_move;
 		// std::cin >> player_move;
@@ -110,7 +110,7 @@ auto main(void) -> int {
 		game.play(move);
 		game.clear();
 		std::cout << game << '\n'; 
-		break;
+		// break;
 	}
 
 	return 0;
