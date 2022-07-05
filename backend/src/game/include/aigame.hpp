@@ -86,6 +86,7 @@ class AIGame : public BaseGame {
 		auto run_minmax(int depth, int for_player) -> int {
 			if (this->terminal()) {
 				auto const player_end = (PLAYER0 == score_ || PLAYER0 == -score_) ? 0 : 1;
+				score_ += depth;	// TODO: HACK to avoid BMing the other player. Will take a win at earlier depths
 				if (player_end != for_player) return -score_;
 				return score_;
 			}
@@ -104,7 +105,7 @@ class AIGame : public BaseGame {
 			if (for_player == 0) {
 				// WANT TO MAXIMIZE
 				for (auto &position : this->states()) {
-					auto eval = position.run_minmax(depth - 1, for_player);
+					auto eval = position.run_minmax(depth - 1, player_after(for_player));
 				}
 				auto const& best = this->find_best();
 				this->score_ = best.score();
@@ -114,7 +115,7 @@ class AIGame : public BaseGame {
 			else {
 				// WANT TO MINIMIZE
 				for (auto &position : this->states()) {
-					auto eval = position.run_minmax(depth - 1, for_player);
+					auto eval = position.run_minmax(depth - 1, player_after(for_player));
 				}
 				auto const& worst = this->find_worst();
 				this->score_ = worst.score();
@@ -148,27 +149,17 @@ class AIGame : public BaseGame {
 					auto const vec_location = axial::vector(tile) + target_vec;
 					// Doesn't land on target
 					if (vec_location.distance() > 4) continue; // Ignore tiles outside the board
-					
-					// std::cout << "\ttarvec: " << target_vec << "  :" << axial::vector::index(target_vec) << '\n';
-					// std::cout << "\tvecloc: " << vec_location << "  :" << axial::vector::index(vec_location) << '\n';
 
 					if (!isSet(player_tiles, vec_location)) 		continue; // You don't have a tile here
-					// std::cout << "\tHERE " << axial::vector::index(vec_location) << '\n';
 					if (isSet(opponent_tiles, (tile + dir))) 		continue; // Opponent tile blocks
 					if (isSet(opponent_tiles, tile + (dir * 2))) 	continue; // Opponent tile blocks
 					
-					if (isSet(player_tiles, (tile + dir))) ++count; // Weight progress higher
+					if (isSet(player_tiles, (tile + dir))) ++count; 	// Weight progress higher
 					if (isSet(player_tiles, tile + (dir * 2))) ++count; // Weight progress higher
-
-					// auto const space_1 = axial::vector::index(axial::vector::index(dir * 2));
-					// if (!std::binary_search(free_spaces.begin(), free_spaces.end(), space_1)) continue;
-					// auto const space_2 = axial::vector::index(axial::vector::index(dir * 3));
-					// if (!std::binary_search(free_spaces.begin(), free_spaces.end(), space_2)) continue;
 
 					++count; // Potential for a connect 4
 				}
 			}
-			// std::cout << count/2 << "\n\n";
 			return count/2;
 		}
 
