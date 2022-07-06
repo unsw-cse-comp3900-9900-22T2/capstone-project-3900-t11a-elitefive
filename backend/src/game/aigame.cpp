@@ -1,6 +1,7 @@
 #include <string.h>
 #include <vector>
 #include <assert.h> // TODO: DELETE
+#include <algorithm>
 #include "aigame.hpp"
 #include "basegame.hpp"
 
@@ -11,7 +12,7 @@ AIGame::AIGame(int nplayers)
 : BaseGame{nplayers}
 , move_{-1}
 , reason_{AIGame::terminal::NONE}
-, eval_{false}
+, eval_depth_{-1}
 , score_{0}		// TODO: CHANGE TO UNSET
 , states_{}
 {}
@@ -21,7 +22,7 @@ AIGame::AIGame(AIGame const& position, int move)
 , move_{move}
 , reason_{position.reason()}
 , score_{position.score()}		// TODO: CHANGE FOR NO SCORE
-, eval_{position.eval()}
+, eval_depth_{position.evalDepth()}
 , states_{}
 {}
 
@@ -31,6 +32,7 @@ auto AIGame::play(std::string move) -> bool {
 }
 
 auto AIGame::generate_all_moves(Memo &memo) -> void {
+	if (states_.size() != 0) return; // Already generated
 	auto const previous_score = score();
 	// auto const nplayers = board().num_players();
 	for (auto const& move : board().free_tiles().binary_to_vector()) {
@@ -122,14 +124,23 @@ auto AIGame::states() const -> std::vector<std::vector<BitBoard>> const& {
 
 auto AIGame::minmax(int depth) -> int {
 	auto memo = Memo();
-	auto const score = run_minmax(depth, this->whose_turn(), memo, -99999, 99999);
-	std::cout << "Best score: " << score << '\n';
-	for (auto const& state : this->states()) {
-		AIGame *position = memo.find(state);
-		if (position->score() == score) return position->move();
+	int final_move = -1;
+	for (int inc_depth = 3; inc_depth <= depth; ++inc_depth) {
+		// std::cout << "\tCalculating depth: " << inc_depth << ' ';
+		auto const score = run_minmax(inc_depth, this->whose_turn(), memo, -99999, 99999);
+		for (auto const& state : this->states()) {
+			AIGame *position = memo.find(state);
+			// std::cout << *position << position->move() << '\t' << position->score() << '\n';
+			if (position->score() == score) {
+				// std::cout << position->move() << '\n';
+				final_move = position->move();
+				break;
+			}
+		}
+		std::cout << "\tDepth: " << inc_depth << "\tBest score: " << score << "\tMove: " << final_move << '\n';
 	}
-	exit(1);
-	// return move;
+	// exit(1);
+	return final_move;
 }
 
 auto AIGame::score_position(int player_perspective, int offset) -> int /*score of state*/ {
@@ -155,7 +166,7 @@ auto AIGame::run_minmax(int depth, int player, Memo &memo, int alpha, int beta) 
 	if (depth == 0 || this->isTerminal()) {
 		auto score = this->score_position(player, depth);
 		this->score_ = score;
-		this->setEval();
+		this->setEval(depth);
 		return score;
 	}
 
@@ -168,8 +179,12 @@ auto AIGame::run_minmax(int depth, int player, Memo &memo, int alpha, int beta) 
 		for (auto const& board_id : this->states()) {
 			AIGame *state = memo.find(board_id);
 			int eval = state->score(); 		// If precomputed take existing eval...
-			if (state->eval() == false) {	// Need to compute for this state
+			if (state->eval(depth) == false) {	// Need to compute for this state
 				eval = state->run_minmax(depth - 1, player_after(player), memo, alpha, beta);
+				state->setEval(depth);
+			}
+			else {
+				// std::cout << "Precomputed\n";
 			}
 			if (eval > maxEval) {
 				maxEval = eval;
@@ -179,6 +194,13 @@ auto AIGame::run_minmax(int depth, int player, Memo &memo, int alpha, int beta) 
 			alpha = std::max(alpha, eval);
 		}
 
+		// Sort higher scoring positions first
+		std::stable_sort(states_.begin(), states_.end(), [&memo](std::vector<BitBoard> const&a, std::vector<BitBoard> const&b) {
+			AIGame *s1 = memo.find(a);
+			AIGame *s2 = memo.find(b);
+			return s1->score() > s2->score();
+		});
+		
 		this->score_ = best->score();
 		return this->score_;
 	}
@@ -190,8 +212,9 @@ auto AIGame::run_minmax(int depth, int player, Memo &memo, int alpha, int beta) 
 		for (auto const& board_id : this->states()) {
 			AIGame *state = memo.find(board_id);
 			int eval = state->score(); 		// If precomputed take existing eval...
-			if (state->eval() == false) {	// Need to compute for this state
+			if (state->eval(depth) == false) {	// Need to compute for this state
 				eval = state->run_minmax(depth - 1, player_after(player), memo, alpha, beta);
+				state->setEval(depth);
 			}
 			if (eval < minEval) {
 				minEval = eval;
@@ -200,6 +223,14 @@ auto AIGame::run_minmax(int depth, int player, Memo &memo, int alpha, int beta) 
 			if (eval <= alpha) break;
 			beta = std::min(beta, eval);
 		}
+
+		// Sort lowest scoring positions first
+		std::stable_sort(states_.begin(), states_.end(), [&memo](std::vector<BitBoard> const&a, std::vector<BitBoard> const&b) {
+			AIGame *s1 = memo.find(a);
+			AIGame *s2 = memo.find(b);
+			return s1->score() < s2->score();
+		});
+
 		this->score_ = worst->score();
 		return this->score_;
 	}

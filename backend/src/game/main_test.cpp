@@ -88,12 +88,12 @@ auto generate_test_game() -> AIGame {
 	// return game;
 	
 	auto game = AIGame(2);
-	game.pass_turn();
-	game.play(0);
-	game.play(1);
-	game.play(2);
-	game.play(3);
-	game.play(4);
+	// game.pass_turn();
+	game.play(30);
+	game.play(38);
+	game.play(31);
+	game.play(12);
+	// game.play(28);
 
 	// game.play(6);
 	// game.play(5)

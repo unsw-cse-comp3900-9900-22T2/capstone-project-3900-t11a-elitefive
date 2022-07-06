@@ -24,11 +24,11 @@ class AIGame : public BaseGame {
 	private:
 		int move_;
 		terminal reason_;
-		bool eval_;			// Says whether the board has been heuristically evaluated
+		int eval_depth_;			// Says whether the board has been heuristically evaluated
 		int score_;			// The heuristic score
 		std::vector<std::vector<BitBoard>> states_;
 	public:
-		AIGame(): BaseGame{2}, move_{-1}, reason_{terminal::NONE}, eval_{}, score_{0}, states_{}{}	// For the memo class
+		AIGame(): BaseGame{2}, move_{-1}, reason_{terminal::NONE}, eval_depth_{-1}, score_{0}, states_{}{}	// For the memo class
 		AIGame(int nplayers);
 		AIGame(AIGame const& position, int move);
 
@@ -38,8 +38,13 @@ class AIGame : public BaseGame {
 		auto play(int index) -> bool override;			// Does NOT provide error checking
 		auto unplay(int index) -> void;
 
-		auto setEval() -> void {eval_ = true;}
-		auto eval() const -> bool {return eval_;}
+		auto setEval(int depth) -> void {eval_depth_ = depth;}
+		auto eval(int depth) const -> bool {
+			if (depth == eval_depth_) return true;
+			return false;
+		}
+		auto evalDepth() const -> int {return eval_depth_;}
+
 		auto score_position(int player_perspective, int offset=0) -> int;
 
 		auto store_game(std::vector<BitBoard> const& board) -> void;
