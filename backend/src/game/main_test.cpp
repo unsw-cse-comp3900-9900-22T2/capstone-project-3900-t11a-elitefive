@@ -3,92 +3,132 @@
 
 #include "board.hpp"
 #include "computer.hpp"
+#include "aigame.hpp"
 #include "game.hpp"
+#include "bitboard.hpp"
 
+#include <unordered_map>
+#include <memory.h>
+
+auto generate_test_game() -> AIGame;
+auto ai_play_game(AIGame &game) -> void;
+auto computer_verse_computer() -> void;
+
+
+// struct BoardHashTEST
+// {
+// 	std::size_t operator()(std::vector<BitBoard> const& key) const
+// 		{
+// 		BitBoard seed = BitBoard();
+// 		for (auto const& i : key) {
+// 			seed = seed | i;
+// 		}
+// 		return seed.value();
+// 	}
+// };
+
+// struct BoardEqualTEST
+// {
+// 	bool operator()(std::vector<BitBoard> const& lhs, std::vector<BitBoard> const& rhs) const {	
+// 		if (lhs.size() != rhs.size()) return false;
+// 		return std::equal(lhs.begin(), lhs.end(), rhs.begin());
+// 	}
+// };
+// 	// auto map = std::unordered_map<std::vector<BitBoard>, std::unique_ptr<AIGame>, BoardHashTEST, BoardEqualTEST> {
+// 	// 	// {{3,4}, "There"}
+// 	// };
+
+// 	// map.insert({game.board().all_boards(), std::make_unique<AIGame>(game, 3)});
+
+// 	// if(map.find(game.board().all_boards()) != map.end()) {
+// 	// 	std::cout <<  *map[game.board().all_boards()];
+// 	// }
 
 auto main(void) -> int {
-	auto board = Board(2);
-	board.set(10, 0);
-	board.set(3, 1);
-	board.set(25, 0);
-	board.set(40, 1);
-	std::cout << board << '\n';
+	// auto game = AIGame(2);
+	// game.play(4);
+	// game.play(2);
+	// game.play(1);
+	// game.play(3);
 
-	auto p1 = board.player_tiles(0);
-	auto p2 = board.player_tiles(1);
+	// auto memo = Memo();
+	// memo.insert(game, 3);
+	// auto boards = game.board().all_boards();
+	// std::cout << memo.contains(boards) << '\n';
+	// std::cout << memo.find(boards) << '\n';
 
-	std::cout << (p1 ^ p2) << '\n';
-
+	auto game = generate_test_game();
+	ai_play_game(game);
+	
 	return 0;
 }
 
-// // // auto main(void) -> int {
-// // // 	auto uids = std::vector<int>{100, 200};
-// // // 	auto board = Board(2, uids);
+auto computer_verse_computer() -> void {
+	for (int i = 0; i < 10000; ++i) {
+		auto game = Game(2);
+		auto computer = Computer(game);
+		while (game.ongoing()) {
+			auto const move = computer.make_random_move(std::as_const(game).board());
+			game.play(move);
+		}
+		std::cout << game << '\n';
+	}
+}
 
-// // // 	while (board.game_status() == Board::state::ONGOING) {
-// // // 		std::cout << board << "Player: " << board.whose_turn() << "\tMove: \n\n";
-// // // 		std::string coord;
-// // // 		std::cin >> coord;
-// // // 		board.play_move(coord);
+auto generate_test_game() -> AIGame {
+	// auto game = AIGame(2);
+	// game.pass_turn();
+	// game.play(1); game.pass_turn();
+	// game.play(3); game.pass_turn();
+	// game.play(4); //game.pass_turn();
+
+	// // game.play(45); game.pass_turn();
+	// // game.play(46); game.pass_turn();
+	// // game.play(48); game.pass_turn();
+	// return game;
+	
+	auto game = AIGame(2);
+	// game.pass_turn();
+	game.play(30);
+	game.play(38);
+	game.play(31);
+	game.play(12);
+	// game.play(28);
+
+	// game.play(6);
+	// game.play(5)
+	// game.play(19);
+	// game.play(12);
+	// game.play(21);
+	// game.play(29);
+	// game.play(7);
+	// game.play(8);
+	// game.play(9);
+
+	// game.play(5);
+	// game.play(7);
+	// game.play(6);
+	// game.play(20);
+	return game;
+}
+
+auto ai_play_game(AIGame &game) -> void {
+	std::cout << game << "\nStarting board\n";
+	auto depth = 5;
+	while (game.isTerminal() == false) {
+		// int player_move;
+		// std::cin >> player_move;
+		// game.play(player_move);
+		// std::cout << game << '\n'; 
 		
-// // // 		std::cout << board << '\n';
-// // // 		auto computer = Computer(board);
-// // // 		Hexagon &hex = board.find_tile(computer.make_random_move());
-// // // 		board.play_move(hex);
-// // // 	}
-// // // 	std::cout << board << "\n";
-
-// // // 	auto result = board.game_status();
-// // // 	std::string output;
-// // // 	if (result == Board::state::WIN) output = std::string(" won!");
-// // // 	if (result == Board::state::LOSS) output = std::string(" lost!");
-// // // 	if (result == Board::state::DRAW) output = std::string(" drew!");
-
-// // // 	std::cout << "Player: " << board.whose_turn() << output << '\n';
-
-// // // 	return 0;
-// // // }
-
-// // auto main(void) -> int {
-// // 	// auto vec = axial::vector{-1,0,1};
-// // 	// std::cout << "Index: " << axial::vector::index(vec) << '\n';
-// // 	// auto board = Board(2);
-// // 	// board.set(30, 1);
-// // 	// board.set(15, 0);
-// // 	// board.set(45, 1);
-// // 	// board.set(41, 0);
-// // 	// board.set(4, 1);
-// // 	// board.set(38, 1);
-
-
-// // 	// auto p1 = board.player_tiles(1);
-// // 	// auto diagonal = Board::axis(4, axial::vector::us());
-// // 	// std::cout << "Three: " << Board::check_n(p1, diagonal, 3) << '\n';
-
-
-// // 	for (int i = 0; i < 61; i++) {
-// // 		auto game = Game(2);
-// // 		game.play(i);
-
-// // 		std::cout << game << '\n';
-// // 		std::cout << Game::indexToCoord(i) << '\n';
-// // 		std::cout << Game::coordToIndex(Game::indexToCoord(i)) << '\n';
-// // 	}
-
-
-// // 	// std::cout << p1 << '\n';
-// // 	// std::cout << diagonal << '\n';
-// // 	// std::cout << (p1 & diagonal) << '\n';
-
-
-// // 	// std::cout << board << '\n';	
-// // 	// std::cout << board.free_tiles() << '\n';	
-
-// // 	// std::cout << board.free_tiles(30, axial::vector::uqr()) << '\n';
-
-// // 	// for (auto i : board.free_tiles(15, axial::vector::ur()).binary_to_vector()) {
-// // 	// 	std::cout << "i: " << i << '\n';
-// // 	// }
-
-// // }
+		// std::cout << "Generating moves ...\n";
+		// game.generate_to_depth(depth);
+		std::cout << "Minmax" << '\n';
+		auto move = game.minmax(depth);
+		std::cout << "Move: " << move << '\n';
+		game.play(move);
+		game.clear();
+		std::cout << game << '\n'; 
+		// break;
+	}
+}
