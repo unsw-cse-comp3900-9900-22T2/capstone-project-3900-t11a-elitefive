@@ -9,19 +9,11 @@ create table users (
 	primary key (id)	
 );
 
-create table friends (
-	friend1 integer,
-	friend2 integer,
-	foreign key (friend1) references users (id),
-	foreign key (friend2) references users (id),
-	primary key (friend1, friend2)
-);
-
 create table matches (
 	id serial,
 	game gameType, 
 	start_time timestamp,
-	-- elapsed_time interval, -- todo 
+	replay text;
 	primary key (id)
 );
 
@@ -35,4 +27,18 @@ create table outcomes (
 	primary key (player, match)
 );
 
--- todo snapsot table
+create table snapshots (
+	match integer,
+	move_num integer,
+	boardstate bigint,
+	foreign key (match) references matches(id),
+	primary key (match, move_num)
+);
+
+create table friends (
+	friend1 integer,
+	friend2 integer,
+	foreign key (friend1) references users (id),
+	foreign key (friend2) references users (id),
+	primary key (friend1, friend2)
+);

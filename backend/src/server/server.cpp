@@ -23,7 +23,7 @@ void RelaySocket(){
 	
 	app.listen(8080, [](auto *listen_socket){
 		if(listen_socket){
-			std::cout<< "Listening on port" << 8080<< std::endl;
+			std::cout<< "Listening on port" << 8080 << std::endl;
 		};
 	});
 
@@ -34,7 +34,9 @@ void RelaySocket(){
   app.get("/db", [](auto *res, auto *req) {
      // test inserting into db
      db_insert_user("jessie" ,"jessie@jessie.com", "meowth");
-     res->end("pgg");
+		 auto user = db_get_user("jessie@jessie.com");
+		 res->end(user->password_hash);
+     // res->end("pgg");
    });
 
 
