@@ -40,3 +40,18 @@ Jacky X and David C set up their coding environments. Unfortunately, I was unabl
 For next week:
 - Set up coding environment and focus heavily on coding to ensure we have completed all tasks for the first sprint.
 - Establish database and corresponding SQL queries.
+
+Week 4
+
+We had a meeting in class on Tuesday to discuss what needed to be set up and completed by next class, which was the first sprint.
+Everyone had Docker and their coding environments set up completely within a day or two of the class so we could begin programming.
+- Jacky X and Yirong focused on frontend work.
+- Sage and I focused on the database.
+- David and I worked on the backend.
+I started by working on the database side and refactored some code that Sage had written up; however, I ran into some issues with libraries.
+I then worked on some backend - more specifically, the game logic, with system and functionality that David had put in place.
+Furthermore, I modified some frontend and backend code to fix some issues with some user interaction issues regarding the playable board.
+
+For next week:
+- Sprint 1 Demo
+- Continue coding and making progress towards Sprint 2

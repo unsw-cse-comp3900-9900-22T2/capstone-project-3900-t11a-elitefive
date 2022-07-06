@@ -12,16 +12,17 @@ include_directories(
 file(GLOB all_SRCS
         "${PROJECT_SOURCE_DIR}/src/server/server.cpp"
         "${PROJECT_SOURCE_DIR}/src/game/*.cpp"
-        # "${PROJECT_SOURCE_DIR}/src/database/*.cpp"  // TODO: Please fix lpqxx so we can uncomment this
+        "${PROJECT_SOURCE_DIR}/src/database/*.cpp"
 
 )
 list(REMOVE_ITEM all_SRCS "${PROJECT_SOURCE_DIR}/src/game/main_test.cpp") # Note: This file is just for local testing
 
-# link pqxx with classic flags
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpqxx -lpq")
 
 # Create project "simple_example"
 set(CMAKE_CXX_STANDARD 17)  # Enable c++17 standard
+
+# linking pqxx 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpqxx -lpq")
 
 # linking zlib
 find_package(ZLIB REQUIRED)
@@ -35,16 +36,12 @@ include_directories(${UWEBSOCKETS_INCLUDE_DIRS})
 find_package(nlohmann_json CONFIG REQUIRED)
 set(nlohmann-json_IMPLICIT_CONVERSIONS OFF)
 
-# linking pqxx
-#add_subdirectory(deps/pqxx build-pqxx)
-#find_package(libpqxx REQUIRED)
-
 # create server executable
 add_executable(server ${all_SRCS})
 
 target_link_libraries(server PRIVATE
   ZLIB::ZLIB
   ${USOCKETS_LIB}
-#   pqxx
+  pqxx
   nlohmann_json::nlohmann_json
 )

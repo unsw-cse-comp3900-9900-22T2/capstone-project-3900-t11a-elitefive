@@ -95,3 +95,15 @@ live updates to all clients who are participating.
 Throughout the week, we all participated in many discord calls to go over what needed to be done.
 
 Next week we need to demo and will be working more on functionality to do with networking and AI.
+
+Week 5
+We had our demo on Tuesday and it seems like it went fairly well. We held our retrospective no long after the demo.
+Our group was pretty happy with what we got done and we planned what we were going to work on for the next sprint.
+During the week I have been rewriting the backend system to be more inline with the replay system, so we can
+easily track moves played in the game and give it to the database to store.
+- Rewrote the game system
+- Wrote BitBoard representation which can compresses a board state into a 64 bit number
+- Rewriting AI to be more flexible with othe rgame modes
+- Fixed Backend directory structure to be more organised
+Also go vscode working with our project now.
+
