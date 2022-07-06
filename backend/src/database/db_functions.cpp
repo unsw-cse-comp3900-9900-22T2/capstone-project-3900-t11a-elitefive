@@ -102,6 +102,25 @@ auto db_add_friends(int friend1, int friend2) -> int{
 	}
 }
 
+auto db_insert_user(std::string username, std::string email, std::string password) -> int {
+
+	try{
+		auto sql = std::string("INSERT INTO users VALUES (DEFAULT") + ", '" +
+		username + "', '" + email + "', '" + hash_password(password) + "');";
+	
+		pqxx::connection conn(DB_STRING);
+		pqxx::work w(conn);
+		w.exec(sql);
+		w.commit();
+		
+		conn.disconnect();
+		return 0;
+	}
+	catch(const pqxx::pqxx_exception &e){
+		std::cerr  << e.base().what();
+		return -1;
+	}
+}
 
 auto hash_password(std::string password) -> std::string {
 
@@ -124,25 +143,3 @@ auto hash_password(std::string password) -> std::string {
     */
     return password;
 }
-
-
-auto db_insert_user(std::string username, std::string email, std::string password) -> int {
-
-	try{
-		auto sql = std::string("INSERT INTO users VALUES (DEFAULT") + ", '" +
-		username + "', '" + email + "', '" + hash_password(password) + "');";
-	
-		pqxx::connection conn(DB_STRING);
-		pqxx::work w(conn);
-		w.exec(sql);
-		w.commit();
-		
-		conn.disconnect();
-		return 0;
-	}
-	catch(const pqxx::pqxx_exception &e){
-		std::cerr  << e.base().what();
-		return -1;
-	}
-}
-

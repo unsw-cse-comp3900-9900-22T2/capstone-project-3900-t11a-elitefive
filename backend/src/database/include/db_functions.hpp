@@ -17,10 +17,8 @@ auto db_get_user(int id) -> User*;
 // Get user with given email
 auto db_get_user(std::string email) -> User*;
 
-// Hash password with sha256
-//auto hash_password(std::string password) -> std::string;
-
 // Add firends using their IDs
 auto db_add_friends(int friend1, int friend2) -> int;
 
-
+// Hash password with sha256
+//auto hash_password(std::string password) -> std::string;
