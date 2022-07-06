@@ -76,7 +76,19 @@ auto computer_verse_computer() -> void {
 }
 
 auto generate_test_game() -> AIGame {
+	// auto game = AIGame(2);
+	// game.pass_turn();
+	// game.play(1); game.pass_turn();
+	// game.play(3); game.pass_turn();
+	// game.play(4); //game.pass_turn();
+
+	// // game.play(45); game.pass_turn();
+	// // game.play(46); game.pass_turn();
+	// // game.play(48); game.pass_turn();
+	// return game;
+	
 	auto game = AIGame(2);
+	game.pass_turn();
 	game.play(0);
 	game.play(1);
 	game.play(2);
@@ -103,7 +115,7 @@ auto generate_test_game() -> AIGame {
 auto ai_play_game(AIGame &game) -> void {
 	std::cout << game << "\nStarting board\n";
 	auto depth = 5;
-	while (game.terminal() == false) {
+	while (game.isTerminal() == false) {
 		// int player_move;
 		// std::cin >> player_move;
 		// game.play(player_move);

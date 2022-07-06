@@ -16,19 +16,19 @@ class Memo;
 
 class AIGame : public BaseGame {
 	public:
-		static int const MAXSCORE = 999;
-		static int const MINSCORE = -999;
-		static int const PLAYER0 = 1000;	// WINNER TODO: Hacky
-		static int const PLAYER1 = 1001;	// WINNER TODO: Hacky
-
+		enum class terminal {
+			PLAYER0_WIN, PLAYER0_LOSS,
+			PLAYER1_WIN, PLAYER1_LOSS,
+			NONE,
+		};
 	private:
 		int move_;
-		bool terminal_;
-		int score_;
-		bool eval_;
+		terminal reason_;
+		bool eval_;			// Says whether the board has been heuristically evaluated
+		int score_;			// The heuristic score
 		std::vector<std::vector<BitBoard>> states_;
 	public:
-		AIGame(): BaseGame{2}, move_{-1}, terminal_{false}, score_{0}, eval_{}, states_{}{}	// For the memo class
+		AIGame(): BaseGame{2}, move_{-1}, reason_{terminal::NONE}, eval_{}, score_{0}, states_{}{}	// For the memo class
 		AIGame(int nplayers);
 		AIGame(AIGame const& position, int move);
 
@@ -39,8 +39,8 @@ class AIGame : public BaseGame {
 		auto unplay(int index) -> void;
 
 		auto setEval() -> void {eval_ = true;}
-		auto eval() -> bool {return eval_;}
-
+		auto eval() const -> bool {return eval_;}
+		auto score_position(int player_perspective, int offset=0) -> int;
 
 		auto store_game(std::vector<BitBoard> const& board) -> void;
 		auto generate_all_moves(Memo &memo) -> void;
@@ -49,7 +49,8 @@ class AIGame : public BaseGame {
 		// auto find_worst() -> AIGame&;
 
 		auto move() const -> int;
-		auto terminal() const -> bool;
+		auto isTerminal() const -> bool;
+		auto reason() const -> AIGame::terminal;
 		auto score() const -> int;
 		auto states() -> std::vector<std::vector<BitBoard>>&;
 		auto states() const -> std::vector<std::vector<BitBoard>> const&;
@@ -62,7 +63,7 @@ class AIGame : public BaseGame {
 		auto minmax(int depth) -> int;
 
 	private:
-		auto run_minmax(int depth, int for_player, Memo &memo, int alpha, int beta) -> int;
+		auto run_minmax(int depth, int player, Memo &memo, int alpha, int beta) -> int;
 		auto heuristic(int const player) -> int;
 
 		auto end_turn() -> void;

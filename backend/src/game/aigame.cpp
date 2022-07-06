@@ -10,18 +10,18 @@ auto isSet(BitBoard const& board, axial::vector const& vec) -> bool;
 AIGame::AIGame(int nplayers)
 : BaseGame{nplayers}
 , move_{-1}
-, terminal_{false}
-, score_{0}		// TODO: CHANGE TO UNSET
+, reason_{AIGame::terminal::NONE}
 , eval_{false}
+, score_{0}		// TODO: CHANGE TO UNSET
 , states_{}
 {}
 
 AIGame::AIGame(AIGame const& position, int move)
 : BaseGame{position.board(), position.whose_turn(), position.num_moves()}
 , move_{move}
-, terminal_{position.terminal()}
+, reason_{position.reason()}
 , score_{position.score()}		// TODO: CHANGE FOR NO SCORE
-, eval_{false}
+, eval_{position.eval()}
 , states_{}
 {}
 
@@ -32,7 +32,7 @@ auto AIGame::play(std::string move) -> bool {
 
 auto AIGame::generate_all_moves(Memo &memo) -> void {
 	auto const previous_score = score();
-	auto const nplayers = board().num_players();
+	// auto const nplayers = board().num_players();
 	for (auto const& move : board().free_tiles().binary_to_vector()) {
 		play(move);
 		store_game(this->board().all_boards());
@@ -43,20 +43,16 @@ auto AIGame::generate_all_moves(Memo &memo) -> void {
 	score_ = previous_score;
 }
 
-auto set_end_state(int player) {
-	if (player == 0) return AIGame::PLAYER0;
-	if (player == 1) return -AIGame::PLAYER1;
-}
-
 auto AIGame::play(int index) -> bool {
 	auto const curr_player = this->whose_turn();
 	board().set(index, curr_player);
 	if (won(index, curr_player)) {
-		terminal_ = true;
-		score_ = set_end_state(curr_player); // TODO: Change because it is hacky
+		if (curr_player == 0) reason_ = AIGame::terminal::PLAYER0_WIN;
+		if (curr_player == 1) reason_ = AIGame::terminal::PLAYER1_WIN;
+
 	} else if (loss(index, curr_player)) {
-		terminal_ = true;
-		score_ = -set_end_state(curr_player); // TODO: Change because it is hacky
+		if (curr_player == 0) reason_ = AIGame::terminal::PLAYER0_LOSS;
+		if (curr_player == 1) reason_ = AIGame::terminal::PLAYER1_LOSS;
 	}
 	end_turn();
 	return true;
@@ -67,8 +63,12 @@ auto AIGame::unplay(int index) -> void {
 	board().unset(index, this->whose_turn());
 }
 
-auto AIGame::terminal() const -> bool {
-	return terminal_;
+auto AIGame::isTerminal() const -> bool {
+	return (reason_ != AIGame::terminal::NONE);
+}
+
+auto AIGame::reason() const -> AIGame::terminal {
+	return reason_;
 }
 
 auto AIGame::score() const -> int {
@@ -96,8 +96,8 @@ auto AIGame::move() const -> int {
 auto AIGame::undo_turn() -> void {
 	this->decrease_move();
 	this->unpass_turn();
-	terminal_ = false;
-	score_ = 0;
+	reason_ = AIGame::terminal::NONE;
+	score_ = 0;		// TODO: Could be a problem
 }
 
 auto AIGame::states() const -> std::vector<std::vector<BitBoard>> const& {
@@ -132,83 +132,76 @@ auto AIGame::minmax(int depth) -> int {
 	// return move;
 }
 
-// Returns best score
-auto AIGame::run_minmax(int depth, int for_player, Memo &memo, int alpha, int beta) -> int {
-	if (this->terminal()) {
-		auto const player_end = (PLAYER0 == score_ || PLAYER0 == -score_) ? 0 : 1;
-		score_ += depth;	// TODO: HACK to avoid BMing the other player. Will take a win at earlier depths
-		
+auto AIGame::score_position(int player_perspective, int offset) -> int /*score of state*/ {
+	if (this->isTerminal() == true) {
+		auto const& reason = this->reason();
+		switch(reason) {
+			case terminal::PLAYER0_WIN:		return  1000 + offset;	
+			case terminal::PLAYER1_WIN:		return -1000 - offset;
+			case terminal::PLAYER0_LOSS:	return -1000 - offset;
+			case terminal::PLAYER1_LOSS:	return  1000 + offset;
+		}
+	}
 
-		if (player_end != for_player) return -score_;
-		return score_;
-	}
-	// if (this->eval()) {
-	// 	// We evaluated a transposition of this position earlier.
-	// 	std::cout << "Evaluated already. Depth: " << depth << "\tScore: " << this->score() << '\n';
-	// 	return this->score();
-	// }
-	if (depth == 0) {
-		// Generate heuristic
-		auto curr = heuristic(for_player);
-		auto other = heuristic(this->player_after(for_player));
-		
+	auto p0 = heuristic(0);	// Player 0
+	auto p1 = heuristic(1);	// Player 1
+	return p0 - p1;
+
+}
+
+
+// Returns best score
+auto AIGame::run_minmax(int depth, int player, Memo &memo, int alpha, int beta) -> int /*score of state*/ {
+	if (depth == 0 || this->isTerminal()) {
+		auto score = this->score_position(player, depth);
+		this->score_ = score;
 		this->setEval();
-		
-		// TODO: This needs to change for three player
-		score_ = curr - other;		// Get different between both players for eval
-		return this->score();
+		return score;
 	}
-	
+
 	this->generate_all_moves(memo);
 
-	// Player 0 is trying to maximize scores (+ve values)
-	if (for_player == 0) {
-		// WANT TO MAXIMIZE
-		int maxeval = -9999;
-		AIGame *ptr = nullptr; 
+	if (player == 0) {
+		int maxEval = -99999;
+		AIGame *best = nullptr;
 
-		for (auto &state : this->states()) {
-			AIGame *position = memo.find(state);
-			int eval = position->score();
-			if (!position->eval()) {
-				eval = position->run_minmax(depth - 1, player_after(for_player), memo, alpha, beta);
+		for (auto const& board_id : this->states()) {
+			AIGame *state = memo.find(board_id);
+			int eval = state->score(); 		// If precomputed take existing eval...
+			if (state->eval() == false) {	// Need to compute for this state
+				eval = state->run_minmax(depth - 1, player_after(player), memo, alpha, beta);
 			}
-
-			if (eval > maxeval) {	// MAX
-				maxeval = eval;
-				ptr = position;
+			if (eval > maxEval) {
+				maxEval = eval;
+				best = state;
 			}
-			alpha = std::max(alpha, maxeval);
-			if (beta <= alpha) break;
+			if (eval >= beta) break;
+			alpha = std::max(alpha, eval);
 		}
 
-		// Set the best score
-		this->score_ = ptr->score();
-		return ptr->score();
+		this->score_ = best->score();
+		return this->score_;
 	}
-	else { // Player 1 is trying to minimize scores (-ve values)
-		// WANT TO MINIMIZE
-		int mineval = 9999;
-		AIGame *ptr = nullptr; 
 
-		for (auto &state : this->states()) {
-			AIGame *position = memo.find(state);
-			int eval = position->score();
-			if (!position->eval()) {
-				eval = position->run_minmax(depth - 1, player_after(for_player), memo, alpha, beta);
-			}
+	if (player == 1) {
+		int minEval = 99999;
+		AIGame *worst = nullptr;
 
-			if (eval < mineval) {	// MIN
-				mineval = eval;
-				ptr = position;
+		for (auto const& board_id : this->states()) {
+			AIGame *state = memo.find(board_id);
+			int eval = state->score(); 		// If precomputed take existing eval...
+			if (state->eval() == false) {	// Need to compute for this state
+				eval = state->run_minmax(depth - 1, player_after(player), memo, alpha, beta);
 			}
-			beta = std::min(beta, mineval);
-			if (beta <= alpha) break;
+			if (eval < minEval) {
+				minEval = eval;
+				worst = state;
+			}
+			if (eval <= alpha) break;
+			beta = std::min(beta, eval);
 		}
-
-		// Set the worst score
-		this->score_ = ptr->score();
-		return ptr->score();
+		this->score_ = worst->score();
+		return this->score_;
 	}
 }
 
