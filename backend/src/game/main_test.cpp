@@ -84,7 +84,7 @@ auto generate_test_game() -> AIGame {
 	game.play(4);
 
 	// game.play(6);
-	// game.play(5);
+	// game.play(5)
 	// game.play(19);
 	// game.play(12);
 	// game.play(21);
@@ -102,7 +102,7 @@ auto generate_test_game() -> AIGame {
 
 auto ai_play_game(AIGame &game) -> void {
 	std::cout << game << "\nStarting board\n";
-	auto depth = 3;
+	auto depth = 5;
 	while (game.terminal() == false) {
 		// int player_move;
 		// std::cin >> player_move;
@@ -117,6 +117,6 @@ auto ai_play_game(AIGame &game) -> void {
 		game.play(move);
 		game.clear();
 		std::cout << game << '\n'; 
-		break;
+		// break;
 	}
 }

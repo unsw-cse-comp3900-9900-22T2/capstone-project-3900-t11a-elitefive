@@ -8,8 +8,20 @@ class Game : public BaseGame {
 	public:
 		enum class state { ONGOING, WIN, LOSS, DRAW };
 	private:
-		std::vector<int> uids_;
+		std::vector<int> uids_; 
 		Game::state gamestate_;
+		// TODO: For backend, need to be able to store the following information for replay functionality.
+		// REPLAY SEQUENCE-> "E3A2E7 ....."
+		// REPLAY SNAPSHOT-> std::vector<uint64_t>{}
+
+		// P0	0 - (64bit board state)
+		// P1	1 - (64bit board state)
+		// P2	2 - (64bit board state)
+		// P0	3 - (64bit board state)
+		// P1	4 - (64bit board state)
+		// P2	5 - (64bit board state)
+		// P0	6 - (64bit board state)
+
 	public:
 		Game(int nplayers);
 
@@ -19,6 +31,7 @@ class Game : public BaseGame {
 		auto ongoing() const -> bool;
 		auto status() const -> Game::state const;		// Tells you whether the game is over or not
 
+		// auto give_replay() -> 
 		// auto check() -> bool; 							// TODO: IMPLEMENT -> Valid move?
 		// auto over() -> bool; 							// TODO: IMPLEMENT -> Has the game ended?
 

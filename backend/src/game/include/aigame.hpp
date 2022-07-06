@@ -62,7 +62,7 @@ class AIGame : public BaseGame {
 		auto minmax(int depth) -> int;
 
 	private:
-		auto run_minmax(int depth, int for_player, Memo &memo) -> int;
+		auto run_minmax(int depth, int for_player, Memo &memo, int alpha, int beta) -> int;
 		auto heuristic(int const player) -> int;
 
 		auto end_turn() -> void;
@@ -113,8 +113,8 @@ class Memo {
 		}
 
 		// NOTE: Need to check if it contains first
-		auto find(std::vector<BitBoard> const& boards) -> AIGame& {
-			return *map_.find(boards)->second;
+		auto find(std::vector<BitBoard> const& boards) -> AIGame *{
+			return map_.find(boards)->second.get();
 		}
 };
 

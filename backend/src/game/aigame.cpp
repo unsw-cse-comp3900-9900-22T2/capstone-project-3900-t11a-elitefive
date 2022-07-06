@@ -122,11 +122,18 @@ auto AIGame::states() const -> std::vector<std::vector<BitBoard>> const& {
 
 auto AIGame::minmax(int depth) -> int {
 	auto memo = Memo();
-	auto const move = run_minmax(depth, this->whose_turn(), memo);
-	return move;
+	auto const score = run_minmax(depth, this->whose_turn(), memo, -99999, 99999);
+	std::cout << "Best score: " << score << '\n';
+	for (auto const& state : this->states()) {
+		AIGame *position = memo.find(state);
+		if (position->score() == score) return position->move();
+	}
+	exit(1);
+	// return move;
 }
 
-auto AIGame::run_minmax(int depth, int for_player, Memo &memo) -> int {
+// Returns best score
+auto AIGame::run_minmax(int depth, int for_player, Memo &memo, int alpha, int beta) -> int {
 	if (this->terminal()) {
 		auto const player_end = (PLAYER0 == score_ || PLAYER0 == -score_) ? 0 : 1;
 		score_ += depth;	// TODO: HACK to avoid BMing the other player. Will take a win at earlier depths
@@ -157,47 +164,51 @@ auto AIGame::run_minmax(int depth, int for_player, Memo &memo) -> int {
 	// Player 0 is trying to maximize scores (+ve values)
 	if (for_player == 0) {
 		// WANT TO MAXIMIZE
-		auto scores = std::vector<AIGame>{};
+		int maxeval = -9999;
+		AIGame *ptr = nullptr; 
+
 		for (auto &state : this->states()) {
-			auto &position = memo.find(state);
-			if (position.eval()) {
-				// std::cout << "Evaluated already. Depth: " << depth << "\tScore: " << position.score() << '\n';
+			AIGame *position = memo.find(state);
+			int eval = position->score();
+			if (!position->eval()) {
+				eval = position->run_minmax(depth - 1, player_after(for_player), memo, alpha, beta);
 			}
-			else {
-				auto eval = position.run_minmax(depth - 1, player_after(for_player), memo);
+
+			if (eval > maxeval) {	// MAX
+				maxeval = eval;
+				ptr = position;
 			}
-			scores.push_back(position);
+			alpha = std::max(alpha, maxeval);
+			if (beta <= alpha) break;
 		}
-		auto const& best = std::max_element(scores.begin(), scores.end(), [](AIGame const& a1, AIGame const& a2) {
-			return a1.score_ < a2.score_;
-		});
-		// auto const& best = this->find_best();
-		this->score_ = best->score();
-		return best->move_;
-		// return -1;
+
+		// Set the best score
+		this->score_ = ptr->score();
+		return ptr->score();
 	}
 	else { // Player 1 is trying to minimize scores (-ve values)
 		// WANT TO MINIMIZE
-		auto scores = std::vector<AIGame>{};
+		int mineval = 9999;
+		AIGame *ptr = nullptr; 
+
 		for (auto &state : this->states()) {
-			auto &position = memo.find(state);
-			if (position.eval()) {
-				// std::cout << "Evaluated already. Depth: " << depth << "\tScore: " << position.score() << '\n';
+			AIGame *position = memo.find(state);
+			int eval = position->score();
+			if (!position->eval()) {
+				eval = position->run_minmax(depth - 1, player_after(for_player), memo, alpha, beta);
 			}
-			else {
-				auto eval = position.run_minmax(depth - 1, player_after(for_player), memo);
+
+			if (eval < mineval) {	// MIN
+				mineval = eval;
+				ptr = position;
 			}
-			scores.push_back(position);
+			beta = std::min(beta, mineval);
+			if (beta <= alpha) break;
 		}
 
-		// TODO: If it's all a tie, pick from the bucket of ties instead of defaulting to start
-		auto const& worst = std::min_element(scores.begin(), scores.end(), [](AIGame const& a1, AIGame const& a2) {
-			return a1.score_ < a2.score_;
-		});
-
-		// auto const& worst = this->find_worst();
-		this->score_ = worst->score();
-		return worst->move_;
+		// Set the worst score
+		this->score_ = ptr->score();
+		return ptr->score();
 	}
 }
 
