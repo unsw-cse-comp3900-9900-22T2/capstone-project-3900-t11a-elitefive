@@ -10,6 +10,7 @@ class Game : public BaseGame {
 	private:
 		std::vector<int> uids_; 
 		Game::state gamestate_;
+		std::vector<std::string> move_sequence_;
 		// TODO: For backend, need to be able to store the following information for replay functionality.
 		// REPLAY SEQUENCE-> "E3A2E7 ....."
 		// REPLAY SNAPSHOT-> std::vector<uint64_t>{}
@@ -31,12 +32,15 @@ class Game : public BaseGame {
 		auto ongoing() const -> bool;
 		auto status() const -> Game::state const;		// Tells you whether the game is over or not
 
+		auto move_sequence() const -> std::string;
+
 		// auto give_replay() -> 
 		// auto check() -> bool; 							// TODO: IMPLEMENT -> Valid move?
 		// auto over() -> bool; 							// TODO: IMPLEMENT -> Has the game ended?
 
 	private:
 		auto end_turn(int index) -> void;
+		auto append_move(std::string move) -> void;
 };
 
 #endif

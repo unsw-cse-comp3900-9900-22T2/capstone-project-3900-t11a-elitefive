@@ -8,6 +8,7 @@ Game::Game(int nplayers)
 : BaseGame{nplayers}
 , uids_{std::vector<int>(nplayers, -1)}
 , gamestate_{Game::state::ONGOING}
+, move_sequence_{}
 {}
 
 
@@ -26,6 +27,7 @@ auto Game::play(std::string move) -> bool {
 auto Game::play(int index) -> bool {
 	board().set(index, this->whose_turn());
 	end_turn(index);
+	append_move(BaseGame::indexToCoord(index));
 	return true;
 }
 
@@ -33,9 +35,16 @@ auto Game::ongoing() const -> bool {
 	return this->status() == Game::state::ONGOING;
 }
 
-
 auto Game::status() const -> Game::state const {
 	return gamestate_;
+}
+
+auto Game::move_sequence() const -> std::string {
+	auto sequence = std::string{};
+	for (auto const& move : move_sequence_) {
+		sequence.append(move);
+	}
+	return sequence;
 }
 
 
@@ -60,3 +69,6 @@ auto Game::end_turn(int index) -> void {
 	pass_turn();
 }
 
+auto Game::append_move(std::string move) -> void {
+	move_sequence_.push_back(move);
+}

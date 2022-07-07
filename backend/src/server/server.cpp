@@ -23,6 +23,7 @@ void RelaySocket(){
 	};
 	
 	auto app = uWS::App();
+	auto db = DatabaseManager();
 	
 	app.listen(8080, [](auto *listen_socket){
 		if(listen_socket){
@@ -34,9 +35,8 @@ void RelaySocket(){
 		res->end("{\"name\": \"david\"}");
 	});
 
-  app.get("/db", [](auto *res, auto *req) {
+  app.get("/db", [&db](auto *res, auto *req) {
      // test inserting into db
-		 auto db = DatabaseManager();
 		//  db.insert_user("username", "email", "password");
 		//  auto user = db.get_user("email");
 		//  res->end(user->password_hash);
@@ -60,7 +60,7 @@ void RelaySocket(){
 			game = std::make_unique<Game>(2);
 			aigame = std::make_unique<AIGame>(2);
 		},
-		.message = [&game, &aigame](auto *ws, std::string_view message, uWS::OpCode opCode){
+		.message = [&game, &aigame, &db](auto *ws, std::string_view message, uWS::OpCode opCode){
 			// 1. Parsing JSON to update board backend
 			auto json = nlohmann::json::parse(message);
 			std::string datastring = json["data"];
@@ -113,7 +113,10 @@ void RelaySocket(){
 					} else {
 						winner = "PLAYER";
 					}
+					std::cout << game->move_sequence() << '\n';
 					ws->publish("ROOM1", "{\"event\": \"game_over\", \"winner\": \"" + winner + "\"}", opCode);
+					auto const match_id = db.save_match("CLASSIC", game->move_sequence());
+					std::cout << "Match ID: " << match_id << '\n';
 				}	
 			}
 		},
