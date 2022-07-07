@@ -35,9 +35,11 @@ void RelaySocket(){
   app.get("/db", [](auto *res, auto *req) {
      // test inserting into db
 		 auto db = DatabaseManager();
-		 db.insert_user("username", "email", "password");
-		 auto user = db.get_user("email");
-		 res->end(user->password_hash);
+		//  db.insert_user("username", "email", "password");
+		//  auto user = db.get_user("email");
+		//  res->end(user->password_hash);
+		auto matchID = db.save_match("CLASSIC", "12345");
+		res->end(std::to_string(matchID));
    });
 
 

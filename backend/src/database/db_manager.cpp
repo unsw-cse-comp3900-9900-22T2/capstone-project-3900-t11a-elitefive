@@ -24,17 +24,27 @@ auto DatabaseManager::get_user(int id) -> User* {
   return new User(row);
 }
 
+auto DatabaseManager::save_match(std::string gameType, std::string move_seq) -> int {
+  auto row = execute1("insert_match", gameType, move_seq);
+  return atoi(row[0].c_str());
+}
+
+// Prepare the statements on instantiation.
+
 auto DatabaseManager::prepare_statements() -> void {
   conn_.prepare("insert_user", "INSERT INTO users VALUES (DEFAULT, $1, $2, $3);");
   conn_.prepare("email_get_user", "SELECT * FROM users WHERE email = $1;");
   conn_.prepare("id_get_user", "SELECT * FROM users WHERE id = $1;");
+  conn_.prepare("insert_match", "INSERT INTO matches(game, replay) VALUES ($1, $2) RETURNING id;");
 }
 
 template<typename... Args>
 auto DatabaseManager::execute(std::string statement, Args... args) -> pqxx::result {
   pqxx::work w(conn_);
   try {
-    return w.exec_prepared(statement, args...);
+    auto result = w.exec_prepared(statement, args...);
+    w.commit();
+    return result;
   } catch (const pqxx::pqxx_exception &e) {
     std::cerr << e.base().what();
   }
@@ -59,7 +69,9 @@ template<typename... Args>
 auto DatabaseManager::execute1(std::string statement, Args... args) -> pqxx::row {
   pqxx::work w(conn_);
   try {
-    return w.exec_prepared1(statement, args...);
+    auto row = w.exec_prepared1(statement, args...);
+    w.commit();
+    return row;
   } catch (const pqxx::pqxx_exception &e) {
     std::cerr << e.base().what();
   }
