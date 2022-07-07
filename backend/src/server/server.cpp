@@ -1,6 +1,7 @@
 #include <iostream>
-#include <uwebsockets/App.h>
-#include <uwebsockets/WebSocket.h>
+// #include <uwebsockets/App.h>
+// #include <uwebsockets/WebSocket.h>
+#include "App.h"
 // #include <libusockets.h>
 #include <nlohmann/json.hpp>
 
@@ -12,8 +13,13 @@
 // https://stackoverflow.com/questions/8304190/cmake-with-include-and-source-paths-basic-setup
 #include "board.hpp"
 #include "computer.hpp"
+<<<<<<< HEAD
 #include "db_utils.hpp"
 #include "db_manager.hpp"
+=======
+#include "db_functions.hpp"
+#include "aigame.hpp"
+>>>>>>> master
 
 void RelaySocket(){
 	struct SocketData{
@@ -48,14 +54,17 @@ void RelaySocket(){
 	// ws->getRemoteAddressAsText() // Gets address of the person
 	// ws->send("Hello there boi"); // Option to send message back to client only
 	std::unique_ptr<Game> game = nullptr;
+	std::unique_ptr<AIGame> aigame = nullptr;
+
 
 	auto websocket = app.ws<SocketData>("/ws/david",uWS::TemplatedApp<false>::WebSocketBehavior<SocketData> {
-		.open = [&game](auto *ws) {
+		.open = [&game, &aigame](auto *ws) {
 			// When client connects, subscribe them to the 'moves' notification game
 			ws->subscribe("ROOM1");
 			game = std::make_unique<Game>(2);
+			aigame = std::make_unique<AIGame>(2);
 		},
-		.message = [&game](auto *ws, std::string_view message, uWS::OpCode opCode){
+		.message = [&game, &aigame](auto *ws, std::string_view message, uWS::OpCode opCode){
 			// 1. Parsing JSON to update board backend
 			auto json = nlohmann::json::parse(message);
 			std::string datastring = json["data"];
@@ -66,13 +75,20 @@ void RelaySocket(){
 			}
 			ws->publish("ROOM1", "{\"event\": \"moveconfirm\", \"tile\": \"" + move + "\"}", opCode);
 
+			// TODO: NEED TO MAKE THIS ASYNC SOMEHOW BECAUSE ALL ws->publish in function GETS BATCHED AND SENT AT ONCE
 			// 2. AI Move
 			// AI/Computer generate move and publish.
 			auto computer = Computer(*game);
 			if (game->status() == Game::state::ONGOING) {
-				auto move = computer.make_random_move();
-				game->play(move);
-				std::string ai_move = Game::indexToCoord(move);
+				// auto move = computer.make_random_move();
+				// game->play(move);
+				// TODO: I THINK THIS CRASHES IF THERES NO MOVES LEFT?
+				aigame->play(move);
+				auto const calc_move = aigame->minmax(3); // depth 3 (could increase but test with that)
+				game->play(calc_move);
+				aigame->play(calc_move);
+				aigame->clear();
+				std::string ai_move = Game::indexToCoord(calc_move);
 				ws->publish("ROOM1", "{\"event\": \"move\", \"tile\": \"" + ai_move + "\"}", opCode);
 			}
 			std::cout << *game << '\n';

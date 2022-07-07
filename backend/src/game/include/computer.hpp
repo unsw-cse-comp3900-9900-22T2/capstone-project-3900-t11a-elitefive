@@ -8,7 +8,8 @@ class Computer {
 		Game game_;
 	public:
 		Computer(Game game);
-		auto make_random_move() -> int;
+		auto make_random_move() const -> int;
+		auto make_random_move(Board const& board) const -> int;
 };
 
 #endif

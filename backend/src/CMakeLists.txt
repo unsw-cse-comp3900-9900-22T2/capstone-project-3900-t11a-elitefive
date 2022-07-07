@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(board VERSION 0.1.0)
 set(CMAKE_CXX_STANDARD 17)  # Enable c++17 standard
-
+set(CMAKE_BUILD_TYPE Debug)
 
 include_directories(
         ${PROJECT_SOURCE_DIR}/game/include/  # Note: Need to say where to find the headers

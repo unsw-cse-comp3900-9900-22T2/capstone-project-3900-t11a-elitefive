@@ -129,6 +129,30 @@ board/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/board.dir/build.make CMakeFiles/board.dir/build
 .PHONY : board/fast
 
+game/aigame.o: game/aigame.cpp.o
+.PHONY : game/aigame.o
+
+# target to build an object file
+game/aigame.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/board.dir/build.make CMakeFiles/board.dir/game/aigame.cpp.o
+.PHONY : game/aigame.cpp.o
+
+game/aigame.i: game/aigame.cpp.i
+.PHONY : game/aigame.i
+
+# target to preprocess a source file
+game/aigame.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/board.dir/build.make CMakeFiles/board.dir/game/aigame.cpp.i
+.PHONY : game/aigame.cpp.i
+
+game/aigame.s: game/aigame.cpp.s
+.PHONY : game/aigame.s
+
+# target to generate assembly for a file
+game/aigame.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/board.dir/build.make CMakeFiles/board.dir/game/aigame.cpp.s
+.PHONY : game/aigame.cpp.s
+
 game/axial.o: game/axial.cpp.o
 .PHONY : game/axial.o
 
@@ -152,6 +176,30 @@ game/axial.s: game/axial.cpp.s
 game/axial.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/board.dir/build.make CMakeFiles/board.dir/game/axial.cpp.s
 .PHONY : game/axial.cpp.s
+
+game/basegame.o: game/basegame.cpp.o
+.PHONY : game/basegame.o
+
+# target to build an object file
+game/basegame.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/board.dir/build.make CMakeFiles/board.dir/game/basegame.cpp.o
+.PHONY : game/basegame.cpp.o
+
+game/basegame.i: game/basegame.cpp.i
+.PHONY : game/basegame.i
+
+# target to preprocess a source file
+game/basegame.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/board.dir/build.make CMakeFiles/board.dir/game/basegame.cpp.i
+.PHONY : game/basegame.cpp.i
+
+game/basegame.s: game/basegame.cpp.s
+.PHONY : game/basegame.s
+
+# target to generate assembly for a file
+game/basegame.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/board.dir/build.make CMakeFiles/board.dir/game/basegame.cpp.s
+.PHONY : game/basegame.cpp.s
 
 game/bitboard.o: game/bitboard.cpp.o
 .PHONY : game/bitboard.o
@@ -282,9 +330,15 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... board"
+	@echo "... game/aigame.o"
+	@echo "... game/aigame.i"
+	@echo "... game/aigame.s"
 	@echo "... game/axial.o"
 	@echo "... game/axial.i"
 	@echo "... game/axial.s"
+	@echo "... game/basegame.o"
+	@echo "... game/basegame.i"
+	@echo "... game/basegame.s"
 	@echo "... game/bitboard.o"
 	@echo "... game/bitboard.i"
 	@echo "... game/bitboard.s"
