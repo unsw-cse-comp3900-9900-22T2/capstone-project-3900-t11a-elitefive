@@ -12,7 +12,8 @@
 // https://stackoverflow.com/questions/8304190/cmake-with-include-and-source-paths-basic-setup
 #include "board.hpp"
 #include "computer.hpp"
-#include "db_functions.hpp"
+#include "db_utils.hpp"
+#include "db_manager.hpp"
 
 void RelaySocket(){
 	struct SocketData{
@@ -33,10 +34,10 @@ void RelaySocket(){
 
   app.get("/db", [](auto *res, auto *req) {
      // test inserting into db
-     db_insert_user("jessie" ,"jessie@jessie.com", "meowth");
-		 auto user = db_get_user("jessie@jessie.com");
+		 auto db = DatabaseManager();
+		 db.insert_user("username", "email", "password");
+		 auto user = db.get_user("email");
 		 res->end(user->password_hash);
-     // res->end("pgg");
    });
 
 

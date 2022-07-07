@@ -5,36 +5,6 @@
 
 #include <pqxx/pqxx>
 
-// todo: config with docker & not sage's laptop
-auto const DB_STRING = std::string("user=yavalath dbname=yavalath password=yavalath host=postgres port=5432");
-
-auto execute_query(std::string sql) -> pqxx::result {
-	try {
-		pqxx::connection conn(DB_STRING);
-		pqxx::work w(conn);
-		auto res = w.exec(sql);
-		conn.disconnect();
-		return res;
-	} catch (const pqxx::pqxx_exception &e) {
-		std::cerr << e.base().what();
-		return pqxx::result{};
-	}
-}
-
-auto commit_query(std::string sql) -> int {
-	try {
-		pqxx::connection conn(DB_STRING);
-		pqxx::work w(conn);
-		w.exec(sql);
-		w.commit();
-		conn.disconnect();
-		return 0;
-	} catch (const pqxx::pqxx_exception &e) {
-		std::cerr << e.base().what();
-		return -1;
-	}
-}
-
 auto hash_password(std::string password) -> std::string {
 
 	// TODO: figure out how to add this lib

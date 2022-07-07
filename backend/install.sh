@@ -12,4 +12,5 @@ fi
 echo "-=-=-=-=-=installing dependencies=-=-=-=-=-"
 ./vcpkg install uwebsockets
 ./vcpkg install nlohmann-json
+apt install -y libpq-dev
 apt install -y libpqxx-dev

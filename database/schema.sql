@@ -13,7 +13,7 @@ create table matches (
 	id serial,
 	game gameType, 
 	start_time timestamp,
-	replay text;
+	replay text,
 	primary key (id)
 );
 
