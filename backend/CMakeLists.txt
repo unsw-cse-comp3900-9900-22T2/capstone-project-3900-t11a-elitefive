@@ -2,11 +2,11 @@ cmake_minimum_required(VERSION 3.13)  # CMake version check
 project(prototype)
 
 include_directories(
-        ${PROJECT_SOURCE_DIR}/src
+        ${PROJECT_SOURCE_DIR}/libs/uWS/
+        # ${PROJECT_SOURCE_DIR}/src
         ${PROJECT_SOURCE_DIR}/src/game/include/  # Note: Need to say where to find the headers
         ${PROJECT_SOURCE_DIR}/src/server/include/  # Note: Need to say where to find the headers
         ${PROJECT_SOURCE_DIR}/src/database/include/  # Note: Need to say where to find the headers
-
 )
 
 file(GLOB all_SRCS
@@ -26,11 +26,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpqxx -lpq")
 
 # linking zlib
 find_package(ZLIB REQUIRED)
-find_library(USOCKETS_LIB uSockets)
+# find_library(USOCKETS_LIB uSockets)
 
 # linking uwebsockets
-find_path(UWEBSOCKETS_INCLUDE_DIRS "uwebsockets/App.h")
-include_directories(${UWEBSOCKETS_INCLUDE_DIRS})
+# find_path(UWEBSOCKETS_INCLUDE_DIRS "uwebsockets/App.h")
+# include_directories(${UWEBSOCKETS_INCLUDE_DIRS})
 
 # linking nlohmann-json
 find_package(nlohmann_json CONFIG REQUIRED)
