@@ -13,13 +13,9 @@
 // https://stackoverflow.com/questions/8304190/cmake-with-include-and-source-paths-basic-setup
 #include "board.hpp"
 #include "computer.hpp"
-<<<<<<< HEAD
 #include "db_utils.hpp"
 #include "db_manager.hpp"
-=======
-#include "db_functions.hpp"
 #include "aigame.hpp"
->>>>>>> master
 
 void RelaySocket(){
 	struct SocketData{
