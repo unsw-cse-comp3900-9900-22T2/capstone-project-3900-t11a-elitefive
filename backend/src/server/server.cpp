@@ -13,7 +13,8 @@
 // https://stackoverflow.com/questions/8304190/cmake-with-include-and-source-paths-basic-setup
 #include "board.hpp"
 #include "computer.hpp"
-#include "db_functions.hpp"
+#include "db_utils.hpp"
+#include "db_manager.hpp"
 #include "aigame.hpp"
 
 void RelaySocket(){
@@ -22,10 +23,11 @@ void RelaySocket(){
 	};
 	
 	auto app = uWS::App();
+	auto db = DatabaseManager();
 	
 	app.listen(8080, [](auto *listen_socket){
 		if(listen_socket){
-			std::cout<< "Listening on port" << 8080<< std::endl;
+			std::cout<< "Listening on port" << 8080 << std::endl;
 		};
 	});
 
@@ -33,10 +35,13 @@ void RelaySocket(){
 		res->end("{\"name\": \"david\"}");
 	});
 
-  app.get("/db", [](auto *res, auto *req) {
+  app.get("/db", [&db](auto *res, auto *req) {
      // test inserting into db
-     db_insert_user("jessie" ,"jessie@jessie.com", "meowth");
-     res->end("pgg");
+		//  db.insert_user("username", "email", "password");
+		//  auto user = db.get_user("email");
+		//  res->end(user->password_hash);
+		auto matchID = db.save_match("CLASSIC", "12345");
+		res->end(std::to_string(matchID));
    });
 
 
@@ -55,7 +60,7 @@ void RelaySocket(){
 			game = std::make_unique<Game>(2);
 			aigame = std::make_unique<AIGame>(2);
 		},
-		.message = [&game, &aigame](auto *ws, std::string_view message, uWS::OpCode opCode){
+		.message = [&game, &aigame, &db](auto *ws, std::string_view message, uWS::OpCode opCode){
 			// 1. Parsing JSON to update board backend
 			auto json = nlohmann::json::parse(message);
 			std::string datastring = json["data"];
@@ -108,7 +113,10 @@ void RelaySocket(){
 					} else {
 						winner = "PLAYER";
 					}
+					std::cout << game->move_sequence() << '\n';
 					ws->publish("ROOM1", "{\"event\": \"game_over\", \"winner\": \"" + winner + "\"}", opCode);
+					auto const match_id = db.save_match("CLASSIC", game->move_sequence());
+					std::cout << "Match ID: " << match_id << '\n';
 				}	
 			}
 		},
