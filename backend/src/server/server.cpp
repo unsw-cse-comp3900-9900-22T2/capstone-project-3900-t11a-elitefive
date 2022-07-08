@@ -35,6 +35,34 @@ void RelaySocket(){
 		res->end("{\"name\": \"david\"}");
 	});
 
+	app.post("/register", [&app](auto *res, auto *req){
+    
+        // Loop through
+        for (auto header : *req){
+            std::cout << header.first << ", " << header.second << "\n";
+        };
+        
+        std::string_view message;
+
+        // Get data from request
+        auto buffer = std::string("");
+        res->onData([&message, res, buffer = std::move(buffer)](std::string_view data, bool last) mutable {
+            buffer.append(data.data(), data.length());
+            if (last) {
+                auto user_json = nlohmann::json::parse(data);
+                auto username = std::string(user_json["username"]);
+                auto email = std::string(user_json["email"]);
+                auto password = std::string(user_json["password"]);
+
+                message = "Whatever dude\n";
+								res->end(message);
+            }
+        });
+				res->onAborted([]() -> void {
+					
+				});
+    });
+
   app.get("/db", [&db](auto *res, auto *req) {
      // test inserting into db
 		//  db.insert_user("username", "email", "password");
