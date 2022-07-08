@@ -7,7 +7,7 @@ Register Success
     "payload" : {
         "outcome" : "success"
 }
-```
+```*
 
 {"event": "register", "action": "register", "payload" : {"outcome" : "success"}
 
