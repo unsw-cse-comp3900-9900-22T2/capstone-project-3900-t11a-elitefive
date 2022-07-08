@@ -17,6 +17,8 @@
 #include "db_manager.hpp"
 #include "aigame.hpp"
 
+using json = nlohmann::json;
+
 void RelaySocket(){
 	struct SocketData{
 		//Empty because we don't need any currently.
@@ -35,32 +37,40 @@ void RelaySocket(){
 		res->end("{\"name\": \"david\"}");
 	});
 
-	app.post("/register", [&app](auto *res, auto *req){
+	app.post("/register", [&app, &db](auto *res, auto *req){
     
-        // Loop through
+        // Loop through header 
         for (auto header : *req){
             std::cout << header.first << ", " << header.second << "\n";
         };
         
-        std::string_view message;
-
         // Get data from request
-        auto buffer = std::string("");
-        res->onData([&message, res, buffer = std::move(buffer)](std::string_view data, bool last) mutable {
+        res->onData([&db, res](std::string_view data, bool last) {
+            auto buffer = std::string("");
+            auto message = std::string("");
+            
             buffer.append(data.data(), data.length());
             if (last) {
-                auto user_json = nlohmann::json::parse(data);
+                auto user_json = json::parse(data);
                 auto username = std::string(user_json["username"]);
                 auto email = std::string(user_json["email"]);
                 auto password = std::string(user_json["password"]);
 
-                message = "Whatever dude\n";
-								res->end(message);
+				// Register Success
+                if (db.insert_user(username, email, password)){
+                    message = 
+                        "{\"event'\": \"register\", \"action\": \"register\", \"payload\" : { \"outcome\" : \"success\"}";
+                }
+                // Register Failure
+                else{
+                    message = 
+                        "{\"event'\": \"register\", \"action\": \"register\", \"payload\" : { \"outcome\" : \"failure\"}";
+                }
+                // Respond
+                res->end(message);
             }
         });
-				res->onAborted([]() -> void {
-					
-				});
+		res->onAborted([]() -> void {});
     });
 
   app.get("/db", [&db](auto *res, auto *req) {
@@ -90,9 +100,9 @@ void RelaySocket(){
 		},
 		.message = [&game, &aigame, &db](auto *ws, std::string_view message, uWS::OpCode opCode){
 			// 1. Parsing JSON to update board backend
-			auto json = nlohmann::json::parse(message);
+			auto json = json::parse(message);
 			std::string datastring = json["data"];
-			auto data = nlohmann::json::parse(datastring);
+			auto data = json::parse(datastring);
 			std::string move = data["move"];
 			if (!game->play(move)) {
 				return;
