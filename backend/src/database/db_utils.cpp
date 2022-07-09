@@ -26,4 +26,9 @@ auto hash_password(std::string password) -> std::string {
     return password;
 }
 
+auto check_password(std::string email, std::string password) -> bool {
+
+    return false;
+}
+
 #endif

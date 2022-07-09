@@ -8,9 +8,9 @@ Login Success
     "payload" : {
         "outcome" : "success"
         "uid" : "<uid>"
-        "session" : "<session_token>"
         "email" : "<email>"
-        "friends": [<array of friends UIDs>]
+        "session" : "<session_token>"
+
 }
 ```
 
@@ -24,13 +24,25 @@ Logout
 }
 ```
 
-Login Failure
+Login Failure - Incorrect Password
 ```
 {
     "event": "login",
     "action": "login",
     "payload" : {
         "outcome" : "failure"
+        "message" : "incorrect password"
+}
+```
+
+Login Failure - Email not in database
+```
+{
+    "event": "login",
+    "action": "login",
+    "payload" : {
+        "outcome" : "failure"
+        "message" : "email not in database"
 }
 ```
 
