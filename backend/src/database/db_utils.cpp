@@ -4,11 +4,11 @@
 #include "db_utils.hpp"
 
 #include <pqxx/pqxx>
+#include <openssl/sha.h>
 
 auto hash_password(std::string password) -> std::string {
 
 	// TODO: figure out how to add this lib
-	/*
 	auto c_password = password.c_str();
 	char buffer[64];
 	
@@ -23,7 +23,6 @@ auto hash_password(std::string password) -> std::string {
     buffer[64] = 0;
     
     return std::string(buffer);
-    */
     return password;
 }
 

@@ -1,4 +1,5 @@
 #include "db_manager.hpp"
+#include "db_utils.hpp"
 
 DatabaseManager::DatabaseManager()
 : conn_{DB_STRING}
@@ -11,7 +12,7 @@ DatabaseManager::DatabaseManager()
 }
 
 auto DatabaseManager::insert_user(std::string username, std::string email, std::string password) -> bool {
-  return execute0("insert_user", username, email, password);
+  return execute0("insert_user", username, email, hash_password(password));
 }
 
 auto DatabaseManager::get_user(std::string email) -> User* {
