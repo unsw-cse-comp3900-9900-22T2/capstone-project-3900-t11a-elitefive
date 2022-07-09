@@ -1,4 +1,4 @@
-create type outcomeType as enum ('WIN', 'LOSE', 'DRAW');
+create type outcomeType as enum ('WIN', 'LOSS', 'DRAW');
 create type gameType as enum ('CLASSIC', 'POTHOLES');
 
 create table users (
@@ -42,3 +42,5 @@ create table friends (
 	foreign key (friend2) references users (id),
 	primary key (friend1, friend2)
 );
+
+INSERT INTO users (username) values ('BOT1'), ('BOT2');

@@ -19,7 +19,8 @@ class DatabaseManager {
     auto get_user(std::string email) -> User*;
     auto get_user(int id) -> User*;
     // MATCHES
-    auto save_match(std::string gameType, std::string move_seq) -> int;
+    auto save_match(std::string gameType, std::map<int, int> playersELO, int winner, std::string move_seq,
+      std::vector<uint64_t> snapshots) -> int;
 
 
   private:
@@ -34,7 +35,9 @@ class DatabaseManager {
     template<typename... Args>
     auto execute1(std::string statement, Args... args) -> pqxx::row;
     // Insert multiple rows.
-    // auto insert_rows(std::string table, std::vector<std::string> columns);
+    template<typename... Args>
+    auto batch_insert(std::string table, std::vector<std::string> columns,
+      std::vector<Args...> entries) -> bool;
 };
 
 #endif

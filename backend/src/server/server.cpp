@@ -56,7 +56,7 @@ void RelaySocket(){
                 auto email = std::string(user_json["email"]);
                 auto password = std::string(user_json["password"]);
 
-				// Register Success
+								// Register Success
                 if (db.insert_user(username, email, password)){
                     message = 
                         "{\"event'\": \"register\", \"action\": \"register\", \"payload\" : { \"outcome\" : \"success\"}";
@@ -78,7 +78,14 @@ void RelaySocket(){
 		//  db.insert_user("username", "email", "password");
 		//  auto user = db.get_user("email");
 		//  res->end(user->password_hash);
-		auto matchID = db.save_match("CLASSIC", "12345");
+		auto playersELO = std::map<int, int>{
+			{1, 1000},
+			{2, 1200}
+		};
+		auto winner = 1;
+		auto move_seq = "12345";
+		auto snapshots = std::vector<uint64_t>{100, 200, 300, 400, 500};
+		auto matchID = db.save_match("CLASSIC", playersELO, winner, move_seq, snapshots);
 		res->end(std::to_string(matchID));
    });
 
@@ -153,8 +160,8 @@ void RelaySocket(){
 					}
 					std::cout << game->move_sequence() << '\n';
 					ws->publish("ROOM1", "{\"event\": \"game_over\", \"winner\": \"" + winner + "\"}", opCode);
-					auto const match_id = db.save_match("CLASSIC", game->move_sequence());
-					std::cout << "Match ID: " << match_id << '\n';
+					// auto const match_id = db.save_match("CLASSIC", game->move_sequence());
+					// std::cout << "Match ID: " << match_id << '\n';
 				}	
 			}
 		},
