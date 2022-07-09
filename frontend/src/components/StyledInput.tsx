@@ -5,6 +5,8 @@ import { TextField, Typography } from '@mui/material';
 type Props = {
   label: string;
   password?: boolean;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const Container = styled.div`
@@ -23,11 +25,13 @@ const inlineStyleOverride = {
   }
 }
 
-export default function({ label, password }: Props) {
+export default function({ label, password, value, onChange }: Props) {
   return (
     <Container>
       <Typography variant="subtitle1">{label}</Typography>
       <StyledTextField
+        value={value}
+        onChange={onChange}
         type={password ? "password": "required"}
         inputProps={{...inlineStyleOverride}}
       />
