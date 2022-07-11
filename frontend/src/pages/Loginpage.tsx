@@ -10,10 +10,8 @@ type Props = {}
 
 const Container = styled.div`
   min-height: 100vh;
-
   display: flex;
   flex-direction: column;
-
   justify-content: center;
   align-items: center;
   grid-gap: 30px;
@@ -30,8 +28,8 @@ export default function Loginpage({}: Props) {
   return (
     <Container>
       <Typography variant="h3">Login</Typography>
-      <StyledInput label="username"/>
-      <StyledInput label="password" password/>
+      {/* <StyledInput label="username"/>
+      <StyledInput label="password" password/> */}
       <Button onClick={navigateToDashboard}> Submit </Button>
     </Container>
   )
