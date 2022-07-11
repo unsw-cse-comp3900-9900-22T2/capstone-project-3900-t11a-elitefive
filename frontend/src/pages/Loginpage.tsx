@@ -28,8 +28,8 @@ export default function Loginpage({}: Props) {
   return (
     <Container>
       <Typography variant="h3">Login</Typography>
-      {/* <StyledInput label="username"/>
-      <StyledInput label="password" password/> */}
+      <StyledInput label="username"/>
+      <StyledInput label="password" password/>
       <Button onClick={navigateToDashboard}> Submit </Button>
     </Container>
   )
