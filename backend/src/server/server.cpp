@@ -58,13 +58,13 @@ void RelaySocket(){
 
 				// Register Success
                 if (db.insert_user(username, email, password)){
-                    message = 
-                        "{\"event'\": \"register\", \"action\": \"register\", \"payload\" : { \"outcome\" : \"success\"}";
+                    message = "{\"event'\": \"register\", \"action\": \"register\","
+                    "\"payload\": { \"outcome\" : \"success\"}}";
                 }
                 // Register Failure
                 else{
-                    message = 
-                        "{\"event'\": \"register\", \"action\": \"register\", \"payload\" : { \"outcome\" : \"failure\"}";
+                    message = "{\"event'\": \"register\", \"action\": \"register\", "
+                        "\"payload\": { \"outcome\" : \"failure\"}}";
                 }
                 // Respond
                 res->end(message);
@@ -72,6 +72,45 @@ void RelaySocket(){
         });
 		res->onAborted([]() -> void {});
     });
+    
+	app.post("/login", [&app, &db](auto *res, auto *req){
+	
+	    // Get data from request
+	    res->onData([&db, res](std::string_view data, bool last) {
+            auto buffer = std::string("");
+            auto message = std::string("");
+            
+            buffer.append(data.data(), data.length());
+            if (last) {
+                auto user_json = json::parse(data);
+                auto email = std::string(user_json["email"]);
+                auto password = std::string(user_json["password"]); 
+        
+				auto user = db.get_user(email);
+
+                if (user != NULL){
+                    // Incorrect password
+                    if (hash_password(password) != user->password_hash){
+                         message =  "{\"event'\": \"login\", \"action\": \"login\", \"payload\":" 
+                            "{ \"outcome\" : \"failure\", \"message\": \"incorrect password\"}}";
+                    // Login success
+                    }else{
+                        message =  std::string("{\"event'\": \"login\", \"action\": \"login\", \"payload\":") +  
+                            std::string("{ \"outcome\" : \"success\", \"uid\": \"") +  std::to_string(user->id) +
+                            std::string("\", \"email\": \"") + user->email + std::string("\" ") +
+                            std::string ("\"session\": \"TODO\"}}");  
+                    }
+				// Email doesn'e exist
+                }else{
+                    message = "{\"event'\": \"login\", \"action\": \"login\", \"payload\" :" 
+                            "{ \"outcome\": \"failure\", \"message\": \"email not in database\"}}";
+                }
+                
+                res->end(message);
+			}
+		});
+		res->onAborted([]() -> void {});
+	});
 
   app.get("/db", [&db](auto *res, auto *req) {
      // test inserting into db

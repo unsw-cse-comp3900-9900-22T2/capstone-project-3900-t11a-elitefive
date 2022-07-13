@@ -22,7 +22,7 @@ list(REMOVE_ITEM all_SRCS "${PROJECT_SOURCE_DIR}/src/game/main_test.cpp") # Note
 set(CMAKE_CXX_STANDARD 17)  # Enable c++17 standard
 
 # linking pqxx 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpqxx -lpq")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpqxx -lpq -lcrypto")
 
 # linking zlib
 find_package(ZLIB REQUIRED)
@@ -43,5 +43,6 @@ target_link_libraries(server PRIVATE
   ZLIB::ZLIB
   ${USOCKETS_LIB}
   pqxx
+  crypto
   nlohmann_json::nlohmann_json
 )
