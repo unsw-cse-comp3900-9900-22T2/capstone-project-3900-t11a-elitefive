@@ -102,7 +102,7 @@ const eloFilter = (data:replayDataType[], secondaryFilter:string) => {
       return data.filter(d => d.elo > 1000);
     }
     case "<= 1000": {
-      return data.filter(d => d.elo < 1000);
+      return data.filter(d => d.elo <= 1000);
     }
   }
       
