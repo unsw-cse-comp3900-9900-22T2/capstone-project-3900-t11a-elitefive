@@ -38,10 +38,14 @@ export default function Dashboard({}: Props) {
 
   const navigate = useNavigate();
 
-    const navigateToGamepage = () => {
-        // 👇️ navigate to /contacts
-        navigate('/game');
-    };
+  const navigateToGamepage = () => {
+      // 👇️ navigate to /contacts
+      navigate('/game');
+  };
+  const navigateToReplays = () => {
+    // 👇️ navigate to /contacts
+    navigate('/replays');
+  };
 
   return (
     <Container>
@@ -53,7 +57,7 @@ export default function Dashboard({}: Props) {
         <LargeButton>
           <Typography variant="h3">{"Leaderboard"}</Typography>
         </LargeButton>
-        <LargeButton>
+        <LargeButton onClick={navigateToReplays}>
           <Typography variant="h3">{"Replays"}</Typography>
         </LargeButton>
       </Container1>

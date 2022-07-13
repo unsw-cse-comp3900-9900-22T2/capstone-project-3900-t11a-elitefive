@@ -37,7 +37,7 @@ export default function Loginpage({}: Props) {
     <Container>
       <Typography variant="h3">Login</Typography>
       <StyledInput onChange={(e) => {setEmail(e.currentTarget.value)}} value={email} label="email"/>
-      <StyledInput onChange={(e) => {setPassword(e.currentTarget.value)}} value={password} label="password"/>
+      <StyledInput onChange={(e) => {setPassword(e.currentTarget.value)}} value={password} label="password" password/>
       <Button onClick={handleClick}> Submit </Button>
     </Container>
   )
