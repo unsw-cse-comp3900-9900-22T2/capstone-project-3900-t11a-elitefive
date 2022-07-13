@@ -14,7 +14,7 @@ type Props = {
 // to look like ours
 
 const Container = styled.div`
-  width: 120px;
+  width: auto;
   background: var(--accent-dark);
   display: flex;
   cursor: pointer;
@@ -85,7 +85,6 @@ const DDMenuItemContainer = styled.div`
 
   position: relative;
   background: var(--accent-dark);
-  width: 100px;
   padding: 10px;
   text-align: center;
 
