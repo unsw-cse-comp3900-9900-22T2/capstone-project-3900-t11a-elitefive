@@ -15,7 +15,11 @@ export async function login(email: string, password: string) {
     })
     
     // register succes or register failure 
-    const response_json = await response.json()
+    console.log(response)
+    // if(!response) return;
+    const response_text = await response.text()
+    console.log(response_text)
+    const response_json = JSON.parse(response_text);
     console.log(response_json)
   
 }
