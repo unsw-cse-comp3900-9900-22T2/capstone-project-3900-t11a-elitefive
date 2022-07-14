@@ -4,6 +4,7 @@ import { Box, Typography } from '@mui/material';
 import ReplayPreview from '../components/ReplayPreview';
 import FilterBar from '../components/FilterBar';
 import SnapshotPopup from '../components/SnapshotPopup';
+import YavalathButton from '../components/YavalathButton';
 
 type Props = {}
 
@@ -115,6 +116,8 @@ export default function ReplaySearchpage({}: Props) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   
   return (
+    <>
+    <YavalathButton/>
     <Box
     display="flex"
     width="100vw"
@@ -142,5 +145,6 @@ export default function ReplaySearchpage({}: Props) {
         bye
       </SideBarContainer>
     </Box>
+    </>
   )
 }
