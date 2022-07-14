@@ -6,6 +6,7 @@ import StyledInput from '../components/StyledInput';
 import {StyledButton} from '../components/ReusableButton-styled';
 import Button, {Button2} from '../components/ReusableButton';
 import {Routes, Route, useNavigate} from 'react-router-dom';
+import { useAuth } from '../global/GlobalAuth';
 
 type Props = {}
 
@@ -42,10 +43,9 @@ const Container2  = styled.div`
   grid-gap: 30px;
 `
 
-
-
 export default function Homepage({}: Props) {
   const navigate = useNavigate();
+  const { isLogged } = useAuth();
 
   const navigateToLogin = () => {
     // 👇️ navigate to /contacts
@@ -59,6 +59,10 @@ export default function Homepage({}: Props) {
 
   const navigateToDashboard = () => {
     // 👇️ navigate to /contacts
+    if(!isLogged()) {
+      navigateToLogin();
+      return;
+    }
     navigate('/dashboard');
   };
 

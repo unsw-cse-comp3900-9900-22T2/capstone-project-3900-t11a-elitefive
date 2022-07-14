@@ -1,11 +1,12 @@
 import { text } from "stream/consumers";
 
-export async function login(email: string, password: string) {
-  // fetch("/login");
+type loginResp = {
+  uid: string,
+  token: string
+} 
+export async function login(email: string, password: string): Promise<loginResp| null> {
   
-  const data = { email: email, password: password };
-
-  
+  const data = { email: email, password: password };  
   const response = await fetch('/login', {
     method: 'POST',
     headers: {
@@ -14,13 +15,14 @@ export async function login(email: string, password: string) {
       body: JSON.stringify(data),
     })
     
-    // register succes or register failure 
-    console.log(response)
-    // if(!response) return;
-    const response_text = await response.text()
-    console.log(response_text)
-    const response_json = JSON.parse(response_text);
-    console.log(response_json)
+  // register succes or register failure 
+  const response_text = await response.text()
+  const response_json = JSON.parse(response_text);
+  const { outcome, uid, session } = response_json.payload
+
+  if(outcome == "failure") return null;
+
+  return { uid, token: session }
   
 }
 
