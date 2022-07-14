@@ -10,16 +10,19 @@ type Props = {
 } & styledProps;
 
 type styledProps = {
-} & TextFieldProps
+  background?: string;
+  size?: "small" | "medium";
+  width?: number;
+}
 
 const Container = styled.div`
   display:flex;
   flex-direction: column;
 `;
 
-const StyledTextField = styled(TextField)`
-  background: var(--textbox-dark);
-  width: 400px;
+const StyledTextField = styled.div<styledProps>`
+  background: ${({background}) => background ? background : "var(--textbox-dark)"};
+
 `;
 
 
@@ -29,7 +32,6 @@ export default function({ label, password, value, onChange, ...styledProps }: Pr
   const inlineStyleOverride = {
     style: {
       color: 'white',
-      ...styledProps
     }
   }
 
@@ -37,12 +39,21 @@ export default function({ label, password, value, onChange, ...styledProps }: Pr
     <Container>
       <Typography variant="subtitle1">{label}</Typography>
       <StyledTextField
-        value={value}
-        onChange={onChange}
-        type={password ? "password": "required"}
-        inputProps={{...inlineStyleOverride}}
         {...styledProps}
-      />
+      >
+        <TextField
+          value={value}
+          onChange={onChange}
+          type={password ? "password": "required"}
+          inputProps={{...inlineStyleOverride}}
+          size={styledProps.size ? styledProps.size : undefined}
+          style={{
+            width: styledProps.width ? styledProps.width : 350
+          }}
+        />
+      </StyledTextField
+      
+      >
     </Container>
   )
 }

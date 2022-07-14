@@ -84,7 +84,7 @@ export const AuthProvider = ({ children }: Props) => {
   }
 
   const isLogged = () => {
-    return !!auth.uid && !!auth.sessionToken;
+    return (!!auth.uid && !!auth.sessionToken) || (!!getStoredToken() && !!getStoredUID());
   }
 
   // on start
