@@ -1,13 +1,16 @@
 import React, { SetStateAction, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components';
 import Dropdown from './Dropdown';
+
 import StyledInput from './StyledInput';
+import Button from './ReusableButton';
 
 type Props = {
   filter: string | undefined;
   setFilter: React.Dispatch<SetStateAction<string|undefined>>;
   secondaryFilter: string | undefined;
   setSecondaryFilter: React.Dispatch<SetStateAction<string|undefined>>;
+  setIsOpen: React.Dispatch<SetStateAction<boolean>>;
 }
 
 const Container = styled.div`
@@ -21,7 +24,8 @@ export const filterSelections = [
   "none",
   "elo",
   "mode",
-  "type"
+  "type",
+  "snapshot"
 ]
 
 export const eloSelections = [
@@ -39,7 +43,7 @@ export const typeSelections = [
   "Potholes"
 ]
 
-export default function FilterBar({filter, setFilter, secondaryFilter, setSecondaryFilter}: Props) {
+export default function FilterBar({filter, setFilter, secondaryFilter, setSecondaryFilter, setIsOpen}: Props) {
   
   const renderDropDowns = () => {
     switch(filter) {
@@ -72,6 +76,12 @@ export default function FilterBar({filter, setFilter, secondaryFilter, setSecond
               setSecondaryFilter(selection);
             }}
           />
+        )
+      case "snapshot":
+        return (
+          <Button height={33} onClick={() => { setIsOpen(true) }}>
+            Snapshot
+          </Button>
         )
     }
   }

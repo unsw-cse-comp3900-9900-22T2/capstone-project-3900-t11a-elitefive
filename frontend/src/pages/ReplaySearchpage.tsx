@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Box, Typography } from '@mui/material';
 import ReplayPreview from '../components/ReplayPreview';
 import FilterBar from '../components/FilterBar';
+import SnapshotPopup from '../components/SnapshotPopup';
 
 type Props = {}
 
@@ -111,13 +112,15 @@ const eloFilter = (data:replayDataType[], secondaryFilter:string) => {
 export default function ReplaySearchpage({}: Props) {
   const [filter, setFilter] = useState<string|undefined>();
   const [secondaryFilter, setSecondaryFilter] = useState<string|undefined>();
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   
   return (
     <Box
-      display="flex"
-      width="100vw"
-      minHeight="100vh"
+    display="flex"
+    width="100vw"
+    minHeight="100vh"
     >
+      <SnapshotPopup open={isOpen} handleClose={() => { setIsOpen(false) }}/>
       <MainContainer>
         <Box margin="30px 50px">
           <Typography variant="h4">Replays</Typography>
@@ -126,6 +129,7 @@ export default function ReplaySearchpage({}: Props) {
             secondaryFilter={secondaryFilter}
             setFilter={setFilter}
             setSecondaryFilter={setSecondaryFilter}
+            setIsOpen={setIsOpen}
           />
         </Box>
         <ReplaysContainer>
