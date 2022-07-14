@@ -76,7 +76,6 @@ export default function Homepage({}: Props) {
           <Typography variant="h4">{"Play Now!"}</Typography>
         </Button2>
       </Container1>
-      
     </Container> 
   )
 }

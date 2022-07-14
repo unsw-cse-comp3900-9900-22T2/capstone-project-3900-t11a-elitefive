@@ -15,7 +15,7 @@ export async function login(email: string, password: string) {
     })
     
     // register succes or register failure 
-    const response_json = await response.text()
+    const response_json = await response.json()
     console.log(response_json)
   
 }
@@ -35,7 +35,7 @@ export async function register(username: string, password: string, email: string
   })
   
   // register succes or register failure 
-  const response_json = await response.text()
+  const response_json = await response.json()
   console.log(response_json)
   
 }

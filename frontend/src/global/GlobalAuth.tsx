@@ -18,6 +18,11 @@ type Props = {
 
 
 // extract from localstorage
+
+export const getStoredUID = (): string|null => window.localStorage.getItem("uid")
+export const setStoredUID = (uid: string): void => { window.localStorage.setItem("uid", uid)}
+export const removeStoredUID = () =>  { window.localStorage.removeItem("uid"); }
+
 export const getStoredToken = (): string|null => window.localStorage.getItem("session-token")
 export const setStoredToken = (token: string): void => { window.localStorage.setItem("session-token", token)}
 export const removeStoredToken = () =>  { window.localStorage.removeItem("session-token"); }
