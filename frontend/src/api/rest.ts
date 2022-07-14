@@ -23,7 +23,6 @@ export async function login(email: string, password: string): Promise<loginResp|
   if(outcome == "failure") return null;
 
   return { uid, token: session }
-  
 }
 
 // Post to server with values from register field
@@ -42,6 +41,7 @@ export async function register(username: string, password: string, email: string
   
   // register succes or register failure 
   const response_json = await response.json()
-  console.log(response_json)
-  
+  const { outcome } = response_json.payload
+  if(outcome == "success") return true;
+  return false;
 }

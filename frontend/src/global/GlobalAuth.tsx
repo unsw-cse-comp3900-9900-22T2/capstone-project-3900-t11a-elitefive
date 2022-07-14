@@ -71,6 +71,8 @@ export const AuthProvider = ({ children }: Props) => {
     setAuth(defaultAuthState);
     removeStoredToken()
     removeStoredUID()
+
+    console.log(auth);
   }
 
   const getUID = () => {

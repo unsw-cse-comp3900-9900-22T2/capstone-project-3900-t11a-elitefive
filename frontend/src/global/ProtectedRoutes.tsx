@@ -16,7 +16,7 @@ export default function ProtectedRoutes({}: Props) {
   const navigate = useNavigate();
 
   if(!isLogged()) {
-    navigate('/login');
+    navigate('/');
   }
   return <Outlet/>
 }

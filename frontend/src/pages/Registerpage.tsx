@@ -30,8 +30,13 @@ export default function Registerpage({}: Props) {
     navigate('/dashboard');
   };
   
-  const handleClick = () => {
-    register(username, password, email)
+  const handleClick = async () => {
+    const success = await register(username, password, email)
+    if(success) {
+      navigate("/login");
+    } else {
+      console.log('register error');
+    }
   }
 
   return (
