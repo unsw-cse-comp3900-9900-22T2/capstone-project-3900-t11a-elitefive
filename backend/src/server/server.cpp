@@ -135,6 +135,14 @@ void RelaySocket(){
 		//res->end(std::to_string(matchID));
 		
 		
+		auto matchID = db.save_match("CLASSIC", "12345");
+		res->end(std::to_string(matchID));
+		
+		// testing get friends 
+		auto friends = db.get_friends(1);
+		for (auto fri : friends) {
+			std::cout << "xx" << fri << "\n";
+		}
    });
 
 

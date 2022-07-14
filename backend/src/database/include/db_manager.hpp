@@ -20,6 +20,8 @@ class DatabaseManager {
     auto get_user(int id) -> User*;
     // MATCHES
     auto save_match(std::string gameType, std::string move_seq) -> int;
+    // FRIENDS
+    auto get_friends(int uid) -> std::vector<User*>;
 
 
   private:
