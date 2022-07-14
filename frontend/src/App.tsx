@@ -19,6 +19,7 @@ import Dashboard from './pages/Dashboard';
 import Profilepage from './pages/Profilepage';
 import Gamepage from './pages/Gamepage/Gamepage';
 import ReplaySearchpage from './pages/ReplaySearchpage';
+import FriendsPage from './pages/Friendspage';
 
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
               <Route path="/login" element={<Loginpage/>}/>
               <Route element={<ProtectedRoutes/>}>
                 <Route path="/profile:id" element={<Profilepage/>}/>
+                <Route path="/friends" element={<FriendsPage/>}/>
                 <Route path="/replays" element={<ReplaySearchpage/>}/>
                 <Route path="/game" element={<Gamepage/>}/>
                 <Route path="/dashboard" element={<Dashboard/>}/>
