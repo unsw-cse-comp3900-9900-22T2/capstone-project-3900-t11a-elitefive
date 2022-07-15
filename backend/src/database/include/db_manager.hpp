@@ -18,11 +18,24 @@ class DatabaseManager {
     auto insert_user(std::string username, std::string email, std::string password) -> bool;
     auto get_user(std::string email) -> User*;
     auto get_user(int id) -> User*;
+    auto does_user_exist(std::string username) -> int;
     // MATCHES
     auto save_match(std::string gameType, std::map<int, int> playersELO, int winner, std::string move_seq,
       std::vector<uint64_t> snapshots) -> int;
-
-
+    auto get_matches() -> std::vector<Match>;
+    auto get_matches(int id) -> std::vector<Match>;
+    // PLAYER PROFILE
+    auto get_latest_elo(int id, std::string gameType) -> int;
+    auto get_stats(int id) -> std::map<std::string, int>;
+    auto get_elo_progress(int id) -> std::map<std::string, std::vector<int>>;
+    // FRIENDS
+    auto get_all_friends(int id) -> void;
+    auto remove_friend(int from, int to) -> void;
+    auto send_friend_req(int from, int to) -> void;
+    auto accept_friend_req(int from, int to) -> void;
+    auto deny_friend_req(int from, int to) -> void;
+    // SNAPSHOTS
+    
   private:
     auto prepare_statements() -> void;
     // Execute query with return result.
@@ -38,6 +51,8 @@ class DatabaseManager {
     template<typename... Args>
     auto batch_insert(std::string table, std::vector<std::string> columns,
       std::vector<Args...> entries) -> bool;
+    // Parse matches
+    auto parse_matches(pqxx::result res) -> std::vector<Match>;
 };
 
 #endif

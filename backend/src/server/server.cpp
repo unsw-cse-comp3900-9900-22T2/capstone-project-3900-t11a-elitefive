@@ -58,13 +58,13 @@ void RelaySocket(){
 
 								// Register Success
                 if (db.insert_user(username, email, password)){
-                    message = 
-                        "{\"event'\": \"register\", \"action\": \"register\", \"payload\" : { \"outcome\" : \"success\"}";
+                    message = "{\"event'\": \"register\", \"action\": \"register\","
+                    "\"payload\": { \"outcome\" : \"success\"}}";
                 }
                 // Register Failure
                 else{
-                    message = 
-                        "{\"event'\": \"register\", \"action\": \"register\", \"payload\" : { \"outcome\" : \"failure\"}";
+                    message = "{\"event'\": \"register\", \"action\": \"register\", "
+                        "\"payload\": { \"outcome\" : \"failure\"}}";
                 }
                 // Respond
                 res->end(message);
@@ -72,12 +72,53 @@ void RelaySocket(){
         });
 		res->onAborted([]() -> void {});
     });
+    
+	app.post("/login", [&app, &db](auto *res, auto *req){
+	
+	    // Get data from request
+	    res->onData([&db, res](std::string_view data, bool last) {
+            auto buffer = std::string("");
+            auto message = std::string("");
+            
+            buffer.append(data.data(), data.length());
+            if (last) {
+                auto user_json = json::parse(data);
+                auto email = std::string(user_json["email"]);
+                auto password = std::string(user_json["password"]); 
+        
+				auto user = db.get_user(email);
+
+                if (user != NULL){
+                    // Incorrect password
+                    if (hash_password(password) != user->password_hash){
+                         message =  "{\"event'\": \"login\", \"action\": \"login\", \"payload\":" 
+                            "{ \"outcome\" : \"failure\", \"message\": \"incorrect password\"}}";
+                    // Login success
+                    }else{
+                        message =  std::string("{\"event'\": \"login\", \"action\": \"login\", \"payload\":") +  
+                            std::string("{ \"outcome\" : \"success\", \"uid\": \"") +  std::to_string(user->id) +
+                            std::string("\", \"email\": \"") + user->email + std::string("\" ") +
+                            std::string ("\"session\": \"TODO\"}}");  
+                    }
+				// Email doesn'e exist
+                }else{
+                    message = "{\"event'\": \"login\", \"action\": \"login\", \"payload\" :" 
+                            "{ \"outcome\": \"failure\", \"message\": \"email not in database\"}}";
+                }
+                
+                res->end(message);
+			}
+		});
+		res->onAborted([]() -> void {});
+	});
 
   app.get("/db", [&db](auto *res, auto *req) {
-     // test inserting into db
-		//  db.insert_user("username", "email", "password");
-		//  auto user = db.get_user("email");
-		//  res->end(user->password_hash);
+    // Testing Database Functionality.
+		// Inserting new user
+		// db.insert_user("new_user", "email", "password");
+		// auto user = db.get_user("email");
+		// std::cout << user->password_hash << std::endl;
+		// Inserting match.
 		auto playersELO = std::map<int, int>{
 			{1, 1000},
 			{2, 1200}
@@ -85,7 +126,23 @@ void RelaySocket(){
 		auto winner = 1;
 		auto move_seq = "12345";
 		auto snapshots = std::vector<uint64_t>{100, 200, 300, 400, 500};
-		auto matchID = db.save_match("CLASSIC", playersELO, winner, move_seq, snapshots);
+		auto matchID = db.save_match("POTHOLES", playersELO, winner, move_seq, snapshots);
+		auto matches = db.get_matches(1);
+		for (auto const &match : matches) {
+			std::cout << match.id << " " << match.game << " " <<
+				match.replay << std::endl;
+			for (auto const &p : match.players) {
+				std::cout << p.username << " " << p.end_elo << " " <<
+					p.outcome << std::endl;
+			}
+		}
+		// Does user exist.
+		std::cout << db.does_user_exist("David") << std::endl;
+		std::cout << db.does_user_exist("JackyJ") << std::endl;
+		std::cout << db.does_user_exist("DNE") << std::endl;
+		// Latest ELO
+		std::cout << db.get_latest_elo(1, "CLASSIC") << std::endl;
+		std::cout << db.get_latest_elo(5, "CLASSIC") << std::endl;
 		res->end(std::to_string(matchID));
    });
 
