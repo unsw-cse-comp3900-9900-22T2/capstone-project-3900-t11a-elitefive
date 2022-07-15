@@ -67,9 +67,23 @@ Register Failure
     "event": "register",
     "action": "register",
     "payload" : {
-        "outcome" : "failure"
+        "user" : "user"
 }
 ```
+
+## get friends
+{
+	"event": "friends",
+	"action": "get",
+	"payload": {
+		"user": "<uid>",
+		"friends": [{
+			"uid": "<uid>",
+			"username": "<username>"
+		}]
+	}
+}
+
 
 
 

@@ -45,7 +45,7 @@ auto DatabaseManager::get_friends(int id) -> std::vector<User*> {
             friends.push_back(get_user(atoi(row[0].c_str())));
       }
       if (atoi(row[1].c_str()) != id){
-            friends.push_back(get_user(atoi(row[0].c_str())));
+            friends.push_back(get_user(atoi(row[1].c_str())));
       }
     }
   return friends;

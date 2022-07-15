@@ -140,9 +140,10 @@ void RelaySocket(){
 		
 		// testing get friends 
 		auto friends = db.get_friends(1);
-		for (auto fri : friends) {
-			std::cout << "xx" << fri << "\n";
-		}
+		auto friends_json = friends_to_json(1, friends);
+		std::cout << " ***** freins to json\n";
+		std::cout << friends_json;
+		std::cout <<  "*****\n";
    });
 
 
