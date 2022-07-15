@@ -5,11 +5,16 @@ import React,
   useContext,
 } from 'react';
 
+import * as API from '../api/rest';
+
 
 // types
 export interface IAuth {
-  login: () => Promise<unknown>;
+  login: (email: string, password: string) => Promise<unknown>;
   logout: () => void;
+  getUID: () => string | null;
+  getToken: () => string |  null;
+  isLogged: () => boolean;
 }
 
 type Props = {
@@ -18,6 +23,11 @@ type Props = {
 
 
 // extract from localstorage
+
+export const getStoredUID = (): string|null => window.localStorage.getItem("uid")
+export const setStoredUID = (uid: string): void => { window.localStorage.setItem("uid", uid)}
+export const removeStoredUID = () =>  { window.localStorage.removeItem("uid"); }
+
 export const getStoredToken = (): string|null => window.localStorage.getItem("session-token")
 export const setStoredToken = (token: string): void => { window.localStorage.setItem("session-token", token)}
 export const removeStoredToken = () =>  { window.localStorage.removeItem("session-token"); }
@@ -31,28 +41,61 @@ const defaultAuthState = {
 
 export const AuthContext = React.createContext<IAuth>({
   ...defaultAuthState,
-  login: () => new Promise((reject, resolve) => {}),
+  login: (email: string, password: string) => new Promise((resolve, reject) => {}),
   logout: () => {}, 
+  getUID: () => null,
+  getToken: () => null,
+  isLogged: () => false,
 });
 
 export const AuthProvider = ({ children }: Props) => {
   const [auth, setAuth] = useState(defaultAuthState);
   
-  const login = async () => {
-    // TODO
+  const login = (email:string, password:string) => {
+    return new Promise( async (resolve, reject) => {
+
+      const resp = await API.login(email, password);
+      if(!resp) {
+        reject(false);
+        return;
+      }
+      const {uid, token} = resp;
+      setAuth({uid, sessionToken: token})
+      setStoredToken(token)
+      setStoredUID(uid)
+      resolve(true);
+    })
   }
 
   const logout = () => {
-    // TODO
+    setAuth(defaultAuthState);
+    removeStoredToken()
+    removeStoredUID()
+
+    console.log(auth);
+  }
+
+  const getUID = () => {
+    return auth.uid;
+  }
+
+  const getToken = () => {
+    return auth.sessionToken;
+  }
+
+  const isLogged = () => {
+    return (!!auth.uid && !!auth.sessionToken) || (!!getStoredToken() && !!getStoredUID());
   }
 
   // on start
   useEffect(() => {
     const token: string|null = getStoredToken();
-    if(token) {
+    const uid: string | null = getStoredUID();
+    if(token && uid) {
       setAuth(prevState => ({
         ...prevState,
-        token: token,
+        sessionToken: token,
+        uid: uid
       }));
     }
   }, [])
@@ -62,6 +105,9 @@ export const AuthProvider = ({ children }: Props) => {
       value={{
         login,
         logout,
+        getUID,
+        getToken,
+        isLogged
       }}
     >
       {children}

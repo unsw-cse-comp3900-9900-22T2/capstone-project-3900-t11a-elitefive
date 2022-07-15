@@ -91,18 +91,18 @@ void RelaySocket(){
                 if (user != NULL){
                     // Incorrect password
                     if (hash_password(password) != user->password_hash){
-                         message =  "{\"event'\": \"login\", \"action\": \"login\", \"payload\":" 
+                         message =  "{\"event\": \"login\", \"action\": \"login\", \"payload\":" 
                             "{ \"outcome\" : \"failure\", \"message\": \"incorrect password\"}}";
                     // Login success
                     }else{
-                        message =  std::string("{\"event'\": \"login\", \"action\": \"login\", \"payload\":") +  
+                        message =  std::string("{\"event\": \"login\", \"action\": \"login\", \"payload\":") +  
                             std::string("{ \"outcome\" : \"success\", \"uid\": \"") +  std::to_string(user->id) +
-                            std::string("\", \"email\": \"") + user->email + std::string("\" ") +
-                            std::string ("\"session\": \"TODO\"}}");  
+                            std::string("\", \"email\": \"") + user->email + std::string("\" ") + ","+
+                            std::string ("\"session\": \"TODO\"}}");
                     }
 				// Email doesn'e exist
                 }else{
-                    message = "{\"event'\": \"login\", \"action\": \"login\", \"payload\" :" 
+                    message = "{\"event\": \"login\", \"action\": \"login\", \"payload\" :" 
                             "{ \"outcome\": \"failure\", \"message\": \"email not in database\"}}";
                 }
                 

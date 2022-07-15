@@ -1,12 +1,18 @@
 import React from 'react'
 import styled from 'styled-components';
-import { TextField, Typography } from '@mui/material'; 
+import { TextField, Typography, TextFieldProps } from '@mui/material'; 
 
 type Props = {
-  label: string;
+  label?: string;
   password?: boolean;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+} & styledProps;
+
+type styledProps = {
+  background?: string;
+  size?: "small" | "medium";
+  width?: number;
 }
 
 const Container = styled.div`
@@ -14,27 +20,40 @@ const Container = styled.div`
   flex-direction: column;
 `;
 
-const StyledTextField = styled(TextField)`
-  background: var(--textbox-dark);
-  width: 400px;
+const StyledTextField = styled.div<styledProps>`
+  background: ${({background}) => background ? background : "var(--textbox-dark)"};
+
 `;
 
-const inlineStyleOverride = {
-  style: {
-    color: 'white'
-  }
-}
 
-export default function({ label, password, value, onChange }: Props) {
+export default function({ label, password, value, onChange, ...styledProps }: Props) {
+
+  // TODO make border white
+  const inlineStyleOverride = {
+    style: {
+      color: 'white',
+    }
+  }
+
   return (
     <Container>
       <Typography variant="subtitle1">{label}</Typography>
       <StyledTextField
-        value={value}
-        onChange={onChange}
-        type={password ? "password": "required"}
-        inputProps={{...inlineStyleOverride}}
-      />
+        {...styledProps}
+      >
+        <TextField
+          value={value}
+          onChange={onChange}
+          type={password ? "password": "required"}
+          inputProps={{...inlineStyleOverride}}
+          size={styledProps.size ? styledProps.size : undefined}
+          style={{
+            width: styledProps.width ? styledProps.width : 350
+          }}
+        />
+      </StyledTextField
+      
+      >
     </Container>
   )
 }

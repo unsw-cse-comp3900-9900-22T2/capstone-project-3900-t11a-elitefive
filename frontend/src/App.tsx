@@ -8,6 +8,7 @@ import {
 // global imports
 import GlobalStyles from './global/GlobalStyles';
 import { AuthProvider } from './global/GlobalAuth';
+import ProtectedRoutes from './global/ProtectedRoutes';
 
 // pages
 import PageContainer from './pages/PageContainer';
@@ -17,6 +18,8 @@ import Registerpage from './pages/Registerpage';
 import Dashboard from './pages/Dashboard';
 import Profilepage from './pages/Profilepage';
 import Gamepage from './pages/Gamepage/Gamepage';
+import ReplaySearchpage from './pages/ReplaySearchpage';
+import FriendsPage from './pages/Friendspage';
 
 
 function App() {
@@ -29,9 +32,13 @@ function App() {
             <Routes>
               <Route path="/register" element={<Registerpage/>}/>
               <Route path="/login" element={<Loginpage/>}/>
-              <Route path="/dashboard" element={<Dashboard/>}/>
-              <Route path="/profile:id" element={<Profilepage/>}/>
-              <Route path="/game" element={<Gamepage/>}/>
+              <Route element={<ProtectedRoutes/>}>
+                <Route path="/profile:id" element={<Profilepage/>}/>
+                <Route path="/friends" element={<FriendsPage/>}/>
+                <Route path="/replays" element={<ReplaySearchpage/>}/>
+                <Route path="/game" element={<Gamepage/>}/>
+                <Route path="/dashboard" element={<Dashboard/>}/>
+              </Route>
               <Route path="/" element={<Homepage/>}/>
             </Routes>
           </Router>

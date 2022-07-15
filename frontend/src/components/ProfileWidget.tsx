@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Typography, Box } from '@mui/material';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../global/GlobalAuth';
 
 type Props = {
   name: string;
@@ -44,10 +45,10 @@ const DropdownContainer = styled.div`
 
 // logout dropdown menu
 function DropDownMenu({}) {
-  const navigate = useNavigate();
+  const { logout } = useAuth();
   return (
     <DropdownContainer
-      onClick={() => { navigate("/") }}
+      onClick={() => { logout() }}
     >
       <Typography variant="body1">
         Logout

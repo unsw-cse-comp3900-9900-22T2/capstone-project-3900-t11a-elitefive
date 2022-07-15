@@ -1,11 +1,12 @@
 import { text } from "stream/consumers";
 
-export async function login(email: string, password: string) {
-  // fetch("/login");
+type loginResp = {
+  uid: string,
+  token: string
+} 
+export async function login(email: string, password: string): Promise<loginResp| null> {
   
-  const data = { email: email, password: password };
-
-  
+  const data = { email: email, password: password };  
   const response = await fetch('/login', {
     method: 'POST',
     headers: {
@@ -14,10 +15,14 @@ export async function login(email: string, password: string) {
       body: JSON.stringify(data),
     })
     
-    // register succes or register failure 
-    const response_json = await response.text()
-    console.log(response_json)
-  
+  // register succes or register failure 
+  const response_text = await response.text()
+  const response_json = JSON.parse(response_text);
+  const { outcome, uid, session } = response_json.payload
+
+  if(outcome == "failure") return null;
+
+  return { uid, token: session }
 }
 
 // Post to server with values from register field
@@ -35,7 +40,8 @@ export async function register(username: string, password: string, email: string
   })
   
   // register succes or register failure 
-  const response_json = await response.text()
-  console.log(response_json)
-  
+  const response_json = await response.json()
+  const { outcome } = response_json.payload
+  if(outcome == "success") return true;
+  return false;
 }
