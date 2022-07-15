@@ -20,10 +20,4 @@ RUN apt install -y \
 
 EXPOSE 8080
 
-COPY install.sh /app/install.sh
-COPY vcpkg /app/vcpkg
-
 WORKDIR /app
-
-RUN ./install.sh
-ENTRYPOINT ["./build.sh"]

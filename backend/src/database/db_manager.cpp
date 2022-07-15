@@ -51,6 +51,32 @@ auto DatabaseManager::get_friends(int id) -> std::vector<User*> {
   return friends;
 }
 
+auto DatabaseManager::add_friend(int id1, int id2) -> bool {
+ 
+  auto fri1 = std::min(id1,id2);
+  auto fri2 = std::max(id1,id2);
+  
+  return execute0("add_friend", fri1, fri2);
+}
+
+auto DatabaseManager::delete_friend(int id1, int id2) -> bool {
+  auto fri1 = std::min(id1,id2);
+  auto fri2 = std::max(id1,id2);
+  
+  pqxx::work w(conn_);
+  try {
+    auto res = w.exec_prepared0("delete_friend", fri1, fri2);
+    w.commit();
+    auto rows_deleted = res.affected_rows();
+    if (rows_deleted > 0){
+      return true;
+    }
+  } catch (const pqxx::pqxx_exception &e) {
+    return false;
+  }
+  return false;
+}
+
 // Prepare the statements on instantiation.
 
 auto DatabaseManager::prepare_statements() -> void {
@@ -59,7 +85,8 @@ auto DatabaseManager::prepare_statements() -> void {
   conn_.prepare("id_get_user", "SELECT * FROM users WHERE id = $1;");
   conn_.prepare("insert_match", "INSERT INTO matches(game, replay) VALUES ($1, $2) RETURNING id;");
   conn_.prepare("get_friends_uid", "SELECT * FROM friends WHERE friend1 = $1 or friend2 = $1;");
-  
+  conn_.prepare("add_friend", "INSERT INTO friends VALUES ($1, $2);");
+  conn_.prepare("delete_friend","delete from friends where friend1 = $1 and friend2 = $2;");
 }
 
 template<typename... Args>
