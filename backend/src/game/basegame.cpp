@@ -44,6 +44,11 @@ auto BaseGame::previous_player() const -> int {
 	return (player_turn_ == 0) ? board().num_players() - 1 : player_turn_ - 1;
 }
 
+auto BaseGame::num_players() const -> int {
+	return this->board_.num_players();
+}
+
+
 auto BaseGame::pass_turn() -> void {
 	player_turn_ = next_player();
 }

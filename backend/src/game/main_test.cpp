@@ -6,6 +6,7 @@
 #include "aigame.hpp"
 #include "game.hpp"
 #include "bitboard.hpp"
+#include "metadatagen.hpp"
 
 #include <unordered_map>
 #include <memory.h>
@@ -45,20 +46,37 @@ auto computer_verse_computer() -> void;
 // 	// }
 
 auto main(void) -> int {
-	// auto game = AIGame(2);
-	// game.play(4);
-	// game.play(2);
-	// game.play(1);
-	// game.play(3);
+	Game game = Game(2);
+	game.play("a1");
+	game.play("b1");
+	game.play("a2");
+	game.play("b2");
+	game.play("a4");
+	game.play("c3");
+	game.play("a3");
+	std::cout << game << '\n';
 
-	// auto memo = Memo();
-	// memo.insert(game, 3);
-	// auto boards = game.board().all_boards();
-	// std::cout << memo.contains(boards) << '\n';
-	// std::cout << memo.find(boards) << '\n';
+	auto meta = MetaDataGenerator(game);
+	for (auto pos : meta.db_snapshot()) {
+		std::cout << pos << '\n';
+	}
+	
 
-	auto game = generate_test_game();
-	ai_play_game(game);
+
+	// // auto game = AIGame(2);
+	// // game.play(4);
+	// // game.play(2);
+	// // game.play(1);
+	// // game.play(3);
+
+	// // auto memo = Memo();
+	// // memo.insert(game, 3);
+	// // auto boards = game.board().all_boards();
+	// // std::cout << memo.contains(boards) << '\n';
+	// // std::cout << memo.find(boards) << '\n';
+
+	// auto game = generate_test_game();
+	// ai_play_game(game);
 	
 	return 0;
 }
