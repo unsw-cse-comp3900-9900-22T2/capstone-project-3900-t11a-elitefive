@@ -5,6 +5,7 @@
 #include "room.hpp"
 #include "game.hpp"
 #include "aigame.hpp"
+#include "metadatagen.hpp"
 
 struct SocketData{
 	//Empty because we don't need any currently.
@@ -70,7 +71,16 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 			if (state != Game::state::ONGOING) {
 				std::string winner = game_result(*this->game_);
 				publish(ws, json_game_winner(winner), opCode);
-				auto const match_id = db_->save_match("CLASSIC", game_->move_sequence());
+				// Save Match to Database.
+				// TODO: This needs to be modified.
+				auto playersELO = std::map<int, int>{};
+				for (auto const &uid : uids_) {
+					playersELO.insert({uid, 0});
+				}
+				auto gen = MetaDataGenerator(*game_);
+				auto snapshots = gen.db_snapshot();
+				auto const match_id = db_->save_match("CLASSIC", false, playersELO, -1,
+					game_->move_sequence(), snapshots);
 				std::cout << "Match ID: " << match_id << '\n';
 			}
 			// auto const match_id = db.save_match("CLASSIC", game->move_sequence());
