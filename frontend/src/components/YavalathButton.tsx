@@ -17,6 +17,15 @@ const Container = styled.div`
   }
 `;
 
+const ContainerYavalath = styled.div`
+  position: absolute;
+  top: 5%;
+  left: 10%;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+`;
+
 export default function YavalathButton({}: Props) {
   const navigate = useNavigate();
   return (
@@ -24,5 +33,17 @@ export default function YavalathButton({}: Props) {
       <img src={YavalathSvg}/>
       <Typography variant="h4">Yavalath</Typography>
     </Container>
+  )
+}
+
+export function YavalathButtonFixed({}: Props) {
+  const navigate = useNavigate();
+  return (
+    <ContainerYavalath>
+      <Container onClick={() => navigate("/dashboard")}>
+        <img src={YavalathSvg}/>
+        <Typography variant="h4">Yavalath</Typography>
+      </Container>
+    </ContainerYavalath>
   )
 }

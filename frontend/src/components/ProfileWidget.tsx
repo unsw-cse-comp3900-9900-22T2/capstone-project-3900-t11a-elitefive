@@ -88,3 +88,15 @@ export default function ProfileWidget({ name }: Props) {
     </Container>
   )
 }
+
+export function ProfileCard({ name }: Props) {
+  return (
+    <ProfileWidgetContainer>
+      <ImageContainer />
+      <Box display="flex" flexDirection="column" marginTop="30px">
+        <Typography variant="h4">{name}</Typography>
+        <Typography variant="body1">Elo</Typography>
+      </Box>
+    </ProfileWidgetContainer>
+  )
+}

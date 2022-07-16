@@ -13,6 +13,8 @@ import Typography from '@mui/material/Typography';
 import {StyledCard, cardProps} from './ReusableCard-styled';
 import HexCell from './HexCell';
 
+import {Routes, Route, useNavigate} from 'react-router-dom';
+
 type Props = {
   children?: React.ReactElement | any;
 } & cardProps;
@@ -31,6 +33,14 @@ const Container2 = styled.div`
   justify-content: center;
   align-items: center;
   grid-gap: 30px;
+`;
+
+const StatContainer = styled.div`
+  display: flex;
+  background: var(--accent-dark);
+  height: 300px;
+  width: 300px;
+  border-radius: 10px;
 `;
 
 const bull = (
@@ -92,6 +102,72 @@ const bull = (
           <Container2>
             <HexCell
             />
+            <Container>
+              {children}
+            </Container>
+          </Container2>
+        </CardContent>
+      </StyledCard>
+    );
+  }
+
+  export function statCard({children, ...styleProps}: Props) {
+    return (
+      <StyledCard
+        {...styleProps}
+      >
+        <CardContent>
+          <StatContainer>
+            <HexCell
+            />
+            <Container>
+              {children}
+            </Container>
+          </StatContainer>
+        </CardContent>
+      </StyledCard>
+    )
+  }
+
+  export function MatchCard() {
+
+  const navigate = useNavigate();
+
+  const navigateToReplayGamepage = () => {
+      // 👇️ navigate to /contacts
+      navigate('/replaygame');
+  };
+
+    return (
+      <Card sx={{ minWidth: 800 }}>
+        <Container2>
+          <CardContent>
+            <Typography variant="h5" component="div">
+              Jacky
+            </Typography>
+            <Typography variant="h5" component="div">
+              Yirong
+            </Typography>
+            <Typography variant="h5" component="div">
+              David
+            </Typography>
+          </CardContent>
+          <CardActions>
+            <Button onClick={navigateToReplayGamepage}>Watch Replay</Button>
+          </CardActions>
+        </Container2>
+      </Card>
+    );
+  }
+
+  // For player card
+  export function ReplayPlayerCard({children, ...styleProps}: Props) {
+    return (
+      <StyledCard
+        {...styleProps}
+      >
+        <CardContent>
+          <Container2>
             <Container>
               {children}
             </Container>
