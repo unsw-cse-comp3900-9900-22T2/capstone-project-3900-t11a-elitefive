@@ -50,16 +50,10 @@ create table friendreqs (
 	to_user integer,
 	foreign key (from_user) references users (id),
 	foreign key (to_user) references users (id),
-	primary key (from_user, to_user),
+	primary key (from_user, to_user)
 );
 
 -- Demo Data
-
--- Bots
-INSERT INTO users (username) values 
-('BOT1'),
-('BOT2'),
-('BOT3');
 
 -- Our passwords are all admin.
 insert into users (username, email, password_hash) values 
@@ -68,6 +62,7 @@ insert into users (username, email, password_hash) values
 ('JackyX', 'jackyx@unsw.edu.au', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'),
 ('Yirong', 'yirong@unsw.edu.au', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'),
 ('Sage', 'sage@unsw.edu.au', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918');
+
 
 -- We are all friends.
 insert into friends (friend1, friend2) values 
@@ -82,3 +77,9 @@ insert into users (username, email, password_hash) values
 ('James', 'james@teamrocket.com', '619227d5cf63bffd286a6529f58fb3e679169230eb7b0151871b8f6583f24bc6');
 
 insert into friends (friend1, friend2) values (9, 10);
+
+-- Bots
+INSERT INTO users (username) values 
+('BOT1'),
+('BOT2'),
+('BOT3');

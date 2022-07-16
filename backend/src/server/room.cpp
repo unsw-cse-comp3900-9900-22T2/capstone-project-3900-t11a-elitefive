@@ -70,8 +70,8 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 			if (state != Game::state::ONGOING) {
 				std::string winner = game_result(*this->game_);
 				publish(ws, json_game_winner(winner), opCode);
-				auto const match_id = db_->save_match("CLASSIC", game_->move_sequence());
-				std::cout << "Match ID: " << match_id << '\n';
+				//auto const match_id = db_->save_match("CLASSIC", game_->move_sequence());
+				//std::cout << "Match ID: " << match_id << '\n';
 			}
 			// auto const match_id = db.save_match("CLASSIC", game->move_sequence());
 		},

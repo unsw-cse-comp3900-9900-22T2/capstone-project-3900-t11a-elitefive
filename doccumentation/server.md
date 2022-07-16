@@ -1,3 +1,38 @@
+Get profile success 
+```
+{
+	"event": "profile",
+	"action": "get",
+	"payload": {
+		"uid": "<iud>",
+		"username": "<username>",
+		"email": "<email>",
+		"classic": {
+			"elo": "<elo>",
+			"wins": "<wins>",
+			"losses": "<losses>",
+			"draws": "<draws>"
+		},
+		"triplets": {
+			"elo": "<elo>",
+			"wins": "<wins>",
+			"losses": "<losses>",
+			"draws": "<draws>"
+		},
+		"potholes": {
+			"elo": "<elo>",
+			"wins": "<wins>",
+			"losses": "<losses>",
+			"draws": "<draws>"
+		},
+		"friends": [{
+			"uid": "<uid>",
+			"username": "<username>"
+		}, ...]
+	}
+}
+```
+
 ## /login
 
 Login Success

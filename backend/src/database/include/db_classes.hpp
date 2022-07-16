@@ -26,6 +26,23 @@ class User {
     , password_hash{row[3].c_str()} {}
 };
 
+/*
+class ProfileStats {
+  public: 
+    int classic_elo;
+    int classic_wins;
+    int classic_loses;
+    int classic_draws;
+    
+    ProfileStats()
+    : classic_elo{0}
+    , classic_wins{0}
+    , classic_loses{0}
+    , classic_draws{0} {}
+};
+*/
+
+
 class Player {
   public:
     int id;
