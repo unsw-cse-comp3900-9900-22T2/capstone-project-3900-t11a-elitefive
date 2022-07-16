@@ -135,7 +135,7 @@ void RelaySocket(){
 		auto profile_json = profile_to_json(user, stats, friends);
 				
 		std::cout << profile_json << "\n";
-		res->end();
+		res->end(profile_json);
 		
 			
 	});	
