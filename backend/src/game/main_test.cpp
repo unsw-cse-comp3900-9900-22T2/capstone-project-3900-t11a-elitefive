@@ -35,9 +35,9 @@ auto computer_verse_computer() -> void;
 // 		return std::equal(lhs.begin(), lhs.end(), rhs.begin());
 // 	}
 // };
-// 	// auto map = std::unordered_map<std::vector<BitBoard>, std::unique_ptr<AIGame>, BoardHashTEST, BoardEqualTEST> {
-// 	// 	// {{3,4}, "There"}
-// 	// };
+// 	auto map = std::unordered_map<std::vector<BitBoard>, std::unique_ptr<AIGame>, BoardHashTEST, BoardEqualTEST> {
+// 		// {{3,4}, "There"}
+// 	};
 
 // 	// map.insert({game.board().all_boards(), std::make_unique<AIGame>(game, 3)});
 

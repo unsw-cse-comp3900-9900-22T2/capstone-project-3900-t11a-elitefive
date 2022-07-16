@@ -1,6 +1,8 @@
 #include "metadatagen.hpp"
 #include "game.hpp"
 
+auto construct_game(std::string moves, int players) -> Game;
+
 MetaDataGenerator::MetaDataGenerator(Game game)
 : nplayers_{game.num_players()}
 , move_sequence_{game.all_moves()}
@@ -23,6 +25,17 @@ MetaDataGenerator::MetaDataGenerator(Game game)
 		positions_.push_back(board);
 	}
 
+}
+
+MetaDataGenerator::MetaDataGenerator(std::string moves, int players) : MetaDataGenerator(construct_game(moves, players)) {}
+
+auto construct_game(std::string moves, int players) -> Game {
+	auto game = Game(2);
+	for(int i = 0; i < moves.size(); i = i+2) {
+		std::string move = moves.substr(i, 2);
+		game.play(move);
+	}
+	return game;
 }
 
 auto MetaDataGenerator::num_players() const -> int {

@@ -19,6 +19,7 @@
 #include "server_util.hpp"
 
 #include "room.hpp"
+#include "metadatagen.hpp"
 
 using json = nlohmann::json;
 
@@ -39,6 +40,24 @@ void RelaySocket(){
 
 	app.get("/api/david", [&app](auto *res, auto *req) {
 		res->end("{\"name\": \"david\"}");
+	});
+
+	app.get("/api/snapshot", [&app](auto *res, auto *req) {
+        for (auto header : *req){
+            std::cout << header.first << ", " << header.second << "\n";
+        };
+
+		// auto query = req->getQuery();
+		auto moves = std::string(req->getQuery("moves")); 
+		auto metadata = MetaDataGenerator(moves, 2); // TODO: Hardcoded snapshot for 2 players
+		auto const position = metadata.db_snapshot();
+		std::cout << position.end()[-1] << '\n';
+		std::cout << position.end()[-2] << '\n';
+
+		
+
+
+		res->end("{\"name\": \"test\"}");
 	});
 
 	app.post("/register", [&app, &db](auto *res, auto *req){
