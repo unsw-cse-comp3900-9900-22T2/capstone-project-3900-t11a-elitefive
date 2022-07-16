@@ -7,10 +7,11 @@ include_directories(
         ${PROJECT_SOURCE_DIR}/src/game/include/  # Note: Need to say where to find the headers
         ${PROJECT_SOURCE_DIR}/src/server/include/  # Note: Need to say where to find the headers
         ${PROJECT_SOURCE_DIR}/src/database/include/  # Note: Need to say where to find the headers
+        ${PROJECT_SOURCE_DIR}/src/server/include/
 )
 
 file(GLOB all_SRCS
-        "${PROJECT_SOURCE_DIR}/src/server/server.cpp"
+        "${PROJECT_SOURCE_DIR}/src/server/*.cpp"
         "${PROJECT_SOURCE_DIR}/src/game/*.cpp"
         "${PROJECT_SOURCE_DIR}/src/database/*.cpp"
 
