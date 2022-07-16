@@ -63,6 +63,11 @@ insert into users (username, email, password_hash) values
 ('Yirong', 'yirong@unsw.edu.au', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'),
 ('Sage', 'sage@unsw.edu.au', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918');
 
+-- Bots
+INSERT INTO users (username) values 
+('BOT1'),
+('BOT2'),
+('BOT3');
 
 -- We are all friends.
 insert into friends (friend1, friend2) values 

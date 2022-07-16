@@ -12,6 +12,7 @@ class MetaDataGenerator {
 		std::vector<BitBoard> positions_;
 	public:
 		MetaDataGenerator(Game game);
+		MetaDataGenerator(std::string moves, int players);
 
 		auto num_players() const -> int;
 		auto db_snapshot() const -> std::vector<uint64_t>;
