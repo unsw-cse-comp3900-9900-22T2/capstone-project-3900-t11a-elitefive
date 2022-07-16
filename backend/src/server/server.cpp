@@ -126,7 +126,9 @@ void RelaySocket(){
 		auto winner = 1;
 		auto move_seq = "12345";
 		auto snapshots = std::vector<uint64_t>{100, 200, 300, 400, 500};
-		auto matchID = db.save_match("POTHOLES", playersELO, winner, move_seq, snapshots);
+		auto matchID = db.save_match("POTHOLES", false, playersELO, winner, move_seq, snapshots);
+		db.save_match("CLASSIC", false, playersELO, winner, move_seq, snapshots);
+		db.save_match("TRIPLES", false, playersELO, winner, move_seq, snapshots);
 		auto matches = db.get_matches(1);
 		for (auto const &match : matches) {
 			std::cout << match.id << " " << match.game << " " <<
@@ -143,6 +145,21 @@ void RelaySocket(){
 		// Latest ELO
 		std::cout << db.get_latest_elo(1, "CLASSIC") << std::endl;
 		std::cout << db.get_latest_elo(5, "CLASSIC") << std::endl;
+		// Get stats
+		auto stats = db.get_stats(1);
+		std::cout << stats->get_WLD("CLASSIC", false).at(0) << std::endl;
+		std::cout << stats->get_WLD("TRIPLES", false).at(0) << std::endl;
+		std::cout << stats->get_WLD("POTHOLES", false).at(0) << std::endl;
+		// Snapshots
+		auto m = db.get_matches(4, 400, 5, 500);
+		for (auto const &match : m) {
+			std::cout << match.id << " " << match.game << " " <<
+				match.replay << std::endl;
+			for (auto const &p : match.players) {
+				std::cout << p.username << " " << p.end_elo << " " <<
+					p.outcome << std::endl;
+			}
+		}
 		res->end(std::to_string(matchID));
    });
 

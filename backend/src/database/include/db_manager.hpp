@@ -20,13 +20,15 @@ class DatabaseManager {
     auto get_user(int id) -> User*;
     auto does_user_exist(std::string username) -> int;
     // MATCHES
-    auto save_match(std::string gameType, std::map<int, int> playersELO, int winner, std::string move_seq,
+    auto save_match(std::string gameType, bool is_ranked, std::map<int, int> playersELO, int winner, std::string move_seq,
       std::vector<uint64_t> snapshots) -> int;
     auto get_matches() -> std::vector<Match>;
     auto get_matches(int id) -> std::vector<Match>;
+    // SNAPSHOTS
+    auto get_matches(int move_n1, int64_t bs1, int move_n2, int64_t bs2) -> std::vector<Match>;
     // PLAYER PROFILE
     auto get_latest_elo(int id, std::string gameType) -> int;
-    auto get_stats(int id) -> std::map<std::string, int>;
+    auto get_stats(int id) -> PlayerStats*;
     auto get_elo_progress(int id) -> std::map<std::string, std::vector<int>>;
     // FRIENDS
     auto get_all_friends(int id) -> void;
@@ -34,8 +36,6 @@ class DatabaseManager {
     auto send_friend_req(int from, int to) -> void;
     auto accept_friend_req(int from, int to) -> void;
     auto deny_friend_req(int from, int to) -> void;
-    // SNAPSHOTS
-    
   private:
     auto prepare_statements() -> void;
     // Execute query with return result.

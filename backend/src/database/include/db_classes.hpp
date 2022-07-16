@@ -55,15 +55,33 @@ class Match {
 };
 
 class PlayerStats {
-  public:
-    int wins;
-    int losses;
-    int draws;
+  private:
+    std::map<std::string, int> stats;
   
-    PlayerStats(int wins_, int losses_, int draws_)
-    : wins{wins_}
-    , losses{losses_}
-    , draws(draws_) {}
-}
+    auto get_outcome(std::string game, bool ranked, std::string outcome) -> int {
+      return stats[game.append(ranked ? " RANKED " : " UNRANKED ").append(outcome)];
+    }
+
+  public:
+    PlayerStats(std::map<std::string, int> stats_) 
+    : stats{stats_} {}
+
+    auto get_WLD(std::string game, bool ranked) -> std::vector<int> {
+      return { get_outcome(game, ranked, "WIN"), get_outcome(game, ranked, "LOSS"),
+        get_outcome(game, ranked, "DRAW") };
+    }
+
+    auto get_wins(std::string game, bool ranked) -> int {
+      return get_WLD(game, ranked)[0];
+    }
+
+    auto get_losses(std::string game, bool ranked) -> int {
+      return get_WLD(game, ranked)[1];
+    }
+
+    auto get_draws(std::string game, bool ranked) -> int {
+      return get_WLD(game, ranked)[2];
+    }
+};
 
 #endif

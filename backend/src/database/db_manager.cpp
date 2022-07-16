@@ -40,10 +40,10 @@ auto DatabaseManager::does_user_exist(std::string username) -> int {
   return atoi(res[0][0].c_str());
 }
 
-auto DatabaseManager::save_match(std::string gameType, std::map<int, int> playersELO, int winner, std::string move_seq,
+auto DatabaseManager::save_match(std::string gameType, bool is_ranked, std::map<int, int> playersELO, int winner, std::string move_seq,
     std::vector<uint64_t> snapshots) -> int {
   // Insert Match
-  auto res = execute("insert_match", gameType, move_seq);
+  auto res = execute("insert_match", gameType, is_ranked, move_seq);
   auto matchID = atoi(res[0][0].c_str());
   // Insert Players & Outcomes
   auto outcome_columns = std::vector<std::string>{"player", "match", "end_elo", "outcome"};
@@ -73,7 +73,12 @@ auto DatabaseManager::get_matches() -> std::vector<Match> {
 }
 
 auto DatabaseManager::get_matches(int id) -> std::vector<Match> {
-  auto res = execute("get_user_matches", id);
+  auto res = execute("get_matches_user", id);
+  return parse_matches(res);
+}
+
+auto DatabaseManager::get_matches(int move_n1, int64_t bs1, int move_n2, int64_t bs2) -> std::vector<Match> {
+  auto res = execute("get_matches_snapshot", move_n1, bs1, move_n2, bs2);
   return parse_matches(res);
 }
 
@@ -83,6 +88,36 @@ auto DatabaseManager::get_latest_elo(int id, std::string gameType) -> int {
     return 0;
   }
   return atoi(res[0][0].c_str());
+}
+
+auto DatabaseManager::get_stats(int id) -> PlayerStats* {
+  auto res = execute("get_stats", id);
+  auto stats = std::map<std::string, int>{};
+  for (auto const &row : res) {
+    auto game = row[0].c_str();
+    auto ranked = row[1].c_str() == "t";
+    auto outcome = row[2].c_str();
+    auto key = std::string(game).append(ranked ? " RANKED " : " UNRANKED ").append(outcome);
+    auto count = atoi(row[3].c_str());
+    stats.insert({key, count});
+  }
+  auto result = new PlayerStats(stats);
+  return result;
+}
+
+auto DatabaseManager::get_elo_progress(int id) -> std::map<std::string, std::vector<int>> {
+  auto res = execute("get_elo_progress", id);
+  auto progress = std::map<std::string, std::vector<int>>{
+    {"CLASSIC", {}},
+    {"TRIPLES", {}},
+    {"POTHOLES", {}}
+  };
+  for (auto const &row : res) {
+    auto game = row[0].c_str();
+    auto elo = atoi(row[1].c_str());
+    progress[game].push_back(elo);
+  }
+  return progress;
 }
 
 // Prepare the statements on instantiation.
@@ -100,8 +135,8 @@ auto DatabaseManager::prepare_statements() -> void {
   "SELECT * FROM users "
   "WHERE username = $1;");
   conn_.prepare("insert_match",
-  "INSERT INTO matches(game, replay) "
-  "VALUES ($1, $2) "
+  "INSERT INTO matches(game, ranked, replay) "
+  "VALUES ($1, $2, $3) "
   "RETURNING id;");
   // TODO: Refactor the two below - similar SQL.
   conn_.prepare("get_matches",
@@ -110,7 +145,7 @@ auto DatabaseManager::prepare_statements() -> void {
   "FROM matches "
   "JOIN outcomes ON matches.id = outcomes.match "
   "JOIN users ON outcomes.player = users.id;");
-  conn_.prepare("get_user_matches",
+  conn_.prepare("get_matches_user",
   "SELECT matches.id, game, replay, outcomes.player, "
   "username, end_elo, outcome "
   "FROM matches "
@@ -120,14 +155,43 @@ auto DatabaseManager::prepare_statements() -> void {
   "(SELECT matches.id FROM matches "
   "JOIN outcomes ON matches.id = outcomes.match "
   "WHERE outcomes.player = $1);");
+  conn_.prepare("get_matches_snapshot",
+  "WITH s1 AS ("
+  "SELECT * FROM snapshots "
+  "WHERE move_num = $1 AND boardstate = $2), "
+  "s2 AS ("
+  "SELECT * FROM snapshots "
+  "WHERE move_num = $3 AND boardstate = $4) "
+  "SELECT matches.id, game, replay, outcomes.player, "
+  "username, end_elo, outcome "
+  "FROM matches "
+  "JOIN outcomes ON matches.id = outcomes.match "
+  "JOIN users ON outcomes.player = users.id "
+  "WHERE match IN ("
+  "SELECT s1.match FROM s1 "
+  "JOIN s2 ON s1.match = s2.match) "
+  "ORDER BY id;");
   conn_.prepare("get_latest_elo",
   "SELECT end_elo "
   "FROM outcomes "
   "JOIN matches ON outcomes.match = matches.id "
-  "WHERE player = $1 "
+  "WHERE player = $1 AND ranked = true "
   "AND game = $2 "
   "ORDER BY end_time DESC "
   "LIMIT 1");
+  conn_.prepare("get_stats",
+  "SELECT game, ranked, outcome, count(outcome) "
+  "FROM outcomes "
+  "JOIN matches ON outcomes.match = matches.id "
+  "WHERE player = $1 "
+  "GROUP BY game, ranked, outcome;");
+  conn_.prepare("get_elo_progress",
+  "SELECT game, end_elo "
+  "FROM outcomes "
+  "JOIN matches ON outcomes.match = matches.id "
+  "WHERE player = $1 AND ranked = true "
+  "GROUP BY game, end_elo, end_time "
+  "ORDER BY game, end_time");
 }
 
 template<typename... Args>
