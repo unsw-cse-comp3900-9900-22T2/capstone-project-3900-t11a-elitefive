@@ -41,7 +41,7 @@ void RelaySocket(){
 		res->end("{\"name\": \"david\"}");
 	});
 
-	app.get("/api/snapshot", [&app](auto *res, auto *req) {
+	app.get("/api/snapshot", [&app, &db](auto *res, auto *req) {
         for (auto header : *req){
             std::cout << header.first << ", " << header.second << "\n";
         };
@@ -49,14 +49,17 @@ void RelaySocket(){
 		// auto query = req->getQuery();
 		auto moves = std::string(req->getQuery("moves")); 
 		auto metadata = MetaDataGenerator(moves, 2); // TODO: Hardcoded snapshot for 2 players
-		auto const position = metadata.db_snapshot();
-		std::cout << position.end()[-1] << '\n';
-		std::cout << position.end()[-2] << '\n';
+		auto const positions = metadata.db_snapshot();
+	    // auto get_matches(int move_n1, int64_t bs1, int move_n2, int64_t bs2) -> std::vector<Match>;
+		auto nmoves = moves.size()/2;
+		auto const& lastpos = positions.end()[-1];
+		auto const& priorpos = positions.end()[-2];
+		auto matches = db.get_matches(nmoves, lastpos, nmoves - 1, priorpos);
 
-		
+		json j;
+		j["name"] = "hi there";
 
-
-		res->end("{\"name\": \"test\"}");
+		res->end(j.dump());
 	});
 
 	app.post("/register", [&app, &db](auto *res, auto *req){
@@ -200,7 +203,7 @@ void RelaySocket(){
 		std::cout <<  "*****\n";
 		
 		// testing add friend
-		auto add = db.add_friend(1,6);
+		auto add = db.accept_friend_req(1,6);
 		if (add){
 			std::cout << "add 1 6 true\n";
 		}else{

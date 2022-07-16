@@ -4,6 +4,9 @@
 #include <unordered_set>
 #include <pqxx/pqxx>
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 // Classes for database tuples
 
 // User Table:
