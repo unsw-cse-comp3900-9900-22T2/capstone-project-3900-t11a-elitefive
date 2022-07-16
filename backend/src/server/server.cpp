@@ -202,26 +202,26 @@ void RelaySocket(){
 		std::cout << friends_json;
 		std::cout <<  "*****\n";
 		
-		// testing add friend
-		auto add = db.accept_friend_req(1,6);
-		if (add){
-			std::cout << "add 1 6 true\n";
-		}else{
-			std::cout << "add 1 6 false\n";
+		// // testing add friend
+		// auto add = db.accept_friend_req(1,6);
+		// if (add){
+		// 	std::cout << "add 1 6 true\n";
+		// }else{
+		// 	std::cout << "add 1 6 false\n";
 
-		}
-		auto del = db.delete_friend(1,6);
-		if (del){
-			std::cout << "del 1 6 true\n";
-		}else{
-			std::cout << "del 1 6 false\n";
-		}
-		auto del2 = db.delete_friend(1,6);
-		if (del2){
-			std::cout << "del 1 6 true\n";
-		}else{
-			std::cout << "del 1 6 false\n";
-		}
+		// }
+		// auto del = db.delete_friend(1,6);
+		// if (del){
+		// 	std::cout << "del 1 6 true\n";
+		// }else{
+		// 	std::cout << "del 1 6 false\n";
+		// }
+		// auto del2 = db.delete_friend(1,6);
+		// if (del2){
+		// 	std::cout << "del 1 6 true\n";
+		// }else{
+		// 	std::cout << "del 1 6 false\n";
+		// }
    });
 
 
