@@ -18,6 +18,8 @@
 #include "aigame.hpp"
 #include "server_util.hpp"
 
+#include "room.hpp"
+
 using json = nlohmann::json;
 
 void RelaySocket(){
@@ -25,7 +27,7 @@ void RelaySocket(){
 		//Empty because we don't need any currently.
 	};
 	
-	auto app = uWS::App();
+	uWS::App app = uWS::App();
 	auto db = DatabaseManager();
 	auto session_tokens = std::unordered_map<int, std::string>();
 	
@@ -170,84 +172,7 @@ void RelaySocket(){
 
 
 	// Functions we have available to in socketing
-	// ws->isSubscribed("moves") // See who is subbed to the "moves" room
-	// ws->getRemoteAddressAsText() // Gets address of the person
-	// ws->send("Hello there boi"); // Option to send message back to client only
-	std::unique_ptr<Game> game = nullptr;
-	std::unique_ptr<AIGame> aigame = nullptr;
-
-
-	auto websocket = app.ws<SocketData>("/ws/david",uWS::TemplatedApp<false>::WebSocketBehavior<SocketData> {
-		.open = [&game, &aigame](auto *ws) {
-			// When client connects, subscribe them to the 'moves' notification game
-			ws->subscribe("ROOM1");
-			game = std::make_unique<Game>(2);
-			aigame = std::make_unique<AIGame>(2);
-		},
-		.message = [&game, &aigame, &db](auto *ws, std::string_view message, uWS::OpCode opCode){
-			// 1. Parsing JSON to update board backend
-			auto json = json::parse(message);
-			std::string datastring = json["data"];
-			auto data = json::parse(datastring);
-			std::string move = data["move"];
-			if (!game->play(move)) {
-				return;
-			}
-			ws->publish("ROOM1", "{\"event\": \"moveconfirm\", \"tile\": \"" + move + "\"}", opCode);
-
-			// 2. AI Move
-			// AI/Computer generate move and publish.
-			auto computer = Computer(*game);
-			if (game->status() == Game::state::ONGOING) {
-				// auto move = computer.make_random_move();
-				// game->play(move);
-				// TODO: I THINK THIS CRASHES IF THERES NO MOVES LEFT?
-				aigame->play(move);
-				auto const calc_move = aigame->minmax(3); // depth 3 (could increase but test with that)
-				game->play(calc_move);
-				aigame->play(calc_move);
-				aigame->clear();
-				std::string ai_move = Game::indexToCoord(calc_move);
-				ws->publish("ROOM1", "{\"event\": \"move\", \"tile\": \"" + ai_move + "\"}", opCode);
-			}
-			std::cout << *game << '\n';
-			// 3. If the game's over, publish game end
-			Game::state state = game->status();
-			if (state != Game::state::ONGOING) {
-				std::string winner;
-				if (state == Game::state::DRAW) {
-					winner = "";
-				} else if (game->whose_turn() == 1 && state == Game::state::WIN
-						|| game->whose_turn() == 0 && state == Game::state::LOSS) {
-					winner = "COMPUTER";
-				} else {
-					winner = "PLAYER";
-				}
-				std::cout << *game << '\n';
-				// 3. If the game's over, publish game end
-				Game::state state = game->status();
-				if (state != Game::state::ONGOING) {
-					std::string winner;
-					if (state == Game::state::DRAW) {
-						winner = "";
-					} else if (game->whose_turn() == 1 && state == Game::state::WIN
-							|| game->whose_turn() == 0 && state == Game::state::LOSS) {
-						winner = "COMPUTER";
-					} else {
-						winner = "PLAYER";
-					}
-					std::cout << game->move_sequence() << '\n';
-					ws->publish("ROOM1", "{\"event\": \"game_over\", \"winner\": \"" + winner + "\"}", opCode);
-					auto const match_id = db.save_match("CLASSIC", game->move_sequence());
-					std::cout << "Match ID: " << match_id << '\n';
-				}	
-			}
-		},
-		.close = [](auto *ws, int x , std::string_view str) {
-			ws->unsubscribe("ROOM1");
-			ws->close();
-		}
-	});
+	Room room = Room(app, &db, {1, 2});
 
 	app.run();
 }
