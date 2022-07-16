@@ -149,3 +149,4 @@ auto game_result(Game const& game) -> std::string {
 	}
 	return winner;
 }
+
