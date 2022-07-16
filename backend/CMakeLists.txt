@@ -10,7 +10,7 @@ include_directories(
 )
 
 file(GLOB all_SRCS
-        "${PROJECT_SOURCE_DIR}/src/server/server.cpp"
+        "${PROJECT_SOURCE_DIR}/src/server/*.cpp"
         "${PROJECT_SOURCE_DIR}/src/game/*.cpp"
         "${PROJECT_SOURCE_DIR}/src/database/*.cpp"
 
