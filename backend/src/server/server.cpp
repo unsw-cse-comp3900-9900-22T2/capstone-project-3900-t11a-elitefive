@@ -1,16 +1,14 @@
+// Normal includes
 #include <iostream>
-// #include <uwebsockets/App.h>
-// #include <uwebsockets/WebSocket.h>
-#include "App.h"
-// #include <libusockets.h>
-#include <nlohmann/json.hpp>
-
-#include <pqxx/pqxx>
 #include <memory>
 #include <string>
 
-// TODO - Change the relative paths... Not really that good
-// https://stackoverflow.com/questions/8304190/cmake-with-include-and-source-paths-basic-setup
+// External libs
+#include <nlohmann/json.hpp>
+#include <pqxx/pqxx>
+#include "App.h"
+
+// Our libs
 #include "board.hpp"
 #include "computer.hpp"
 #include "db_utils.hpp"
@@ -148,7 +146,6 @@ void RelaySocket(){
 			}
 			ws->publish("ROOM1", "{\"event\": \"moveconfirm\", \"tile\": \"" + move + "\"}", opCode);
 
-			// TODO: NEED TO MAKE THIS ASYNC SOMEHOW BECAUSE ALL ws->publish in function GETS BATCHED AND SENT AT ONCE
 			// 2. AI Move
 			// AI/Computer generate move and publish.
 			auto computer = Computer(*game);

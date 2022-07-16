@@ -26,6 +26,7 @@ class BaseGame {
 		auto next_player() const -> int;
 		auto player_after(int curr_player) const -> int;
 		auto previous_player() const -> int;
+		auto num_players() const -> int;
 
 		// auto status() -> Game::state;
 		auto increase_move() -> void;

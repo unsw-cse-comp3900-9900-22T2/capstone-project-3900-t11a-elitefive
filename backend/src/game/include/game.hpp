@@ -33,7 +33,7 @@ class Game : public BaseGame {
 		auto status() const -> Game::state const;		// Tells you whether the game is over or not
 
 		auto move_sequence() const -> std::string;
-
+		auto all_moves() const -> const std::vector<std::string>;
 		// auto give_replay() -> 
 		// auto check() -> bool; 							// TODO: IMPLEMENT -> Valid move?
 		// auto over() -> bool; 							// TODO: IMPLEMENT -> Has the game ended?
