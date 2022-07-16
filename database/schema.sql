@@ -1,5 +1,5 @@
-create type outcomeType as enum ('WIN', 'LOSE', 'DRAW');
-create type gameType as enum ('CLASSIC', 'POTHOLES');
+create type outcomeType as enum ('WIN', 'LOSS', 'DRAW');
+create type gameType as enum ('CLASSIC', 'TRIPLES', 'POTHOLES');
 
 create table users (
 	id serial, 
@@ -11,8 +11,9 @@ create table users (
 
 create table matches (
 	id serial,
-	game gameType, 
-	start_time timestamp,
+	game gameType,
+	ranked boolean,
+	end_time timestamptz default CURRENT_TIMESTAMP,
 	replay text,
 	primary key (id)
 );
@@ -44,32 +45,40 @@ create table friends (
 	check (friend1 < friend2)
 );
 
+create table friendreqs (
+	from_user integer,
+	to_user integer,
+	foreign key (from_user) references users (id),
+	foreign key (to_user) references users (id),
+	primary key (from_user, to_user),
+);
 
+-- Demo Data
 
--- demo data
+-- Bots
+INSERT INTO users (username) values 
+('BOT1'),
+('BOT2'),
+('BOT3');
 
+-- Our passwords are all admin.
+insert into users (username, email, password_hash) values 
+('David', 'david@unsw.edu.au', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'),
+('JackyJ', 'jackyj@unsw.edu.au', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'),
+('JackyX', 'jackyx@unsw.edu.au', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'),
+('Yirong', 'yirong@unsw.edu.au', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'),
+('Sage', 'sage@unsw.edu.au', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918');
 
--- our passwords r all admin 
-insert into users values (1, 'David', 'david@unsw.edu.au', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918');
-insert into users values (2, 'JackyJ', 'jackyj@unsw.edu.au', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918');
-insert into users values (3, 'JackyX', 'jackyx@unsw.edu.au', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918');
-insert into users values (4, 'Yirong', 'yirong@unsw.edu.au', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918');
-insert into users values (5, 'Sage', 'sage@unsw.edu.au', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918');
+-- We are all friends.
+insert into friends (friend1, friend2) values 
+(4, 5), (4, 6), (4, 7), (4, 8),
+(5, 6), (5, 7), (5, 8),
+(6, 7), (6, 8),
+(7, 8);
 
--- we are all friends
-insert into friends values(1,2);
-insert into friends values(1,3);
-insert into friends values(1,4);
-insert into friends values(1,5);
-insert into friends values(2,3);
-insert into friends values(2,4);
-insert into friends values(2,5);
-insert into friends values(3,4);
-insert into friends values(3,5);
-insert into friends values(4,5);
+-- Password = meowth
+insert into users (username, email, password_hash) values
+('Jesse', 'jesse@teamrocket.com', '619227d5cf63bffd286a6529f58fb3e679169230eb7b0151871b8f6583f24bc6'),
+('James', 'james@teamrocket.com', '619227d5cf63bffd286a6529f58fb3e679169230eb7b0151871b8f6583f24bc6');
 
--- password = meowth
-insert into users values (6, 'Jesse', 'jesse@teamrocket.com', '619227d5cf63bffd286a6529f58fb3e679169230eb7b0151871b8f6583f24bc6');
-insert into users values (7, 'James', 'james@teamrocket.com', '619227d5cf63bffd286a6529f58fb3e679169230eb7b0151871b8f6583f24bc6');
-
-insert into friends values(6,7);
+insert into friends (friend1, friend2) values (9, 10);

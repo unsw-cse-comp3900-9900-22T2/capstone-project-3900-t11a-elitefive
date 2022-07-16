@@ -18,14 +18,24 @@ class DatabaseManager {
     auto insert_user(std::string username, std::string email, std::string password) -> bool;
     auto get_user(std::string email) -> User*;
     auto get_user(int id) -> User*;
+    auto does_user_exist(std::string username) -> int;
     // MATCHES
-    auto save_match(std::string gameType, std::string move_seq) -> int;
+    auto save_match(std::string gameType, bool is_ranked, std::map<int, int> playersELO, int winner, std::string move_seq,
+      std::vector<uint64_t> snapshots) -> int;
+    auto get_matches() -> std::vector<Match>;
+    auto get_matches(int id) -> std::vector<Match>;
+    // SNAPSHOTS
+    auto get_matches(int move_n1, int64_t bs1, int move_n2, int64_t bs2) -> std::vector<Match>;
+    // PLAYER PROFILE
+    auto get_latest_elo(int id, std::string gameType) -> int;
+    auto get_stats(int id) -> PlayerStats*;
+    auto get_elo_progress(int id) -> std::map<std::string, std::vector<int>>;
     // FRIENDS
-    auto get_friends(int uid) -> std::vector<User*>;
-    auto add_friend(int id1, int id2) -> bool;
-    auto delete_friend(int id1, int id2) -> bool;
-
-
+    auto get_friends(int id) -> std::vector<User*>;
+    auto delete_friend(int from, int to) -> bool;
+    auto send_friend_req(int from, int to) -> bool;
+    auto accept_friend_req(int from, int to) -> bool;
+    auto deny_friend_req(int from, int to) -> bool;
   private:
     auto prepare_statements() -> void;
     // Execute query with return result.
@@ -38,7 +48,11 @@ class DatabaseManager {
     template<typename... Args>
     auto execute1(std::string statement, Args... args) -> pqxx::row;
     // Insert multiple rows.
-    // auto insert_rows(std::string table, std::vector<std::string> columns);
+    template<typename... Args>
+    auto batch_insert(std::string table, std::vector<std::string> columns,
+      std::vector<Args...> entries) -> bool;
+    // Parse matches
+    auto parse_matches(pqxx::result res) -> std::vector<Match>;
 };
 
 #endif

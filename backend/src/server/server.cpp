@@ -4,7 +4,6 @@
 #include <string>
 #include <unordered_map>
 
-
 // External libs
 #include <nlohmann/json.hpp>
 #include <pqxx/pqxx>
@@ -60,7 +59,7 @@ void RelaySocket(){
                 auto email = std::string(user_json["email"]);
                 auto password = std::string(user_json["password"]);
 
-				// Register Success
+								// Register Success
                 if (db.insert_user(username, email, password)){
                     message = "{\"event'\": \"register\", \"action\": \"register\","
                     "\"payload\": { \"outcome\" : \"success\"}}";
@@ -125,25 +124,59 @@ void RelaySocket(){
 	});
 
   app.get("/db", [&db](auto *res, auto *req) {
-     // test inserting into db
-		//  db.insert_user("username", "email", "password");
-		//  auto user = db.get_user("email");
-		//  res->end(user->password_hash);
-		
-				// test generate session token 
-		res->end(generate_session_token(1));
-		
-		//auto matchID = db.save_match("CLASSIC", "12345");
-		//res->end(std::to_string(matchID));
-		
-		
-		auto matchID = db.save_match("CLASSIC", "12345");
+    // Testing Database Functionality.
+		// Inserting new user
+		// db.insert_user("new_user", "email", "password");
+		// auto user = db.get_user("email");
+		// std::cout << user->password_hash << std::endl;
+		// Inserting match.
+		auto playersELO = std::map<int, int>{
+			{1, 1000},
+			{2, 1200}
+		};
+		auto winner = 1;
+		auto move_seq = "12345";
+		auto snapshots = std::vector<uint64_t>{100, 200, 300, 400, 500};
+		auto matchID = db.save_match("POTHOLES", false, playersELO, winner, move_seq, snapshots);
+		db.save_match("CLASSIC", false, playersELO, winner, move_seq, snapshots);
+		db.save_match("TRIPLES", false, playersELO, winner, move_seq, snapshots);
+		auto matches = db.get_matches(1);
+		for (auto const &match : matches) {
+			std::cout << match.id << " " << match.game << " " <<
+				match.replay << std::endl;
+			for (auto const &p : match.players) {
+				std::cout << p.username << " " << p.end_elo << " " <<
+					p.outcome << std::endl;
+			}
+		}
+		// Does user exist.
+		std::cout << db.does_user_exist("David") << std::endl;
+		std::cout << db.does_user_exist("JackyJ") << std::endl;
+		std::cout << db.does_user_exist("DNE") << std::endl;
+		// Latest ELO
+		std::cout << db.get_latest_elo(1, "CLASSIC") << std::endl;
+		std::cout << db.get_latest_elo(5, "CLASSIC") << std::endl;
+		// Get stats
+		auto stats = db.get_stats(1);
+		std::cout << stats->get_WLD("CLASSIC", false).at(0) << std::endl;
+		std::cout << stats->get_WLD("TRIPLES", false).at(0) << std::endl;
+		std::cout << stats->get_WLD("POTHOLES", false).at(0) << std::endl;
+		// Snapshots
+		auto m = db.get_matches(4, 400, 5, 500);
+		for (auto const &match : m) {
+			std::cout << match.id << " " << match.game << " " <<
+				match.replay << std::endl;
+			for (auto const &p : match.players) {
+				std::cout << p.username << " " << p.end_elo << " " <<
+					p.outcome << std::endl;
+			}
+		}
 		res->end(std::to_string(matchID));
 		
 		// testing get friends 
 		auto friends = db.get_friends(1);
 		auto friends_json = friends_to_json(1, friends);
-		std::cout << " ***** freins to json\n";
+		std::cout << " ***** friends to json\n";
 		std::cout << friends_json;
 		std::cout <<  "*****\n";
 		
@@ -167,11 +200,10 @@ void RelaySocket(){
 		}else{
 			std::cout << "del 1 6 false\n";
 		}
-		
    });
 
 
-	// Functions we have available to in socketing
+
 	Room room = Room(app, &db, {1, 2});
 
 	app.run();
