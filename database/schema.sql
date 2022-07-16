@@ -40,7 +40,8 @@ create table friends (
 	friend2 integer,
 	foreign key (friend1) references users (id),
 	foreign key (friend2) references users (id),
-	primary key (friend1, friend2)
+	primary key (friend1, friend2),
+	check (friend1 < friend2)
 );
 
 

@@ -135,6 +135,37 @@ void RelaySocket(){
 		//res->end(std::to_string(matchID));
 		
 		
+		auto matchID = db.save_match("CLASSIC", "12345");
+		res->end(std::to_string(matchID));
+		
+		// testing get friends 
+		auto friends = db.get_friends(1);
+		auto friends_json = friends_to_json(1, friends);
+		std::cout << " ***** freins to json\n";
+		std::cout << friends_json;
+		std::cout <<  "*****\n";
+		
+		// testing add friend
+		auto add = db.add_friend(1,6);
+		if (add){
+			std::cout << "add 1 6 true\n";
+		}else{
+			std::cout << "add 1 6 false\n";
+
+		}
+		auto del = db.delete_friend(1,6);
+		if (del){
+			std::cout << "del 1 6 true\n";
+		}else{
+			std::cout << "del 1 6 false\n";
+		}
+		auto del2 = db.delete_friend(1,6);
+		if (del2){
+			std::cout << "del 1 6 true\n";
+		}else{
+			std::cout << "del 1 6 false\n";
+		}
+		
    });
 
 
