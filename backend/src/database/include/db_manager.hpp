@@ -31,11 +31,11 @@ class DatabaseManager {
     auto get_stats(int id) -> PlayerStats*;
     auto get_elo_progress(int id) -> std::map<std::string, std::vector<int>>;
     // FRIENDS
-    auto get_all_friends(int id) -> void;
-    auto remove_friend(int from, int to) -> void;
-    auto send_friend_req(int from, int to) -> void;
-    auto accept_friend_req(int from, int to) -> void;
-    auto deny_friend_req(int from, int to) -> void;
+    auto get_friends(int id) -> std::vector<User*>;
+    auto delete_friend(int from, int to) -> bool;
+    auto send_friend_req(int from, int to) -> bool;
+    auto accept_friend_req(int from, int to) -> bool;
+    auto deny_friend_req(int from, int to) -> bool;
   private:
     auto prepare_statements() -> void;
     // Execute query with return result.

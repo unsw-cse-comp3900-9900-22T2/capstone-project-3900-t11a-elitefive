@@ -32,7 +32,6 @@ class Board {
 		auto num_players() const -> int;
 		auto num_spaces() const -> int;
 		
-		
 		auto player_tiles(int player) const -> BitBoard;												// Gives you all 'set' tiles for player
 		auto opponent_tiles(int player) const -> BitBoard;												// Gives you all 'set' tiles for opponents
 		auto free_tiles() const -> BitBoard;															// Gives all available free tiles on board

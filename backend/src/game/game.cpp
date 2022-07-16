@@ -47,6 +47,10 @@ auto Game::move_sequence() const -> std::string {
 	return sequence;
 }
 
+auto Game::all_moves() const -> const std::vector<std::string> {
+	return move_sequence_;
+}
+
 
 // Private
 auto Game::end_turn(int index) -> void {

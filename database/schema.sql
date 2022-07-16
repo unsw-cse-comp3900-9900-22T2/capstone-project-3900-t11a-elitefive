@@ -36,16 +36,21 @@ create table snapshots (
 	primary key (match, move_num)
 );
 
-create table friendship (
-	id serial,
+create table friends (
 	friend1 integer,
 	friend2 integer,
-	status integer default 1,
-	action_by integer,
-	tm timestamptz default CURRENT_TIMESTAMP,
 	foreign key (friend1) references users (id),
 	foreign key (friend2) references users (id),
-	primary key (friend1, friend2)
+	primary key (friend1, friend2),
+	check (friend1 < friend2)
+);
+
+create table friendreqs (
+	from_user integer,
+	to_user integer,
+	foreign key (from_user) references users (id),
+	foreign key (to_user) references users (id),
+	primary key (from_user, to_user),
 );
 
 -- Demo Data
@@ -65,7 +70,7 @@ insert into users (username, email, password_hash) values
 ('Sage', 'sage@unsw.edu.au', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918');
 
 -- We are all friends.
-insert into friendship (friend1, friend2) values 
+insert into friends (friend1, friend2) values 
 (4, 5), (4, 6), (4, 7), (4, 8),
 (5, 6), (5, 7), (5, 8),
 (6, 7), (6, 8),
@@ -76,4 +81,4 @@ insert into users (username, email, password_hash) values
 ('Jesse', 'jesse@teamrocket.com', '619227d5cf63bffd286a6529f58fb3e679169230eb7b0151871b8f6583f24bc6'),
 ('James', 'james@teamrocket.com', '619227d5cf63bffd286a6529f58fb3e679169230eb7b0151871b8f6583f24bc6');
 
-insert into friendship (friend1, friend2) values (9, 10);
+insert into friends (friend1, friend2) values (9, 10);

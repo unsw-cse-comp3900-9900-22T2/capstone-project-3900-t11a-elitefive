@@ -67,7 +67,9 @@ class PlayerStats {
     : stats{stats_} {}
 
     auto get_WLD(std::string game, bool ranked) -> std::vector<int> {
-      return { get_outcome(game, ranked, "WIN"), get_outcome(game, ranked, "LOSS"),
+      return
+      { get_outcome(game, ranked, "WIN"),
+        get_outcome(game, ranked, "LOSS"),
         get_outcome(game, ranked, "DRAW") };
     }
 

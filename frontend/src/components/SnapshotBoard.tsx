@@ -8,11 +8,15 @@ import HexCell from './HexCell';
 type Props = {
   width?: number;
   height?: number;
-  isStatic?: boolean;
 }
 
 type RowStyleProps = {
   x_offset: number
+}
+
+type snapshotCellType = {
+  position: string;
+  color?: string;
 }
 
 const defaultBoard = [
@@ -26,6 +30,15 @@ const defaultBoard = [
   ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
   ['i1', 'i2', 'i3', 'i4', 'i5'],
 ]
+
+const createSnapShotCells = () => {
+  return defaultBoard.map((col: string[]) => col.map(
+    (cell: string) => { 
+      return {
+        position: cell,
+      }
+  }))
+}
 
 const BoardContainer = styled.div`
   padding: 50px;
@@ -43,27 +56,62 @@ const ColumnContainer = styled.div`
   margin-top: -15px;
 `;
 
+const DEFAULT_COLOR_1 = "red";
+const DEFAULT_COLOR_2 = "blue";
+
+
 const DEFAULT_BOARD_WIDTH = 1200;
 // const DEFAULT_BOARD_HEIGHT = 800;
 
-export default function SnapshotBoard({ width, height, isStatic }: Props) {
+export default function SnapshotBoard({ width, height }: Props) {
+
+  const [state, setState] = useState<snapshotCellType[][]>(createSnapShotCells());
+  const [replayString, setReplayString] = useState<string[]>([]);
+
+  // useEffect(() => {
+  //   console.log(state);
+  // },[state])
+
+  const handleCellClick = (position:string, row_number:number) => () => {
+      if(!replayString.find(replay_string => replay_string == position)) {
+
+        const currColor = (replayString.length % 2 == 0) ? DEFAULT_COLOR_1 : DEFAULT_COLOR_2;
+
+        // changes color of the clicked hexcell
+        setState(prev => prev.map((row, index:number) => {
+          if(index == row_number) {
+            return row.map(cell => {
+              if(cell.position == position) {
+                return {
+                  ...cell,
+                  color: currColor,
+                }
+              }
+              return cell;
+            })
+          } else {
+            return row
+          }
+        }))
+
+        // adds current cell to replayString
+        setReplayString(prev => [
+          ...prev,
+          position,
+        ]);
+      }
+  }
   
-  const renderRow = (row: string[] , x_offset: number) => {
+  const renderRow = (row: snapshotCellType[] , row_number: number, x_offset: number) => {
     return (
       <RowContainer x_offset={x_offset}>
-        {row.map(( _x : string) => {
+        {row.map(( { position, color } : snapshotCellType) => {
           return (
             <HexCell
               width={60}
               height={65}
-              // fill={hexState?.color ? hexState?.color : "var(--accent-darker)"}
-              onClick={() => {
-                // if isStatic does not do any of this Websocket stuff
-                if(!isStatic) {
-                  // playMove("abc", hexKey);
-                  // then sends WS emit method which will cause change
-                }
-              }}
+              fill={color ? color : "var(--accent-darker)"}
+              onClick={handleCellClick(position, row_number)}
             />
           )
         })}
@@ -74,14 +122,14 @@ export default function SnapshotBoard({ width, height, isStatic }: Props) {
   const renderBoard = () => {
     const w = width ? width : DEFAULT_BOARD_WIDTH;
 
-    return defaultBoard.map((row, index) => {
+    return state.map((row, index) => {
       // it works
       const x_offset = Math.abs((index+1)- 5) * w/40
       const y_offset = index * 90;
       return (
         <ColumnContainer>
           {
-            renderRow(row, x_offset)
+            renderRow(row, index, x_offset)
           }
         </ColumnContainer>
       )

@@ -1,21 +1,21 @@
+// Normal includes
 #include <iostream>
-// #include <uwebsockets/App.h>
-// #include <uwebsockets/WebSocket.h>
-#include "App.h"
-// #include <libusockets.h>
-#include <nlohmann/json.hpp>
-
-#include <pqxx/pqxx>
 #include <memory>
 #include <string>
+#include <unordered_map>
 
-// TODO - Change the relative paths... Not really that good
-// https://stackoverflow.com/questions/8304190/cmake-with-include-and-source-paths-basic-setup
+// External libs
+#include <nlohmann/json.hpp>
+#include <pqxx/pqxx>
+#include "App.h"
+
+// Our libs
 #include "board.hpp"
 #include "computer.hpp"
 #include "db_utils.hpp"
 #include "db_manager.hpp"
 #include "aigame.hpp"
+#include "server_util.hpp"
 
 using json = nlohmann::json;
 
@@ -26,6 +26,7 @@ void RelaySocket(){
 	
 	auto app = uWS::App();
 	auto db = DatabaseManager();
+	auto session_tokens = std::unordered_map<int, std::string>();
 	
 	app.listen(8080, [](auto *listen_socket){
 		if(listen_socket){
@@ -73,10 +74,11 @@ void RelaySocket(){
 		res->onAborted([]() -> void {});
     });
     
-	app.post("/login", [&app, &db](auto *res, auto *req){
+	app.post("/login", [&app, &db, &session_tokens](auto *res, auto *req){
+	
 	
 	    // Get data from request
-	    res->onData([&db, res](std::string_view data, bool last) {
+	    res->onData([&db, res, &session_tokens](std::string_view data, bool last) {
             auto buffer = std::string("");
             auto message = std::string("");
             
@@ -95,10 +97,17 @@ void RelaySocket(){
                             "{ \"outcome\" : \"failure\", \"message\": \"incorrect password\"}}";
                     // Login success
                     }else{
+                    
+                        if (session_tokens.find(user->id) == session_tokens.end()){
+                            std::cout << "generating token\n";
+	                        auto session_token = generate_session_token(user->id);
+	                        session_tokens[user->id] = session_token;
+						}
+                    
                         message =  std::string("{\"event\": \"login\", \"action\": \"login\", \"payload\":") +  
                             std::string("{ \"outcome\" : \"success\", \"uid\": \"") +  std::to_string(user->id) +
                             std::string("\", \"email\": \"") + user->email + std::string("\" ") + ","+
-                            std::string ("\"session\": \"TODO\"}}");
+                            std::string ("\"session\": \"") + session_tokens[user->id] + std::string("\"}}");
                     }
 				// Email doesn'e exist
                 }else{
@@ -161,6 +170,34 @@ void RelaySocket(){
 			}
 		}
 		res->end(std::to_string(matchID));
+		
+		// testing get friends 
+		auto friends = db.get_friends(1);
+		auto friends_json = friends_to_json(1, friends);
+		std::cout << " ***** friends to json\n";
+		std::cout << friends_json;
+		std::cout <<  "*****\n";
+		
+		// testing add friend
+		auto add = db.add_friend(1,6);
+		if (add){
+			std::cout << "add 1 6 true\n";
+		}else{
+			std::cout << "add 1 6 false\n";
+
+		}
+		auto del = db.delete_friend(1,6);
+		if (del){
+			std::cout << "del 1 6 true\n";
+		}else{
+			std::cout << "del 1 6 false\n";
+		}
+		auto del2 = db.delete_friend(1,6);
+		if (del2){
+			std::cout << "del 1 6 true\n";
+		}else{
+			std::cout << "del 1 6 false\n";
+		}
    });
 
 
@@ -190,7 +227,6 @@ void RelaySocket(){
 			}
 			ws->publish("ROOM1", "{\"event\": \"moveconfirm\", \"tile\": \"" + move + "\"}", opCode);
 
-			// TODO: NEED TO MAKE THIS ASYNC SOMEHOW BECAUSE ALL ws->publish in function GETS BATCHED AND SENT AT ONCE
 			// 2. AI Move
 			// AI/Computer generate move and publish.
 			auto computer = Computer(*game);
@@ -247,6 +283,7 @@ void RelaySocket(){
 
 	app.run();
 }
+
 
 int main()
 {

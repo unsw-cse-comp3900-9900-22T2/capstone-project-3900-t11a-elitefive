@@ -16,7 +16,6 @@ auto DatabaseManager::insert_user(std::string username, std::string email, std::
 }
 
 auto DatabaseManager::get_user(std::string email) -> User* {
-
   auto res = execute("email_get_user", email);
   if (res.size() != 1) {
     return NULL;
@@ -120,6 +119,43 @@ auto DatabaseManager::get_elo_progress(int id) -> std::map<std::string, std::vec
   return progress;
 }
 
+auto DatabaseManager::get_friends(int id) -> std::vector<User*> {
+  auto friends = std::vector<User*>();
+    auto res = execute("get_friends_uid", id);
+    for (auto row : res){
+      std::cout << row[0] << " "  << row[1] << "\n";
+      if (atoi(row[0].c_str()) != id) {
+        friends.push_back(get_user(atoi(row[0].c_str())));
+      }
+      if (atoi(row[1].c_str()) != id) {
+        friends.push_back(get_user(atoi(row[1].c_str())));
+      }
+    }
+  return friends;
+}
+
+auto DatabaseManager::delete_friend(int from, int to) -> bool {
+  auto fri1 = std::min(from, to);
+  auto fri2 = std::max(from, to);
+  return execute0("delete_friend", fri1, fri2);
+}
+
+auto DatabaseManager::send_friend_req(int from, int to) -> bool {
+  return execute0("send_friend_req", from, to);
+}
+
+auto DatabaseManager::accept_friend_req(int accepter, int accepted) -> bool {
+  auto fri1 = std::min(accepter, accepted);
+  auto fri2 = std::max(accepter, accepted);
+  bool remove = execute0("delete_friend_req", accepted, accepter);
+  bool add = execute0("add_friend", fri1, fri2);
+  return add && remove;
+}
+
+auto DatabaseManager::deny_friend_req(int denier, int denied) -> bool {
+  return execute0("delete_friend_req", denied, denier);
+}
+
 // Prepare the statements on instantiation.
 auto DatabaseManager::prepare_statements() -> void {
   conn_.prepare("insert_user",
@@ -192,6 +228,27 @@ auto DatabaseManager::prepare_statements() -> void {
   "WHERE player = $1 AND ranked = true "
   "GROUP BY game, end_elo, end_time "
   "ORDER BY game, end_time");
+  conn_.prepare("get_friends_uid",
+  "SELECT * FROM friends "
+  "WHERE friend1 = $1 OR friend2 = $1;");
+  conn_.prepare("get_incoming_freqs",
+  "SELECT * FROM friendreqs "
+  "WHERE to_user = $1;");
+  conn_.prepare("get_outgoing_freqs",
+  "SELECT * FROM friendreqs "
+  "WHERE from_user = $1;");
+  conn_.prepare("add_friend",
+  "INSERT INTO friends "
+  "VALUES ($1, $2);");
+  conn_.prepare("delete_friend",
+  "DELETE FROM friends "
+  "WHERE friend1 = $1 AND friend2 = $2;");
+  conn_.prepare("send_friend_req",
+  "INSERT INTO friendreqs "
+  "VALUES ($1, $2);");
+  conn_.prepare("delete_friend_req",
+  "DELETE FROM friendreqs "
+  "WHERE from_user = $1 AND to_user = $2;");
 }
 
 template<typename... Args>
@@ -211,9 +268,12 @@ template<typename... Args>
 auto DatabaseManager::execute0(std::string statement, Args... args) -> bool {
   try {
     pqxx::work w(conn_);
-    w.exec_prepared0(statement, args...);
+    auto res = w.exec_prepared0(statement, args...);
     w.commit();
-    return true;
+    auto rows_deleted = res.affected_rows();
+    if (rows_deleted > 0){
+      return true;
+    }
   } catch (const pqxx::pqxx_exception &e) {
     std::cerr << e.base().what();
     return false;
