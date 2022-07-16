@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Board from '../components/Board';
 import { Typography, Box } from '@mui/material';
@@ -68,8 +68,52 @@ const MatchContainer  = styled.div`
   grid-gap: 10px;
 `
 
+export type profileDataType = {
+  uid: number;
+  username: string;
+  email: string;
+  classic: statsDataType;
+  potholes: statsDataType;
+  triples: statsDataType;
+}
+
+type statsDataType = {
+  draws: number;
+  elo: number;
+  losses: number;
+  wins: number;
+}
+
+const DefaultProfileData = {
+  "email": "",
+  "username": "",
+  "uid": 0,
+  "classic": {
+    "draws": 0,
+    "elo": 0,
+    "losses": 0,
+    "wins": 0
+  },
+  "potholes": {
+    "draws": 0,
+    "elo": 0,
+    "losses": 0,
+    "wins": 0
+  },
+  "triples": {
+    "draws": 0,
+    "elo": 0,
+    "losses": 0,
+    "wins": 0
+  },
+}
+
+
+
+
 
 export default function Profilepage({}: Props) {
+  const [profileData, setProfileData] = useState<profileDataType>(DefaultProfileData);
   const navigate = useNavigate();
 
   const navigateToFriends = () => {
@@ -77,17 +121,27 @@ export default function Profilepage({}: Props) {
       navigate('/friends');
   };
 
+  useEffect(() => {
+    fetch("/api/profile")
+    .then(resp => resp.json())
+    .then(data => {
+      const payload = data.payload;
+      setProfileData(payload);
+    })
+  },[])
+
+
   return (
     <Container>
       <YavalathButtonFixed/>
       <Container1>
         <Container>
-          <ProfileCard name="name"/>
+          <ProfileCard name={profileData.username}/>
           <CustomizedInputBase/>
           <Button align-items="right" onClick={navigateToFriends}>Friends</Button>
         </Container>
         <StatContainer>
-        <StatTab/>
+          <StatTab data={profileData}/>
         </StatContainer>
       </Container1>
       <Typography variant="h3">{"Past Matches"}</Typography>

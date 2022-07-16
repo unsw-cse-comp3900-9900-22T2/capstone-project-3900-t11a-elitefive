@@ -4,10 +4,6 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../global/GlobalAuth';
 
-type Props = {
-  name: string;
-}
-
 const Container = styled.div`
   position: absolute;
   top: 5%;
@@ -57,8 +53,11 @@ function DropDownMenu({}) {
   )
 }
 
+type ProfileWidgetProps = {
+  name: string;
+}
 
-export default function ProfileWidget({ name }: Props) {
+export default function ProfileWidget({ name }: ProfileWidgetProps) {
   const [isHovered, setIsHovered ] = useState(false);
 
   const handleHoverStart = () => {
@@ -89,13 +88,17 @@ export default function ProfileWidget({ name }: Props) {
   )
 }
 
-export function ProfileCard({ name }: Props) {
+type ProfileCardProps = {
+  name: string;
+}
+
+export function ProfileCard({ name }: ProfileCardProps) {
   return (
     <ProfileWidgetContainer>
       <ImageContainer />
       <Box display="flex" flexDirection="column" marginTop="30px">
         <Typography variant="h4">{name}</Typography>
-        <Typography variant="body1">Elo</Typography>
+        {/* <Typography variant="body1">Elo {elo}</Typography> */}
       </Box>
     </ProfileWidgetContainer>
   )

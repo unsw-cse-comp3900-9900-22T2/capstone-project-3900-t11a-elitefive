@@ -145,7 +145,7 @@ void RelaySocket(){
 		});
 		res->onAborted([]() -> void {});
 	});
-	app.get("/profile", [&app, &db, &session_tokens](auto *res, auto *req) {
+	app.get("/api/profile", [&app, &db, &session_tokens](auto *res, auto *req) {
 	
 		// todo, parse request 
 		
