@@ -7,7 +7,7 @@ type Props = {
   stroke?: string;
   fill?: string;
   transform?: string;
-  onClick?: () => void;
+  onClick?: (args?: any) =>void;
 }
 
 type StyledProps = {

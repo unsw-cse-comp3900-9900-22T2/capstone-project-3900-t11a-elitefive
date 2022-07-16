@@ -71,6 +71,78 @@ Register Failure
 }
 ```
 
+## Friends
+
+Get friends
+
+```
+{
+	"event": "friends",
+	"action": "get",
+	"payload": {
+		"user": "<uid>",
+		"friends": [{
+			"uid": "<uid>",
+			"username": "<username>"
+		}, ...]
+	}
+}
+```
+
+Add friend success
+
+```
+{
+    "event": "friends",
+    "action": "add",
+    "payload" : {
+        "outcome" : "success"
+    }
+}
+```
+
+Add friend failure
+
+```
+{
+    "event": "friends",
+    "action": "add",
+    "payload" : {
+        "outcome" : "failure"
+    }
+}
+```
+
+Delete friend success
+
+```
+{
+    "event": "friends",
+    "action": "delete",
+    "payload" : {
+        "outcome" : "success"
+    }
+}
+```
+
+Delete friend failure
+
+```
+{
+    "event": "friends",
+    "action": "delete",
+    "payload" : {
+        "outcome" : "failure"
+    }
+}
+```
+
+
+
+
+
+
+
 
 
 

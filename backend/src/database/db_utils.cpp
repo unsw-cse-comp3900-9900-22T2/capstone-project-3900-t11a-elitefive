@@ -2,6 +2,7 @@
 #define DATABASE_UTILS_HPP
 
 #include "db_utils.hpp"
+#include "db_classes.hpp"
 
 #include <pqxx/pqxx>
 #include <openssl/sha.h>
@@ -26,9 +27,36 @@ auto hash_password(std::string password) -> std::string {
     return password;
 }
 
+
+
 auto check_password(std::string email, std::string password) -> bool {
 
     return false;
+}
+
+auto friends_to_json(int id, std::vector<User*> friends) -> std::string {
+    
+    auto friends_json = std::string(
+    "{"
+    	"\"event\": \"friends\","
+    	"\"action\": \"get\","
+    	"\"payload\": {"
+    		"\"user\": \"" + std::to_string(id) + "\", "
+    		"\"friends\": ["
+    );
+    
+    for (auto fri : friends){
+        friends_json = friends_json + 
+        "{"
+			"\"uid\":" +  std::to_string(fri->id)  + ","
+			"\"username\": \"" + fri->username + "\"" + 
+		"},";
+    }
+    
+    friends_json.pop_back();
+    friends_json += "]}}";
+            
+    return friends_json;
 }
 
 #endif
