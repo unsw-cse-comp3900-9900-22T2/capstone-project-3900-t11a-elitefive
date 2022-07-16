@@ -20,6 +20,8 @@ import Profilepage from './pages/Profilepage';
 import Gamepage from './pages/Gamepage/Gamepage';
 import ReplaySearchpage from './pages/ReplaySearchpage';
 import FriendsPage from './pages/Friendspage';
+import Gamemode from './pages/Gamemode';
+import ReplayGamepage from './pages/ReplayGamepage/ReplayGamePage';
 
 
 function App() {
@@ -32,13 +34,15 @@ function App() {
             <Routes>
               <Route path="/register" element={<Registerpage/>}/>
               <Route path="/login" element={<Loginpage/>}/>
-              <Route element={<ProtectedRoutes/>}>
+              {/* <Route element={<ProtectedRoutes/>}> */}
                 <Route path="/profile:id" element={<Profilepage/>}/>
                 <Route path="/friends" element={<FriendsPage/>}/>
                 <Route path="/replays" element={<ReplaySearchpage/>}/>
                 <Route path="/game" element={<Gamepage/>}/>
                 <Route path="/dashboard" element={<Dashboard/>}/>
-              </Route>
+                <Route path="/gamemode" element={<Gamemode/>}/>
+                <Route path="/replaygame" element={<ReplayGamepage/>}/>
+              {/* </Route> */}
               <Route path="/" element={<Homepage/>}/>
             </Routes>
           </Router>
