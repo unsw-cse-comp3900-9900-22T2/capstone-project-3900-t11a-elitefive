@@ -126,6 +126,7 @@ void RelaySocket(){
                             std::cout << "generating token\n";
 	                        auto session_token = generate_session_token(user->id);
 	                        session_tokens[user->id] = session_token;
+	                        std::cout << "generating token\n";
 						}
                     
                         message =  std::string("{\"event\": \"login\", \"action\": \"login\", \"payload\":") +  
@@ -144,6 +145,23 @@ void RelaySocket(){
 		});
 		res->onAborted([]() -> void {});
 	});
+	app.get("/profile", [&app, &db, &session_tokens](auto *res, auto *req) {
+	
+		// todo, parse request 
+		
+		// hard coded user for functionality 
+		auto user = db.get_user(1);
+		auto stats = db.get_stats(1);
+		auto friends = db.get_friends(1);
+		
+		auto profile_json = profile_to_json(user, stats, friends);
+				
+		std::cout << profile_json << "\n";
+		res->end(profile_json);
+		
+			
+	});	
+	
 
   app.get("/db", [&db](auto *res, auto *req) {
     // Testing Database Functionality.
@@ -202,29 +220,27 @@ void RelaySocket(){
 		std::cout << friends_json;
 		std::cout <<  "*****\n";
 		
-		// // testing add friend
-		// auto add = db.accept_friend_req(1,6);
-		// if (add){
-		// 	std::cout << "add 1 6 true\n";
-		// }else{
-		// 	std::cout << "add 1 6 false\n";
+		// testing add friend
+		auto add = db.accept_friend_req(1,6);
+		if (add){
+			std::cout << "add 1 6 true\n";
+		}else{
+			std::cout << "add 1 6 false\n";
 
-		// }
-		// auto del = db.delete_friend(1,6);
-		// if (del){
-		// 	std::cout << "del 1 6 true\n";
-		// }else{
-		// 	std::cout << "del 1 6 false\n";
-		// }
-		// auto del2 = db.delete_friend(1,6);
-		// if (del2){
-		// 	std::cout << "del 1 6 true\n";
-		// }else{
-		// 	std::cout << "del 1 6 false\n";
-		// }
+		}
+		auto del = db.delete_friend(1,6);
+		if (del){
+			std::cout << "del 1 6 true\n";
+		}else{
+			std::cout << "del 1 6 false\n";
+		}
+		auto del2 = db.delete_friend(1,6);
+		if (del2){
+			std::cout << "del 1 6 true\n";
+		}else{
+			std::cout << "del 1 6 false\n";
+		}
    });
-
-
 
 	Room room = Room(app, &db, {1, 2});
 

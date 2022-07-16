@@ -83,7 +83,7 @@ auto DatabaseManager::get_matches(int move_n1, int64_t bs1, int move_n2, int64_t
 
 auto DatabaseManager::get_latest_elo(int id, std::string gameType) -> int {
   auto res = execute("get_latest_elo", id, gameType);
-  if (res.size() != 1) {
+  if (res.size() < 1) {
     return 0;
   }
   return atoi(res[0][0].c_str());
