@@ -10,52 +10,47 @@ import * as API from '../api/rest';
 
 type Props = {}
 
-type replayDataType = {
+export type replayDataType = {
   mode: "Ranked" | "Casual";
-  type: "Classic" | "Triples" | "Potholes"
+  gamemode: "CLASSIC" | "TRIPLES" | "POTHOLES"
   result: "win" | "loss" | "draw";
   date: string;
   img: string;
   players: any[]; // todo
-  elo: number;
 }
 
 const mockData: replayDataType[] = [
   {
     mode: "Ranked",
-    type: "Classic",
+    gamemode: "CLASSIC",
     result: "win",
     date: "15/3/2022",
     img: "",
     players: [], // todo
-    elo: 1000
   },
   {
     mode: "Casual",
-    type: "Triples",
+    gamemode: "TRIPLES",
     result: "loss",
     date: "15/3/2022",
     img: "",
     players: [], // todo
-    elo: 1000
   },
   {
     mode: "Casual",
-    type: "Potholes",
+    gamemode: "POTHOLES",
     result: "loss",
     date: "15/3/2022",
     img: "",
     players: [], // todo
-    elo: 1000
   },
   {
     mode: "Casual",
-    type: "Potholes",
+    gamemode: "POTHOLES",
     result: "loss",
     date: "15/3/2022",
     img: "",
     players: [], // todo
-    elo: 2000
   }
 ]
 
@@ -88,10 +83,11 @@ const filterData = (data: replayDataType[], filterType:string|undefined, seconda
       return data.filter(d => d.mode == secondaryFilter)
     }
     case "type": {
-      return data.filter(d => d.type == secondaryFilter)
+      return data.filter(d => d.gamemode == secondaryFilter)
     }
     case "elo": {
-      return eloFilter(data, secondaryFilter);
+      // return eloFilter(data, secondaryFilter);
+      return data;
     }
     default: {
       return data;
@@ -100,17 +96,17 @@ const filterData = (data: replayDataType[], filterType:string|undefined, seconda
 }
 
 
-const eloFilter = (data:replayDataType[], secondaryFilter:string) => {
-  switch(secondaryFilter) {
-    case "> 1000": {
-      return data.filter(d => d.elo > 1000);
-    }
-    case "<= 1000": {
-      return data.filter(d => d.elo <= 1000);
-    }
-  }
+// const eloFilter = (data:replayDataType[], secondaryFilter:string) => {
+//   switch(secondaryFilter) {
+//     case "> 1000": {
+//       return data.filter(d => d.elo > 1000);
+//     }
+//     case "<= 1000": {
+//       return data.filter(d => d.elo <= 1000);
+//     }
+//   }
       
-}
+// }
 
 export default function ReplaySearchpage({}: Props) {
   const [replays, setReplays] = useState<replayDataType[]|undefined>();
@@ -120,26 +116,37 @@ export default function ReplaySearchpage({}: Props) {
 
   // on mount
   useEffect(() => {
-    (async () => {
-      const result = await API.getAllReplays()
-      if(!result) return;
-      const { all_matches: matches } = result;
-      setReplays(matches);
-      // setReplays(mockData);
-    })();
+    fetchAllMatches();
   },[])
+
+  // on filter change if choose none as filter mode
+  useEffect(() => {
+    if(filter === undefined) {
+      fetchAllMatches();
+    }
+  },[filter])
   
-  
+  const fetchAllMatches = async () => {
+    const result = await API.getAllReplays()
+    if(!result) return;
+    const { all_matches: matches } = result;
+    setReplays(matches);
+    console.log(matches);
+  }
   
   return (
     <>
     <YavalathButton/>
     <Box
-    display="flex"
-    width="100vw"
-    minHeight="100vh"
+      display="flex"
+      width="100vw"
+      minHeight="100vh"
     >
-      <SnapshotPopup open={isOpen} handleClose={() => { setIsOpen(false) }}/>
+      <SnapshotPopup 
+        open={isOpen} 
+        handleClose={() => { setIsOpen(false) }}
+        setReplayData={setReplays}
+      />
       <MainContainer>
         <Box margin="30px 50px">
           <Typography variant="h4">Replays</Typography>
@@ -152,9 +159,10 @@ export default function ReplaySearchpage({}: Props) {
           />
         </Box>
         <ReplaysContainer>
-          {replays && filterData(replays as replayDataType[], filter, secondaryFilter)?.map((data) => (
-            <ReplayPreview {...data}/>
-          ))}
+          {replays && filterData(replays as replayDataType[], filter, secondaryFilter)?.map((data: replayDataType) => (
+              <ReplayPreview {...data}/>
+            ))
+          }
         </ReplaysContainer>
       </MainContainer>
       <SideBarContainer>

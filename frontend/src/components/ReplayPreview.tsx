@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Box } from '@mui/material';
 
 type Props = {
-  mode: string;
+  gamemode: string;
   result: string;
   date: string;
   img: string;
@@ -45,19 +45,19 @@ const BottomTags = styled.div`
   padding: 10px 30px;
 `;
 
-export default function ReplayPreview({mode, result, date, img}: Props) {
+export default function ReplayPreview({gamemode, result, date, img}: Props) {
   return (
     <Container>
       <Box display="flex" justifyContent="flexStart" margin="10px">
-        <Tag color="grey">{mode}</Tag>
+        <Tag color="grey">{gamemode}</Tag>
       </Box>
       <ImagePlaceholder/>
-      <BottomTags>
-        <Box marginRight="auto">
-          <Tag color={ result=="win" ? "green": "red" } padding="1px 15px">{result}</Tag>
-        </Box>
-        <Tag color="grey" padding="1px 15px">{date}</Tag>
-      </BottomTags>
+      {/* <BottomTags> */}
+        {/* <Box marginRight="auto"> */}
+          {/* <Tag color={ result=="win" ? "green": "red" } padding="1px 15px">{result}</Tag> */}
+        {/* </Box> */}
+        {/* <Tag color="grey" padding="1px 15px">{date}</Tag> */}
+      {/* </BottomTags> */}
     </Container>
   )
 }

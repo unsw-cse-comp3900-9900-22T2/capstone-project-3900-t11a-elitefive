@@ -37,11 +37,11 @@ function App() {
               {/* <Route element={<ProtectedRoutes/>}> */}
                 <Route path="/profile" element={<Profilepage/>}/>
                 <Route path="/friends" element={<FriendsPage/>}/>
-                <Route path="/replays" element={<ReplaySearchpage/>}/>
                 <Route path="/game" element={<Gamepage/>}/>
                 <Route path="/dashboard" element={<Dashboard/>}/>
                 <Route path="/gamemode" element={<Gamemode/>}/>
-                <Route path="/replaygame" element={<ReplayGamepage/>}/>
+                <Route path="/replays" element={<ReplaySearchpage/>}/>
+                <Route path="/replay/:replayid" element={<ReplayGamepage/>}/>
               {/* </Route> */}
               <Route path="/" element={<Homepage/>}/>
             </Routes>
