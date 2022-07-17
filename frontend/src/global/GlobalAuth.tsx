@@ -76,11 +76,11 @@ export const AuthProvider = ({ children }: Props) => {
   }
 
   const getUID = () => {
-    return auth.uid;
+    return getStoredUID();
   }
 
   const getToken = () => {
-    return auth.sessionToken;
+    return getStoredToken();
   }
 
   const isLogged = () => {

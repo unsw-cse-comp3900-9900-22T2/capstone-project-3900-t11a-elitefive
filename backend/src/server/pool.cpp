@@ -6,6 +6,7 @@
 
 #include <string>
 #include <queue>
+#include <unistd.h>
 
 using json = nlohmann::json;
 
@@ -24,10 +25,11 @@ auto Pool::create_waiting_room(uWS::App &app, DatabaseManager *db) -> void {
 		ws->publish(this->room_id(), message, opCode);
 	};
 
-	app.ws<SocketData>("/ws/david",uWS::TemplatedApp<false>::WebSocketBehavior<SocketData> {
+	app.ws<SocketData>("/ws/waitingroom",uWS::TemplatedApp<false>::WebSocketBehavior<SocketData> {
 		.open = [this, publish](auto *ws) {
 			ws->subscribe(this->room_id());
 			std::cout << "Joined room\n";
+			// ws->publish(this->room_id(), "ALJKSDLKJA", uWS::OpCode{200});
 		},
 		.message = [this, publish, &db, &app](auto *ws, std::string_view message, uWS::OpCode opCode) {
 			std::cout << "Recieved message\n";
@@ -37,13 +39,15 @@ auto Pool::create_waiting_room(uWS::App &app, DatabaseManager *db) -> void {
 			std::string datastring = json_data["data"];
 			auto data = nlohmann::json::parse(datastring);
 			// std::cout << data["move"] << '\n';
-			std::string move = data["move"];
+			// std::string move = data["move"];
+			std::string suid = data["uid"];
+			int uid = atoi(suid.c_str());
 
-			int uid = 0;
-			if (move == "a1") uid = 1;
-			if (move == "a2") uid = 2;
-			if (move == "a3") uid = 3;
-			if (move == "a4") uid = 4;
+			// int uid = 0;
+			// if (move == "a1") uid = 1;
+			// if (move == "a2") uid = 2;
+			// if (move == "a3") uid = 3;
+			// if (move == "a4") uid = 4;
 			
 			std::cout << "Player joined: " << uid << '\n';
 			// Ignore player if they are already in queue
@@ -69,11 +73,12 @@ auto Pool::create_waiting_room(uWS::App &app, DatabaseManager *db) -> void {
 				payload["event"] = "match_created";
 				payload["uids"] = {opponent, uid};
 				payload["room_id"] = room_id;
+
+				sleep(2);
+				std::cout << ws->isSubscribed(this->room_id());
 				publish(ws, payload.dump(), opCode);
 				std::cout << payload.dump() << '\n';
 			}
-
-
 
 		},
 		.close = [this](auto *ws, int x , std::string_view str) {
