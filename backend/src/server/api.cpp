@@ -5,6 +5,7 @@
 #include "server_util.hpp"
 #include "metadatagen.hpp"
 
+#include <algorithm>
 
 using json = nlohmann::json;
 
@@ -113,19 +114,41 @@ auto api_profile(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std
 	});	
 }
 
-// Gets all replays
 auto api_replay(uWS::App &app, DatabaseManager &db) -> void {
 	app.get("/api/replay", [&app, &db](auto *res, auto *req) {
 		auto matchid = std::string(req->getQuery("matchid")); 
-		// int id = atoi(matchid);
-		// auto match = db.get_matches(id);
+		int id = atoi(matchid.c_str());
 		
+		// TODO: This must change to an appropriate database call
+		auto matches = db.get_matches();
+		auto match = std::find_if(matches.begin(), matches.end(), [id](Match const& match) {
+			return match.id == id;
+		});
+
 		json payload;
+		if (match != matches.end()) {
+			std::cout << "Found the match\n";
+			payload = match->to_json();
+
+			int nplayers = payload["players"].size();
+			std::string const& moves = payload["moves"];
+
+			payload["nplayers"] = nplayers;
+			payload["holes"] = {};
+						
+			auto meta = MetaDataGenerator(moves, nplayers);
+			payload["move_seq"] = {};
+			for (int player = 0; player < nplayers; ++player) {
+				payload["move_seq"][player] = meta.moves_by(player);
+			}
+
+		}
 
 		res->end(payload.dump());
 	});
 }
 
+// Gets all replays
 auto api_search_all(uWS::App &app, DatabaseManager &db) -> void {
 	app.get("/api/search/all", [&app, &db](auto *res, auto *req) {
 		json payload;

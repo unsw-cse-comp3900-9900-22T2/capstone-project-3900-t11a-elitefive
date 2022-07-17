@@ -16,6 +16,8 @@ class MetaDataGenerator {
 
 		auto num_players() const -> int;
 		auto db_snapshot() const -> std::vector<uint64_t>;
+		auto moves_by(int player) const -> std::vector<std::string>;
+
 };
 
 

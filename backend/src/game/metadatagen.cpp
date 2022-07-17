@@ -38,6 +38,10 @@ auto construct_game(std::string moves, int players) -> Game {
 	return game;
 }
 
+auto MetaDataGenerator::moves_by(int player) const -> std::vector<std::string> {
+	return moves_by_player_[player];
+}
+
 auto MetaDataGenerator::num_players() const -> int {
 	return nplayers_;
 }
