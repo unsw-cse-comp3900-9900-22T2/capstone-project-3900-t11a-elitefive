@@ -7,6 +7,8 @@
 #include "aigame.hpp"
 #include "metadatagen.hpp"
 
+using json = nlohmann::json;
+
 struct SocketData{
 	//Empty because we don't need any currently.
 };
@@ -189,15 +191,24 @@ auto parse_move(std::string_view message) -> std::string {
 }
 
 auto Room::json_confirm_move(std::string const& move) -> std::string {
-	return "{\"event\": \"moveconfirm\", \"tile\": \"" + move + "\"}";
+	json payload;
+	payload["event"] = "moveconfirm";
+	payload["tile"] = move;
+	return payload.dump();
 }
 
 auto Room::json_board_move(std::string const& move) -> std::string {
-	return "{\"event\": \"move\", \"tile\": \"" + move + "\"}";
+	json payload;
+	payload["event"] = "move";
+	payload["tile"] = move;
+	return payload.dump();
 }
 
 auto Room::json_game_winner(std::string const& player) -> std::string {
-	return "{\"event\": \"game_over\", \"winner\": \"" + player + "\"}";
+	json payload;
+	payload["event"] = "game_over";
+	payload["winner"] = player;
+	return payload.dump();
 }
 
 // TODO: Make this a game function instead

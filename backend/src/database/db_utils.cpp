@@ -7,8 +7,9 @@
 #include <pqxx/pqxx>
 #include <openssl/sha.h>
 
-auto hash_password(std::string password) -> std::string {
+using json = nlohmann::json;
 
+auto hash_password(std::string password) -> std::string {
 	// TODO: figure out how to add this lib
 	auto c_password = password.c_str();
 	char buffer[64];
@@ -27,36 +28,25 @@ auto hash_password(std::string password) -> std::string {
     return password;
 }
 
-
-
 auto check_password(std::string email, std::string password) -> bool {
-
     return false;
 }
 
 auto friends_to_json(int id, std::vector<User*> friends) -> std::string {
-    
-    auto friends_json = std::string(
-    "{"
-    	"\"event\": \"friends\","
-    	"\"action\": \"get\","
-    	"\"payload\": {"
-    		"\"user\": \"" + std::to_string(id) + "\", "
-    		"\"friends\": ["
-    );
-    
-    for (auto fri : friends){
-        friends_json = friends_json + 
-        "{"
-			"\"uid\":" +  std::to_string(fri->id)  + ","
-			"\"username\": \"" + fri->username + "\"" + 
-		"},";
+    json payload;
+    payload["event"] = "friends";
+    payload["action"] = "get";
+    payload["payload"] = {};
+    payload["payload"]["user"] = std::to_string(id);
+    payload["payload"]["friends"] = {};
+    for (auto fri : friends) {
+        json fjson;
+        fjson["uid"] = std::to_string(fri->id);
+        fjson["username"] = fri->username;
+        payload["payload"]["friends"].push_back(fjson);
     }
-    
-    friends_json.pop_back();
-    friends_json += "]}}";
-            
-    return friends_json;
+    // friends_json.pop_back();
+    return payload.dump();
 }
 
 #endif
