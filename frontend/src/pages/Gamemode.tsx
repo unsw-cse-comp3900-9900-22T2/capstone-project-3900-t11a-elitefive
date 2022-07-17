@@ -50,7 +50,7 @@ export default function Gamemode({}: Props) {
     return (
         <Container>
           <YavalathButtonFixed/>
-          <ProfileWidget name="name"/>
+          <ProfileWidget/>
           <Typography variant="h3">{"Select Game Mode"}</Typography>
           <ReusableToggleButtonGroup>
             <ToggleButton value="Vs Ai">Vs Ai</ToggleButton>
