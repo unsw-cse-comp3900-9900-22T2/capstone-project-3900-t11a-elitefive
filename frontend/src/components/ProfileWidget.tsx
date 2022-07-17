@@ -42,9 +42,13 @@ const DropdownContainer = styled.div`
 // logout dropdown menu
 function DropDownMenu({}) {
   const { logout } = useAuth();
+  const navigate = useNavigate();
   return (
     <DropdownContainer
-      onClick={() => { logout() }}
+      onClick={() => { 
+        logout();
+        navigate('/');
+      }}
     >
       <Typography variant="body1">
         Logout

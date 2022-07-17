@@ -117,17 +117,12 @@ auto api_profile(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std
 auto api_replay(uWS::App &app, DatabaseManager &db) -> void {
 	app.get("/api/replay", [&app, &db](auto *res, auto *req) {
 		auto matchid = std::string(req->getQuery("matchid")); 
-		int id = atoi(matchid.c_str());
+		auto id = atoi(matchid.c_str());
 		
-		// TODO: This must change to an appropriate database call
-		auto matches = db.get_matches();
-		auto match = std::find_if(matches.begin(), matches.end(), [id](Match const& match) {
-			return match.id == id;
-		});
-
+		// Fetch the match with given ID from database.
+		auto match = db.get_match(id);
 		json payload;
-		if (match != matches.end()) {
-			std::cout << "Found the match\n";
+		if (match != nullptr) {
 			payload = match->to_json();
 
 			int nplayers = payload["players"].size();
@@ -141,9 +136,7 @@ auto api_replay(uWS::App &app, DatabaseManager &db) -> void {
 			for (int player = 0; player < nplayers; ++player) {
 				payload["move_seq"][player] = meta.moves_by(player);
 			}
-
 		}
-
 		res->end(payload.dump());
 	});
 }
@@ -182,7 +175,8 @@ auto api_search_snapshot(uWS::App &app, DatabaseManager &db) -> void {
 		auto nmoves = moves.size()/2;
 		auto const& lastpos = positions.end()[-1];
 		auto const& priorpos = positions.end()[-2];
-		auto matches = db.get_matches(nmoves, lastpos, nmoves - 1, priorpos);
+		auto matches = (nmoves <= 1) ? db.get_matches(nmoves, lastpos)
+		: db.get_matches(nmoves, lastpos, nmoves - 1, priorpos);
 
 		// Serve the matches to frontend
 		json payload;

@@ -26,6 +26,7 @@ class DatabaseManager {
     auto get_matches() -> std::vector<Match>;
     auto get_matches(int id) -> std::vector<Match>;
     // SNAPSHOTS
+    auto get_matches(int move_n, int64_t bs) -> std::vector<Match>;
     auto get_matches(int move_n1, int64_t bs1, int move_n2, int64_t bs2) -> std::vector<Match>;
     // PLAYER PROFILE
     auto get_latest_elo(int id, std::string gameType) -> int;

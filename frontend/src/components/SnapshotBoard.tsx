@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { SetStateAction, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 // local
@@ -8,6 +8,8 @@ import HexCell from './HexCell';
 type Props = {
   width?: number;
   height?: number;
+  replayString: string[];
+  setReplayString: React.Dispatch<SetStateAction<string[]>>
 }
 
 type RowStyleProps = {
@@ -63,10 +65,10 @@ const DEFAULT_COLOR_2 = "blue";
 const DEFAULT_BOARD_WIDTH = 1200;
 // const DEFAULT_BOARD_HEIGHT = 800;
 
-export default function SnapshotBoard({ width, height }: Props) {
+export default function SnapshotBoard({ width, height, replayString, setReplayString }: Props) {
 
   const [state, setState] = useState<snapshotCellType[][]>(createSnapShotCells());
-  const [replayString, setReplayString] = useState<string[]>([]);
+
 
   // useEffect(() => {
   //   console.log(state);
@@ -95,7 +97,7 @@ export default function SnapshotBoard({ width, height }: Props) {
         }))
 
         // adds current cell to replayString
-        setReplayString(prev => [
+        setReplayString((prev:string[]) => [
           ...prev,
           position,
         ]);
