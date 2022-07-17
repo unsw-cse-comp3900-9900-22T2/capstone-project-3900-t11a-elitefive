@@ -112,13 +112,39 @@ auto api_profile(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std
 		res->end(profile_json);	
 	});	
 }
+
+// Gets all replays
 auto api_replay(uWS::App &app, DatabaseManager &db) -> void {
+	app.get("/api/replay", [&app, &db](auto *res, auto *req) {
+		auto matchid = std::string(req->getQuery("matchid")); 
+		// int id = atoi(matchid);
+		// auto match = db.get_matches(id);
+		
+		json payload;
 
+		res->end(payload.dump());
+	});
 }
+
 auto api_search_all(uWS::App &app, DatabaseManager &db) -> void {
+	app.get("/api/search/all", [&app, &db](auto *res, auto *req) {
+		json payload;
+		std::string key = "all_matches";
+		payload[key] = {};
+		
+		std::cout << "Getting all matches\n";
+		auto matches = db.get_matches();
+		std::cout << "Retrieved\n";
+		for (auto const& match : matches) {
+			payload[key].push_back(match.to_json());
+		}
 
+		res->end(payload.dump());
+	});
 }
+
 auto api_search_snapshot(uWS::App &app, DatabaseManager &db) -> void {
+	// Query => /api/search/snapshot?moves=e5a1
 	app.get("/api/search/snapshot", [&app, &db](auto *res, auto *req) {
 		// for (auto header : *req){
 		// 	std::cout << header.first << ", " << header.second << "\n";

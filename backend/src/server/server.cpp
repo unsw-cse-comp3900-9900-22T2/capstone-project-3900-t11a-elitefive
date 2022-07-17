@@ -43,6 +43,7 @@ void BackendServer() {
 
 	// Get Requests
 	api_search_snapshot(app, db);
+	api_search_all(app, db);
 	api_profile(app, db, tokens);
 
 	// Test functionality (REMOVE LATER)
