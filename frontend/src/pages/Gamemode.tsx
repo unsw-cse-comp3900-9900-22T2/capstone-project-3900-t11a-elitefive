@@ -91,6 +91,7 @@ export default function Gamemode({}: Props) {
             case "match_created":{
               const { room_id , uids } = payload;
               if(uids.includes(uid)) {
+                ws.close();
                 navigate(`/game/${room_id}`);
               }
             }
