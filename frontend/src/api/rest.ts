@@ -45,3 +45,21 @@ export async function register(username: string, password: string, email: string
   if(outcome == "success") return true;
   return false;
 }
+
+export async function getAllReplays() {
+  const resp = await fetch(`/api/search/all`);
+  console.log(resp)
+  if(!resp) return null;
+  const data = await resp.json();
+  console.log(data);
+  if(!data) return null;
+  return data
+}
+
+
+export async function querySnapShot(snapshotstring: string) {
+  const resp = await fetch(`/api/snapshot?moves=${snapshotstring}`);
+  const data = await resp.json();
+
+  return data
+}

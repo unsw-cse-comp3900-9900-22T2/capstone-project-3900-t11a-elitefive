@@ -1,10 +1,12 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components';
 import { Box, Typography } from '@mui/material';
 import ReplayPreview from '../components/ReplayPreview';
 import FilterBar from '../components/FilterBar';
 import SnapshotPopup from '../components/SnapshotPopup';
 import YavalathButton from '../components/YavalathButton';
+
+import * as API from '../api/rest';
 
 type Props = {}
 
@@ -14,11 +16,11 @@ type replayDataType = {
   result: "win" | "loss" | "draw";
   date: string;
   img: string;
-  players: string[]; // todo
+  players: any[]; // todo
   elo: number;
 }
 
-const mockData = [
+const mockData: replayDataType[] = [
   {
     mode: "Ranked",
     type: "Classic",
@@ -111,9 +113,23 @@ const eloFilter = (data:replayDataType[], secondaryFilter:string) => {
 }
 
 export default function ReplaySearchpage({}: Props) {
+  const [replays, setReplays] = useState<replayDataType[]|undefined>();
   const [filter, setFilter] = useState<string|undefined>();
   const [secondaryFilter, setSecondaryFilter] = useState<string|undefined>();
   const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  // on mount
+  useEffect(() => {
+    (async () => {
+      const result = await API.getAllReplays()
+      if(!result) return;
+      const { all_matches: matches } = result;
+      setReplays(matches);
+      // setReplays(mockData);
+    })();
+  },[])
+  
+  
   
   return (
     <>
@@ -136,7 +152,7 @@ export default function ReplaySearchpage({}: Props) {
           />
         </Box>
         <ReplaysContainer>
-          {filterData(mockData as replayDataType[], filter, secondaryFilter)?.map((data) => (
+          {replays && filterData(replays as replayDataType[], filter, secondaryFilter)?.map((data) => (
             <ReplayPreview {...data}/>
           ))}
         </ReplaysContainer>
