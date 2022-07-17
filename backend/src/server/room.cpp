@@ -29,8 +29,8 @@ Room::Room(uWS::App &app, DatabaseManager *db, std::string room_id, std::vector<
 , db_{db}
 {
 	generate_game();	// CLASSIC / POTHOLES / ETC
-	create_socket_ai(app);
-	// create_socket_player_verse_player(app);
+	// create_socket_ai(app);
+	create_socket_player_verse_player(app);
 	std::cout << "Room is setup\n";
 }
 
@@ -45,8 +45,9 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 		ws->publish(this->room_id(), message, opCode);
 	};
 
+	std::string room_link = this->room_code();
 	std::cout << "ROOM: Player verse player room being created\n";
-	app.ws<SocketData>("/ws/david", uWS::TemplatedApp<false>::WebSocketBehavior<SocketData> {
+	app.ws<SocketData>(room_link, uWS::TemplatedApp<false>::WebSocketBehavior<SocketData> {
 		.open = [this, publish](auto *ws) {
 			ws->subscribe(this->room_id());
 			std::cout << "Joined room\n";

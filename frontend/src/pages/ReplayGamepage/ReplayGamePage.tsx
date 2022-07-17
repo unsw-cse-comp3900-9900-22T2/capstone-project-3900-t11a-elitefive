@@ -27,16 +27,17 @@ const Container2 = styled.div`
 
 export default function ReplayGamepage({}: Props) {
   return (
-    <GSProvider>
-      <WSProvider>
-        <Container>
-          <YavalathButton/>
-          <Container2>
-            <Board />
-            <Sidebar />
-          </Container2>
-        </Container>
-      </WSProvider>
-    </GSProvider>
+    // <GSProvider>
+    //   <WSProvider>
+    //     <Container>
+    //       <YavalathButton/>
+    //       <Container2>
+    //         <Board />
+    //         <Sidebar />
+    //       </Container2>
+    //     </Container>
+    //   </WSProvider>
+    // </GSProvider>
+    <></>
   )
 }

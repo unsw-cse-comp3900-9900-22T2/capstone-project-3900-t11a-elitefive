@@ -23,6 +23,7 @@ Pool::Pool(uWS::App &app, DatabaseManager *db)
 auto Pool::create_waiting_room(uWS::App &app, DatabaseManager *db) -> void {
 	auto publish = [this](auto *ws, std::string message, uWS::OpCode opCode) -> void {
 		ws->publish(this->room_id(), message, opCode);
+		ws->send(message, opCode);
 	};
 
 	app.ws<SocketData>("/ws/waitingroom",uWS::TemplatedApp<false>::WebSocketBehavior<SocketData> {
@@ -73,12 +74,11 @@ auto Pool::create_waiting_room(uWS::App &app, DatabaseManager *db) -> void {
 				payload["event"] = "match_created";
 				payload["uids"] = {opponent, uid};
 				payload["room_id"] = room_id;
-
-				sleep(2);
-				std::cout << ws->isSubscribed(this->room_id());
 				publish(ws, payload.dump(), opCode);
 				std::cout << payload.dump() << '\n';
 			}
+
+
 
 		},
 		.close = [this](auto *ws, int x , std::string_view str) {

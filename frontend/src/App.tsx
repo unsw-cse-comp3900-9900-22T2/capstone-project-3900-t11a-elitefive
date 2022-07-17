@@ -38,7 +38,7 @@ function App() {
                 <Route path="/profile" element={<Profilepage/>}/>
                 <Route path="/friends" element={<FriendsPage/>}/>
                 <Route path="/dashboard" element={<Dashboard/>}/>
-                <Route path="/game/:uid" element={<Gamepage/>}/>
+                <Route path="/game/:gameid" element={<Gamepage/>}/>
                 <Route path="/gamemode" element={<Gamemode/>}/>
                 <Route path="/replays" element={<ReplaySearchpage/>}/>
                 <Route path="/replay/:replayid" element={<ReplayGamepage/>}/>

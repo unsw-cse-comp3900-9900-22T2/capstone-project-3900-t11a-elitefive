@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components';
+import { useParams } from 'react-router-dom';
 
 // local
 import { GSProvider, useGameState } from '../../global/GlobalGameState';
@@ -27,9 +28,10 @@ const Container2 = styled.div`
 
 
 export default function Gamepage({}: Props) {
+  const { gameid } = useParams();
   return (
     <GSProvider>
-      <WSProvider>
+      <WSProvider gameId={gameid}>
         <Container>
           <YavalathButton/>
           <Container2>

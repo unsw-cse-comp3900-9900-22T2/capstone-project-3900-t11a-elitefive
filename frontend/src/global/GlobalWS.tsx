@@ -11,6 +11,7 @@ interface payload {
 
 type Props = {
   children?: any;
+  gameId: string | undefined;
 }
 
 type WSType = {
@@ -25,14 +26,14 @@ export const WSContext = React.createContext<WSType>({
 
 
 
-export const WSProvider = ({ children }: Props) => {
+export const WSProvider = ({ children, gameId }: Props) => {
   const [socket, setSocket] = useState<WebSocket| null>(null);
   const [socketConnected, setSocketConnected] = useState<boolean>(false);
   
   const { playMove, setHexTileState, playerJoin, getPlayerInfo, setWinner } = useGameState();
   
   useEffect(() => {
-    const WS = new WebSocket(`ws://localhost:8080/ws/david`);
+    const WS = new WebSocket(`ws://localhost:8080/${gameId}`);
     WS.onopen = () => {
       setSocketConnected(true);
       playerJoin({uid: "abc", color: "red"});
