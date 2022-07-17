@@ -17,6 +17,7 @@
 #include "aigame.hpp"
 
 #include "room.hpp"
+#include "pool.hpp"
 #include "api.hpp"
 #include "server_util.hpp"
 
@@ -51,7 +52,8 @@ void BackendServer() {
 	api_david(app);
 	api_db(app, db);
 
-	Room room = Room(app, &db, {1, 2});
+	// Room room = Room(app, &db, {1, 2});
+	Pool pool = Pool(app, &database_connection);
 
 	app.run();
 }
