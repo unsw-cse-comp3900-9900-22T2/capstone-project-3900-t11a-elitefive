@@ -4,9 +4,11 @@
 #include "game.hpp"
 #include "axial.hpp"
 
-Game::Game(int nplayers)
+Game::Game(int nplayers) : Game(nplayers, std::vector<int>(nplayers, -1)) {} // When you don't care about uids. Usually for metadata stuff
+
+Game::Game(int nplayers, std::vector<int> const uids)
 : BaseGame{nplayers}
-, uids_{std::vector<int>(nplayers, -1)}
+, uids_{uids}
 , gamestate_{Game::state::ONGOING}
 , move_sequence_{}
 {}
