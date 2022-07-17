@@ -182,7 +182,8 @@ auto api_search_snapshot(uWS::App &app, DatabaseManager &db) -> void {
 		auto nmoves = moves.size()/2;
 		auto const& lastpos = positions.end()[-1];
 		auto const& priorpos = positions.end()[-2];
-		auto matches = db.get_matches(nmoves, lastpos, nmoves - 1, priorpos);
+		auto matches = (nmoves <= 1) ? db.get_matches(nmoves, lastpos)
+		: db.get_matches(nmoves, lastpos, nmoves - 1, priorpos);
 
 		// Serve the matches to frontend
 		json payload;

@@ -97,8 +97,13 @@ auto DatabaseManager::get_matches(int id) -> std::vector<Match> {
   return parse_matches(res);
 }
 
+auto DatabaseManager::get_matches(int move_n, int64_t bs) -> std::vector<Match> {
+  auto res = execute("get_matches_snapshot1", move_n, bs);
+  return parse_matches(res);
+}
+
 auto DatabaseManager::get_matches(int move_n1, int64_t bs1, int move_n2, int64_t bs2) -> std::vector<Match> {
-  auto res = execute("get_matches_snapshot", move_n1, bs1, move_n2, bs2);
+  auto res = execute("get_matches_snapshot2", move_n1, bs1, move_n2, bs2);
   return parse_matches(res);
 }
 
@@ -219,7 +224,17 @@ auto DatabaseManager::prepare_statements() -> void {
   "(SELECT matches.id FROM matches "
   "JOIN outcomes ON matches.id = outcomes.match "
   "WHERE outcomes.player = $1);");
-  conn_.prepare("get_matches_snapshot",
+  conn_.prepare("get_matches_snapshot1",
+  "SELECT matches.id, game, replay, outcomes.player, "
+  "username, end_elo, outcome "
+  "FROM matches "
+  "JOIN outcomes ON matches.id = outcomes.match "
+  "JOIN users ON outcomes.player = users.id "
+  "WHERE match IN ("
+  "SELECT match FROM snapshots "
+  "WHERE move_num = $1 AND boardstate = $2) "
+  "ORDER BY id;");
+  conn_.prepare("get_matches_snapshot2",
   "WITH s1 AS ("
   "SELECT * FROM snapshots "
   "WHERE move_num = $1 AND boardstate = $2), "
