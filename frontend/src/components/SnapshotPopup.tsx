@@ -1,13 +1,16 @@
-import React from 'react'
+import React, { SetStateAction, useState } from 'react'
 import styled from 'styled-components';
 import { Modal } from '@mui/material';
 import SnapshotBoard from './SnapshotBoard';
 import Button from './ReusableButton';
+import * as API from '../api/rest';
+import { replayDataType } from '../pages/ReplaySearchpage';
 
 
 type Props = {
   open: boolean;
   handleClose: () => void;
+  setReplayData: React.Dispatch<SetStateAction<replayDataType[]|undefined>>
 }
 
 const Container = styled.div`
@@ -38,15 +41,30 @@ const Right = styled.div`
 `
 
 
-export default function SnapshotPopup({open, handleClose}: Props) {
+export default function SnapshotPopup({open, handleClose, setReplayData}: Props) {
+
+  const [replayString, setReplayString] = useState<string[]>([]);
+
+  const handleSnapshotSearch = async () => {
+    const RString = replayString.join('');
+    const results = await API.querySnapShot(RString);
+    
+    if(results.snapshot_matches == null) {
+      setReplayData(undefined);
+    } else {
+      setReplayData(results.snapshot_matches);
+    }
+    handleClose();
+  }
+
   return (
     <Modal open={open} onClose={handleClose}>
       <Container>
         <Left>
-          <SnapshotBoard/>
+          <SnapshotBoard replayString={replayString} setReplayString={setReplayString}/>
         </Left>
         <Right>
-          <Button>
+          <Button onClick={handleSnapshotSearch}>
             Confirm
           </Button>
         </Right>
