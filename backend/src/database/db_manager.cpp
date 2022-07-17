@@ -66,6 +66,27 @@ auto DatabaseManager::save_match(std::string gameType, bool is_ranked, std::map<
   return matchID;
 }
 
+auto DatabaseManager::get_match(int id) -> Match* {
+  auto res = execute("get_match", id);
+  if (res.size() < 1) {
+    return nullptr;
+  }
+  auto match = atoi(res[0][0].c_str());
+  auto game = res[0][1].c_str();
+  auto replay = res[0][2].c_str();
+  auto curmatch = new Match(match, game, replay, std::vector<Player>{});
+  for (auto const &row : res) {
+    // Add player
+    auto p_id = atoi(row[3].c_str());
+    auto p_username = row[4].c_str();
+    auto p_endelo = atoi(row[5].c_str());
+    auto p_outcome = row[6].c_str();
+    auto *player = new Player(p_id, p_username, p_endelo, p_outcome);
+    curmatch->players.push_back(*player);
+  }
+  return curmatch;
+}
+
 auto DatabaseManager::get_matches() -> std::vector<Match> {
   auto res = execute("get_matches");
   return parse_matches(res);
@@ -174,6 +195,13 @@ auto DatabaseManager::prepare_statements() -> void {
   "INSERT INTO matches(game, ranked, replay) "
   "VALUES ($1, $2, $3) "
   "RETURNING id;");
+  conn_.prepare("get_match",
+  "SELECT matches.id, game, replay, outcomes.player, "
+  "username, end_elo, outcome "
+  "FROM matches "
+  "JOIN outcomes ON matches.id = outcomes.match "
+  "JOIN users ON outcomes.player = users.id "
+  "WHERE matches.id = $1;");
   // TODO: Refactor the two below - similar SQL.
   conn_.prepare("get_matches",
   "SELECT matches.id, game, replay, outcomes.player, "
