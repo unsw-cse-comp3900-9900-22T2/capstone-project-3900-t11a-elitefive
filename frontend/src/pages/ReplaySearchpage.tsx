@@ -11,48 +11,49 @@ import * as API from '../api/rest';
 type Props = {}
 
 export type replayDataType = {
+  match_id: number;
   mode: "Ranked" | "Casual";
   gamemode: "CLASSIC" | "TRIPLES" | "POTHOLES"
-  result: "win" | "loss" | "draw";
+  // result: "win" | "loss" | "draw";
   date: string;
   img: string;
   players: any[]; // todo
 }
 
-const mockData: replayDataType[] = [
-  {
-    mode: "Ranked",
-    gamemode: "CLASSIC",
-    result: "win",
-    date: "15/3/2022",
-    img: "",
-    players: [], // todo
-  },
-  {
-    mode: "Casual",
-    gamemode: "TRIPLES",
-    result: "loss",
-    date: "15/3/2022",
-    img: "",
-    players: [], // todo
-  },
-  {
-    mode: "Casual",
-    gamemode: "POTHOLES",
-    result: "loss",
-    date: "15/3/2022",
-    img: "",
-    players: [], // todo
-  },
-  {
-    mode: "Casual",
-    gamemode: "POTHOLES",
-    result: "loss",
-    date: "15/3/2022",
-    img: "",
-    players: [], // todo
-  }
-]
+// const mockData: replayDataType[] = [
+//   {
+//     mode: "Ranked",
+//     gamemode: "CLASSIC",
+//     result: "win",
+//     date: "15/3/2022",
+//     img: "",
+//     players: [], // todo
+//   },
+//   {
+//     mode: "Casual",
+//     gamemode: "TRIPLES",
+//     result: "loss",
+//     date: "15/3/2022",
+//     img: "",
+//     players: [], // todo
+//   },
+//   {
+//     mode: "Casual",
+//     gamemode: "POTHOLES",
+//     result: "loss",
+//     date: "15/3/2022",
+//     img: "",
+//     players: [], // todo
+//   },
+//   {
+//     mode: "Casual",
+//     gamemode: "POTHOLES",
+//     result: "loss",
+//     date: "15/3/2022",
+//     img: "",
+//     players: [], // todo
+//   }
+// ]
 
 const MainContainer = styled.div`
   width: 90vw;
@@ -71,6 +72,8 @@ const SideBarContainer = styled.div`
   background: var(--accent-dark);
   width: 20vw;
   margin: 120px 80px;
+  display:flex;
+  flex-direction: column;
 `;
 
 // helper fnc
@@ -113,6 +116,7 @@ export default function ReplaySearchpage({}: Props) {
   const [filter, setFilter] = useState<string|undefined>();
   const [secondaryFilter, setSecondaryFilter] = useState<string|undefined>();
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [sideBarData, setSideBarData] = useState<replayDataType|undefined>();
 
   // on mount
   useEffect(() => {
@@ -160,14 +164,22 @@ export default function ReplaySearchpage({}: Props) {
         </Box>
         <ReplaysContainer>
           {replays && filterData(replays as replayDataType[], filter, secondaryFilter)?.map((data: replayDataType) => (
-              <ReplayPreview {...data}/>
+              <ReplayPreview {...data} setSideBarData={() => {
+                setSideBarData({...data})
+              }}/>
             ))
           }
         </ReplaysContainer>
       </MainContainer>
-      <SideBarContainer>
-        bye
-      </SideBarContainer>
+      {sideBarData && (
+        <SideBarContainer>
+
+          <Typography>{sideBarData.match_id}</Typography>
+          <Typography>{sideBarData.gamemode}</Typography>
+          <Typography>{sideBarData.mode}</Typography>
+          <Typography>{}</Typography>
+        </SideBarContainer>
+      )}
     </Box>
     </>
   )

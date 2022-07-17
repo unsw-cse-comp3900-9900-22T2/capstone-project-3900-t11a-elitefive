@@ -1,12 +1,12 @@
-import React from 'react'
+import React, { SetStateAction } from 'react'
 import styled from 'styled-components';
 import { Box } from '@mui/material';
 
 type Props = {
   gamemode: string;
-  result: string;
   date: string;
   img: string;
+  setSideBarData: () => void;
 }
 
 const Container = styled.div`
@@ -45,9 +45,10 @@ const BottomTags = styled.div`
   padding: 10px 30px;
 `;
 
-export default function ReplayPreview({gamemode, result, date, img}: Props) {
+export default function ReplayPreview(props: Props) {
+  const { gamemode, date, img, setSideBarData } = props
   return (
-    <Container>
+    <Container onClick={setSideBarData}>
       <Box display="flex" justifyContent="flexStart" margin="10px">
         <Tag color="grey">{gamemode}</Tag>
       </Box>
