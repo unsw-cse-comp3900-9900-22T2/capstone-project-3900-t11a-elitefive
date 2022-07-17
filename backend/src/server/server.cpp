@@ -15,10 +15,11 @@
 #include "db_utils.hpp"
 #include "db_manager.hpp"
 #include "aigame.hpp"
-#include "server_util.hpp"
 
 #include "room.hpp"
 #include "metadatagen.hpp"
+#include "api.hpp"
+#include "server_util.hpp"
 
 using json = nlohmann::json;
 
@@ -28,20 +29,28 @@ void RelaySocket(){
 	};
 	
 	uWS::App app = uWS::App();
-	auto db = DatabaseManager();
+	auto database_connection = DatabaseManager();
 	auto session_tokens = std::unordered_map<int, std::string>();
 	
+
+	auto &db = database_connection;
+	auto &tokens = session_tokens;
+
 	app.listen(8080, [](auto *listen_socket){
 		if(listen_socket){
 			std::cout<< "Listening on port" << 8080 << std::endl;
 		};
 	});
 
+	// Post Requests
+	registerPage(app, db);
+	login(app, db, tokens);
+
 	app.get("/api/david", [&app](auto *res, auto *req) {
 		res->end("{\"name\": \"david\"}");
 	});
 
-	app.get("/api/snapshot", [&app, &db](auto *res, auto *req) {
+	app.get("/api/search/snapshot", [&app, &db](auto *res, auto *req) {
         // for (auto header : *req){
         //     std::cout << header.first << ", " << header.second << "\n";
         // };
@@ -68,89 +77,8 @@ void RelaySocket(){
 		res->end(payload.dump());
 	});
 
-	app.post("/register", [&app, &db](auto *res, auto *req){
-    
-        // Loop through header 
-        for (auto header : *req){
-            std::cout << header.first << ", " << header.second << "\n";
-        };
-        
-        // Get data from request
-        res->onData([&db, res](std::string_view data, bool last) {
-            auto buffer = std::string("");
-            auto message = std::string("");
-            
-            buffer.append(data.data(), data.length());
-            if (last) {
-                auto user_json = json::parse(data);
-                auto username = std::string(user_json["username"]);
-                auto email = std::string(user_json["email"]);
-                auto password = std::string(user_json["password"]);
 
-				// Register Success
-                if (db.insert_user(username, email, password)){
-                    message = "{\"event'\": \"register\", \"action\": \"register\","
-                    "\"payload\": { \"outcome\" : \"success\"}}";
-                }
-                // Register Failure
-                else{
-                    message = "{\"event'\": \"register\", \"action\": \"register\", "
-                        "\"payload\": { \"outcome\" : \"failure\"}}";
-                }
-                // Respond
-                res->end(message);
-            }
-        });
-		res->onAborted([]() -> void {});
-    });
-    
-	app.post("/login", [&app, &db, &session_tokens](auto *res, auto *req){
-	
-	
-	    // Get data from request
-	    res->onData([&db, res, &session_tokens](std::string_view data, bool last) {
-            auto buffer = std::string("");
-            auto message = std::string("");
-            
-            buffer.append(data.data(), data.length());
-            if (last) {
-                auto user_json = json::parse(data);
-                auto email = std::string(user_json["email"]);
-                auto password = std::string(user_json["password"]); 
-        
-				auto user = db.get_user(email);
 
-                if (user != NULL){
-                    // Incorrect password
-                    if (hash_password(password) != user->password_hash){
-                         message =  "{\"event\": \"login\", \"action\": \"login\", \"payload\":" 
-                            "{ \"outcome\" : \"failure\", \"message\": \"incorrect password\"}}";
-                    // Login success
-                    }else{
-                    
-                        if (session_tokens.find(user->id) == session_tokens.end()){
-                            std::cout << "generating token\n";
-	                        auto session_token = generate_session_token(user->id);
-	                        session_tokens[user->id] = session_token;
-	                        std::cout << "generating token\n";
-						}
-                    
-                        message =  std::string("{\"event\": \"login\", \"action\": \"login\", \"payload\":") +  
-                            std::string("{ \"outcome\" : \"success\", \"uid\": \"") +  std::to_string(user->id) +
-                            std::string("\", \"email\": \"") + user->email + std::string("\" ") + ","+
-                            std::string ("\"session\": \"") + session_tokens[user->id] + std::string("\"}}");
-                    }
-				// Email doesn'e exist
-                }else{
-                    message = "{\"event\": \"login\", \"action\": \"login\", \"payload\" :" 
-                            "{ \"outcome\": \"failure\", \"message\": \"email not in database\"}}";
-                }
-                
-                res->end(message);
-			}
-		});
-		res->onAborted([]() -> void {});
-	});
 	app.get("/api/profile", [&app, &db, &session_tokens](auto *res, auto *req) {
 	
 		// todo, parse request 
