@@ -45,7 +45,6 @@ auto friends_to_json(int id, std::vector<User*> friends) -> std::string {
         fjson["username"] = fri->username;
         payload["payload"]["friends"].push_back(fjson);
     }
-    // friends_json.pop_back();
     return payload.dump();
 }
 
