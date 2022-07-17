@@ -58,6 +58,16 @@ class Player {
     , username{username_}
     , end_elo{end_elo_}
     , outcome{outcome_} {}
+
+    auto to_json() const -> json {
+        json payload;
+        payload["uid"] = id;
+        payload["username"] = username;
+        payload["elo_end"] = end_elo;
+        payload["elo_start"] = 0;
+        payload["outcome"] = outcome;
+        return payload;
+    }
 };
 
 class Match {
@@ -72,6 +82,18 @@ class Match {
     , game{game_}
     , replay{replay_}
     , players{players_} {}
+
+    auto to_json() const -> json {
+        json payload;
+        payload["match_id"] = id;
+        payload["gamemode"] = game;
+        payload["moves"] = replay;
+        payload["players"] = {};
+        for (auto const& player : players) {
+            payload["players"].push_back(player.to_json());
+        }
+        return payload;
+    }
 };
 
 class PlayerStats {

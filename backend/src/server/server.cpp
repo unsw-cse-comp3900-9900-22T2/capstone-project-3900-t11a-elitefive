@@ -42,24 +42,30 @@ void RelaySocket(){
 	});
 
 	app.get("/api/snapshot", [&app, &db](auto *res, auto *req) {
-        for (auto header : *req){
-            std::cout << header.first << ", " << header.second << "\n";
-        };
+        // for (auto header : *req){
+        //     std::cout << header.first << ", " << header.second << "\n";
+        // };
 
-		// auto query = req->getQuery();
+		// Get given snapshot move sequence from frontend get query
 		auto moves = std::string(req->getQuery("moves")); 
-		auto metadata = MetaDataGenerator(moves, 2); // TODO: Hardcoded snapshot for 2 players
+		auto metadata = MetaDataGenerator(moves, 2); 		// TODO: Hardcoded snapshot search for 2 players only
 		auto const positions = metadata.db_snapshot();
-	    // auto get_matches(int move_n1, int64_t bs1, int move_n2, int64_t bs2) -> std::vector<Match>;
+		
+		// Get all matches that match the given snapshot
 		auto nmoves = moves.size()/2;
 		auto const& lastpos = positions.end()[-1];
 		auto const& priorpos = positions.end()[-2];
 		auto matches = db.get_matches(nmoves, lastpos, nmoves - 1, priorpos);
 
-		json j;
-		j["name"] = "hi there";
+		// Serve the matches to frontend
+		json payload;
+		std::string key = "snapshot_matches";
+		payload[key] = {};
+		for (auto const& match : matches) {
+			payload[key].push_back(match.to_json());
+		}
 
-		res->end(j.dump());
+		res->end(payload.dump());
 	});
 
 	app.post("/register", [&app, &db](auto *res, auto *req){
@@ -81,7 +87,7 @@ void RelaySocket(){
                 auto email = std::string(user_json["email"]);
                 auto password = std::string(user_json["password"]);
 
-								// Register Success
+				// Register Success
                 if (db.insert_user(username, email, password)){
                     message = "{\"event'\": \"register\", \"action\": \"register\","
                     "\"payload\": { \"outcome\" : \"success\"}}";
