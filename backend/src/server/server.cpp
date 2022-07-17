@@ -45,6 +45,7 @@ void BackendServer() {
 	api_search_snapshot(app, db);
 	api_search_all(app, db);
 	api_profile(app, db, tokens);
+	api_replay(app, db);
 
 	// Test functionality (REMOVE LATER)
 	api_david(app);
