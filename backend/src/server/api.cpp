@@ -266,7 +266,7 @@ auto api_db(uWS::App &app, DatabaseManager &db) -> void {
 		auto friends_json = friends_to_json(1, friends);
 		std::cout << " ***** friends to json\n";
 		std::cout << friends_json;
-		std::cout <<  "*****\n";
+		std::cout <<  "\n *****\n";
 		
 		// testing add friend
 		auto add = db.accept_friend_req(1,6);

@@ -71,10 +71,10 @@ INSERT INTO users (username) values
 
 -- We are all friends.
 insert into friends (friend1, friend2) values 
-(4, 5), (4, 6), (4, 7), (4, 8),
-(5, 6), (5, 7), (5, 8),
-(6, 7), (6, 8),
-(7, 8);
+(1, 2), (1, 3), (1, 4), (1, 5),
+(2, 3), (2, 4), (2, 5),
+(3, 4), (3, 5),
+(4, 5);
 
 -- Password = meowth
 insert into users (username, email, password_hash) values
