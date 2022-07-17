@@ -52,8 +52,8 @@ void BackendServer() {
 	api_david(app);
 	api_db(app, db);
 
-	// Room room = Room(app, &db, {1, 2});
-	Pool pool = Pool(app, &database_connection);
+	Room room = Room(app, &db, "4732432", {1, 2});
+	// Pool pool = Pool(app, &database_connection);
 
 	app.run();
 }

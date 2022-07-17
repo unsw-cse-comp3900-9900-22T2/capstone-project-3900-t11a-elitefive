@@ -63,7 +63,7 @@ auto Pool::create_waiting_room(uWS::App &app, DatabaseManager *db) -> void {
 
 
 				uint32_t room_id = ((uint32_t) opponent << 16) | (uint32_t) uid;
-				Room room = Room(app, db, {opponent, uid});
+				Room room = Room(app, db, std::to_string(room_id), {opponent, uid});
 		
 				json payload;
 				payload["event"] = "match_created";
