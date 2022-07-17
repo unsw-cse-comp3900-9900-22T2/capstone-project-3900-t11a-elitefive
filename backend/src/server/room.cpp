@@ -36,7 +36,7 @@ Room::Room(uWS::App &app, DatabaseManager *db, std::string room_id, std::vector<
 
 auto Room::generate_game() -> void {
 	int nplayers = uids_.size();
-	this->game_ = std::make_unique<Game>(nplayers);
+	this->game_ = std::make_unique<Game>(nplayers, uids_);
 	this->aigame_ = std::make_unique<AIGame>(nplayers);
 }
 
@@ -131,11 +131,16 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 				// TODO: This needs to be modified.
 				auto playersELO = std::map<int, int>{};
 				for (auto const &uid : uids_) {
+					// TODO: Give the new elo calculation
 					playersELO.insert({uid, 0});
 				}
 				auto gen = MetaDataGenerator(*game_);
 				auto snapshots = gen.db_snapshot();
-				auto const match_id = db_->save_match("CLASSIC", false, playersELO, -1,
+				// True/False flag for elo
+				int const winning_player = this->game_->which_player_won();
+				int const winning_uid = this->game_->give_uid(winning_player);
+				std::cout << "Room: Winning player - " << winning_player << " with uid: " << winning_uid << '\n';
+				auto const match_id = db_->save_match("CLASSIC", false, playersELO, winning_uid,
 					game_->move_sequence(), snapshots);
 				std::cout << "Match ID: " << match_id << '\n';
 			}
@@ -197,16 +202,20 @@ auto Room::json_game_winner(std::string const& player) -> std::string {
 
 // TODO: Make this a game function instead
 auto game_result(Game const& game) -> std::string {
-	auto const state = game.status();
-	std::string winner;
-	if (state == Game::state::DRAW) {
-		winner = "";
-	} else if (game.whose_turn() == 1 && state == Game::state::WIN
-			|| game.whose_turn() == 0 && state == Game::state::LOSS) {
-		winner = "COMPUTER";
-	} else {
-		winner = "PLAYER";
-	}
-	return winner;
+	// auto const state = game.status();
+	// std::string winner;
+	// if (state == Game::state::DRAW) {
+	// 	winner = "";
+	// } else if (game.whose_turn() == 1 && state == Game::state::WIN
+	// 		|| game.whose_turn() == 0 && state == Game::state::LOSS) {
+	// 	winner = "COMPUTER";
+	// } else {
+	// 	winner = "PLAYER";
+	// }
+	// return winner;
+	int winning_player = game.which_player_won();
+	if (winning_player == 0) return "PLAYER";
+	if (winning_player == 1) return "COMPUTER";
+	return "MISSINGNO";
 }
 
