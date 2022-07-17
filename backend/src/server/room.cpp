@@ -21,8 +21,8 @@ auto game_result(Game const& game) -> std::string;
 // ======================================
 // 			Class implementation
 // ======================================
-Room::Room(uWS::App &app, DatabaseManager *db, std::vector<int> uids)
-: room_id_{"testing"}
+Room::Room(uWS::App &app, DatabaseManager *db, std::string room_id, std::vector<int> uids)
+: room_id_{room_id}
 , uids_{uids}
 , game_{nullptr}
 , aigame_{nullptr}
@@ -44,7 +44,12 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 		ws->publish(this->room_id(), message, opCode);
 	};
 
-	app.ws<SocketData>("/ws/david",uWS::TemplatedApp<false>::WebSocketBehavior<SocketData> {
+	std::string room_link = std::string{"/ws/game/" + this->room_id()};
+	std::cout << "Room code: " << room_link << '\n';
+
+	std::string temp_link = "/ws/david";
+
+	app.ws<SocketData>(temp_link, uWS::TemplatedApp<false>::WebSocketBehavior<SocketData> {
 		.open = [this, publish](auto *ws) {
 			ws->subscribe(this->room_id());
 			std::cout << "Joined room\n";

@@ -17,7 +17,7 @@ class Room {
         DatabaseManager *db_;
 
     public:
-        Room(uWS::App &app, DatabaseManager *db, std::vector<int> uids);
+        Room(uWS::App &app, DatabaseManager *db, std::string room_id, std::vector<int> uids);
 
         auto room_id() const -> std::string;
 
