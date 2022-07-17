@@ -5,7 +5,7 @@ import { Typography, Box } from '@mui/material';
 import StyledInput from '../components/StyledInput';
 import {StyledButton} from '../components/ReusableButton-styled';
 import Button, {Button2, LargeButton} from '../components/ReusableButton';
-import {Routes, Route, useNavigate} from 'react-router-dom';
+import {Routes, Route, useNavigate, useParams} from 'react-router-dom';
 import YavalathButton, {YavalathButtonFixed} from '../components/YavalathButton';
 import ProfileWidget, {ProfileCard} from '../components/ProfileWidget';
 import ScrollWidget from '../components/ScrollWidget';
@@ -116,13 +116,15 @@ export default function Profilepage({}: Props) {
   const [profileData, setProfileData] = useState<profileDataType>(DefaultProfileData);
   const navigate = useNavigate();
 
+  const { uid } = useParams();
+
   const navigateToFriends = () => {
       // 👇️ navigate to /contacts
       navigate('/friends');
   };
 
   useEffect(() => {
-    fetch("/api/profile")
+    fetch(`/api/profile?uid=${uid}`)
     .then(resp => resp.json())
     .then(data => {
       const payload = data.payload;

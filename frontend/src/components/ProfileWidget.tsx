@@ -64,6 +64,10 @@ type ProfileWidgetProps = {
 export default function ProfileWidget({ name }: ProfileWidgetProps) {
   const [isHovered, setIsHovered ] = useState(false);
 
+  const navigate = useNavigate();
+
+  const { getUID } = useAuth();
+
   const handleHoverStart = () => {
     setIsHovered(true);
   }
@@ -78,7 +82,9 @@ export default function ProfileWidget({ name }: ProfileWidgetProps) {
     onMouseEnter={handleHoverStart}
     onMouseLeave={handleHoverEnd}
     >
-      <ProfileWidgetContainer>
+      <ProfileWidgetContainer onClick={() => {
+        navigate(`/profile/${getUID()}`);
+      }}>
         <ImageContainer />
         <Box display="flex" flexDirection="column" marginTop="30px">
           <Typography variant="h4">{name}</Typography>
