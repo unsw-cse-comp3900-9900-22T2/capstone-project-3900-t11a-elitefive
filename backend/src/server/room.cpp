@@ -219,15 +219,14 @@ auto Room::json_game_winner(std::string const& player) -> std::string {
 auto Room::calc_elos(int winning_player) -> std::map<int, int> {
 	auto playersELO = std::map<int, int>{};	// Contains starting elo
 	for (auto const &uid : uids_) {
-		playersELO.insert({uid, 1000});
+		auto start_elo = db_->get_latest_elo(uid, "CLASSIC");
+		playersELO.insert({uid, start_elo});
 	}
-
-	std::map<int, int> endELO = playersELO; // Make copy and modify elo to pass to save_match
 	// Don't do calculation if there is a draw
 	if (this->ranked_ && winning_player != -1) {
 		std::cout << "\tRoom: Do elo calculation\n";
 		int player = 0;
-		for (auto &elo : endELO) {
+		for (auto &elo : playersELO) {
 			if (player == winning_player) elo.second += 30;
 			else elo.second -= 30;
 			++player;
