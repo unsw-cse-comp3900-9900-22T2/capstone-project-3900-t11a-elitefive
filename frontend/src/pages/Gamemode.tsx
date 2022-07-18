@@ -132,12 +132,12 @@ export default function Gamemode({}: Props) {
           </Modal>
           <Typography variant="h3">{"Select Game Mode"}</Typography>
           <ReusableToggleButtonGroup>
-            <ToggleButton value="Vs Ai" onClick={() => {setVsAI(true)}}>Vs Ai</ToggleButton>
-            <ToggleButton value="Vs Human" onClick={() => {setVsAI(false)}}>Vs Human</ToggleButton>
+            <ToggleButton value="Vs Ai" onClick={() => {setVsAI(!true)}}>Vs Ai</ToggleButton>
+            <ToggleButton value="Vs Human" onClick={() => {setVsAI(!false)}}>Vs Human</ToggleButton>
           </ReusableToggleButtonGroup>
           <ReusableToggleButtonGroup>
-            <ToggleButton value="Ranked" onClick={() => {setIsRanked(true)}}>Ranked</ToggleButton>
-            <ToggleButton value="Casual" onClick={() => {setIsRanked(false)}}>Casual</ToggleButton>
+            <ToggleButton value="Ranked" onClick={() => {setIsRanked(!true)}}>Ranked</ToggleButton>
+            <ToggleButton value="Casual" onClick={() => {setIsRanked(!false)}}>Casual</ToggleButton>
           </ReusableToggleButtonGroup>
           <Container1>
             <LargeButton onClick={handleJoinWaitingRoom}>
