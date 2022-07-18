@@ -70,7 +70,6 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 		.message = [this, publish](auto *ws, std::string_view message, uWS::OpCode opCode) {
 			// std::cout << "Lobby: Recieved message\n";
 			int uid = parse_uid(message);
-
 			if (player_resigned(message)) {
 				int player = this->game_->give_player_with_uid(uid);
 				int winning_player = this->game_->player_after(player);
@@ -153,6 +152,12 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 		},
 		.message = [this, publish](auto *ws, std::string_view message, uWS::OpCode opCode) {
 			std::cout << "Recieved message\n";
+			
+			if (player_resigned(message)) {
+				publish(ws, json_game_winner("COMPUTER"), opCode);
+				return;
+			}
+			
 			// Get move
 			std::string move = parse_move(message);
 			
