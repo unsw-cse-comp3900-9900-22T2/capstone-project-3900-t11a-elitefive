@@ -49,6 +49,8 @@ export default function Gamemode({}: Props) {
     };
 
     const [waitingRoomSock, setWaitingRoomSock] = useState<WebSocket|undefined>();
+    const [vsAI, setVsAI] = useState(false);
+    const [isRanked, setIsRanked] = useState(false);
 
     const { getUID } = useAuth();
     
@@ -62,7 +64,9 @@ export default function Gamemode({}: Props) {
         setTimeout(() => {
           ws.send(JSON.stringify({
             "data": JSON.stringify({
-              "uid": uid
+              "uid": uid,
+              "ranked": vsAI,
+              "ai": isRanked,
             })
           }));
         },1000)
@@ -118,21 +122,21 @@ export default function Gamemode({}: Props) {
           <ProfileWidget/>
           <Typography variant="h3">{"Select Game Mode"}</Typography>
           <ReusableToggleButtonGroup>
-            <ToggleButton value="Vs Ai">Vs Ai</ToggleButton>
-            <ToggleButton value="Vs Human">Vs Human</ToggleButton>
+            <ToggleButton value="Vs Ai" onClick={() => {setVsAI(true)}}>Vs Ai</ToggleButton>
+            <ToggleButton value="Vs Human" onClick={() => {setVsAI(false)}}>Vs Human</ToggleButton>
           </ReusableToggleButtonGroup>
           <ReusableToggleButtonGroup>
-            <ToggleButton value="Ranked">Ranked</ToggleButton>
-            <ToggleButton value="Casual">Casual</ToggleButton>
+            <ToggleButton value="Ranked" onClick={() => {setIsRanked(true)}}>Ranked</ToggleButton>
+            <ToggleButton value="Casual" onClick={() => {setIsRanked(false)}}>Casual</ToggleButton>
           </ReusableToggleButtonGroup>
           <Container1>
             <LargeButton onClick={handleJoinWaitingRoom}>
               <Typography variant="h3">{"Classic"}</Typography>
             </LargeButton>
-            <LargeButton>
+            <LargeButton onClick={handleJoinWaitingRoom}>
               <Typography variant="h3">{"Triplets"}</Typography>
             </LargeButton>
-            <LargeButton>
+            <LargeButton onClick={handleJoinWaitingRoom}>
               <Typography variant="h3">{"Pothole"}</Typography>
             </LargeButton>
           </Container1>

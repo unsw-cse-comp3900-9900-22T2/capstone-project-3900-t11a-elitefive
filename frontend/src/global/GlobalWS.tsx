@@ -32,6 +32,7 @@ export const WSProvider = ({ children, gameId }: Props) => {
   
   const { playMove, setHexTileState, playerJoin, getPlayerInfo, setWinner } = useGameState();
   
+  
   useEffect(() => {
     const WS = new WebSocket(`ws://localhost:8080/ws/game/${gameId}`);
     WS.onopen = () => {
