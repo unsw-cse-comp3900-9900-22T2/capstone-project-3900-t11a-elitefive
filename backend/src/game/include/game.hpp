@@ -11,17 +11,6 @@ class Game : public BaseGame {
 		std::vector<int> uids_; 
 		Game::state gamestate_;
 		std::vector<std::string> move_sequence_;
-		// TODO: For backend, need to be able to store the following information for replay functionality.
-		// REPLAY SEQUENCE-> "E3A2E7 ....."
-		// REPLAY SNAPSHOT-> std::vector<uint64_t>{}
-
-		// P0	0 - (64bit board state)
-		// P1	1 - (64bit board state)
-		// P2	2 - (64bit board state)
-		// P0	3 - (64bit board state)
-		// P1	4 - (64bit board state)
-		// P2	5 - (64bit board state)
-		// P0	6 - (64bit board state)
 
 	public:
 		Game(int nplayers);
