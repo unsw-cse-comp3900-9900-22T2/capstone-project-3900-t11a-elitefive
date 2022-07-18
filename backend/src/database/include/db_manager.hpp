@@ -34,6 +34,8 @@ class DatabaseManager {
     auto get_elo_progress(int id) -> std::map<std::string, std::vector<int>>;
     // FRIENDS
     auto get_friends(int id) -> std::vector<User*>;
+    auto get_incoming_freqs(int id) -> std::vector<User*>;
+    auto get_outgoing_freqs(int id) -> std::vector<User*>;
     auto delete_friend(int from, int to) -> bool;
     auto send_friend_req(int from, int to) -> bool;
     auto accept_friend_req(int from, int to) -> bool;

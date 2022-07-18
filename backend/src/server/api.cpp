@@ -113,8 +113,6 @@ auto login(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std::stri
 auto addfriend(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std::string> &session_tokens) -> void;
 auto removefriend(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std::string> &session_tokens) -> void;
 
-
-
 // GET REQUESTS
 auto api_profile(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std::string> &session_tokens) -> void {
 	app.get("/api/profile", [&app, &db, &session_tokens](auto *res, auto *req) {
@@ -126,9 +124,11 @@ auto api_profile(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std
 		auto stats = db.get_stats(uid);
 		auto friends = db.get_friends(uid);
 		
-		auto profile_json = profile_to_json(user, stats, friends);
-				
-		res->end(profile_json);	
+		json profile_json;
+		if (user != nullptr) {
+			profile_json = profile_to_json(user, stats, friends);
+		}
+		res->end(profile_json.dump());	
 	});	
 }
 
@@ -159,7 +159,20 @@ auto api_replay(uWS::App &app, DatabaseManager &db) -> void {
 	});
 }
 
-auto api_friends_pending(uWS::App &app, DatabaseManager &db) -> void;
+auto api_friends(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std::string> &session_tokens) -> void {
+	app.get("/api/friends", [&app, &db, &session_tokens](auto *res, auto *req) {
+		auto suid = std::string(req->getQuery("uid")); 
+		auto uid = atoi(suid.c_str());
+
+		auto friends = db.get_friends(uid);
+		auto incoming = db.get_incoming_freqs(uid);
+		auto outgoing = db.get_outgoing_freqs(uid);
+		
+		auto friends_json = all_friends_to_json(uid, friends, incoming, outgoing);
+				
+		res->end(friends_json.dump());	
+	});
+}
 
 // Gets all replays
 auto api_search_all(uWS::App &app, DatabaseManager &db) -> void {
@@ -266,10 +279,10 @@ auto api_db(uWS::App &app, DatabaseManager &db) -> void {
 		
 		// testing get friends 
 		auto friends = db.get_friends(1);
-		auto friends_json = friends_to_json(1, friends);
-		std::cout << " ***** friends to json\n";
-		std::cout << friends_json;
-		std::cout <<  "\n *****\n";
+		// auto friends_json = friends_to_json(1, friends);
+		// std::cout << " ***** friends to json\n";
+		// std::cout << friends_json;
+		// std::cout <<  "\n *****\n";
 		
 		// testing add friend
 		auto add = db.accept_friend_req(1,6);

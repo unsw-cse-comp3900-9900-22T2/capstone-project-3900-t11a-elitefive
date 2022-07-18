@@ -147,17 +147,35 @@ auto DatabaseManager::get_elo_progress(int id) -> std::map<std::string, std::vec
 
 auto DatabaseManager::get_friends(int id) -> std::vector<User*> {
   auto friends = std::vector<User*>();
-    auto res = execute("get_friends_uid", id);
-    for (auto row : res){
-      std::cout << row[0] << " "  << row[1] << "\n";
-      if (atoi(row[0].c_str()) != id) {
-        friends.push_back(get_user(atoi(row[0].c_str())));
-      }
-      if (atoi(row[1].c_str()) != id) {
-        friends.push_back(get_user(atoi(row[1].c_str())));
-      }
+  auto res = execute("get_friends_uid", id);
+  for (auto row : res) {
+    std::cout << row[0] << " "  << row[1] << "\n";
+    if (atoi(row[0].c_str()) != id) {
+      friends.push_back(get_user(atoi(row[0].c_str())));
     }
+    if (atoi(row[1].c_str()) != id) {
+      friends.push_back(get_user(atoi(row[1].c_str())));
+    }
+  }
   return friends;
+}
+
+auto DatabaseManager::get_incoming_freqs(int id) -> std::vector<User*> {
+  auto incoming = std::vector<User*>();
+  auto res = execute("get_incoming_freqs", id);
+  for (auto row : res) {
+    incoming.push_back(get_user(atoi(row[0].c_str())));
+  }
+  return incoming;
+}
+
+auto DatabaseManager::get_outgoing_freqs(int id) -> std::vector<User*> {
+  auto outgoing = std::vector<User*>();
+  auto res = execute("get_outgoing_freqs", id);
+  for (auto row : res) {
+    outgoing.push_back(get_user(atoi(row[0].c_str())));
+  }
+  return outgoing;
 }
 
 auto DatabaseManager::delete_friend(int from, int to) -> bool {
@@ -275,10 +293,10 @@ auto DatabaseManager::prepare_statements() -> void {
   "SELECT * FROM friends "
   "WHERE friend1 = $1 OR friend2 = $1;");
   conn_.prepare("get_incoming_freqs",
-  "SELECT * FROM friendreqs "
+  "SELECT from_user FROM friendreqs "
   "WHERE to_user = $1;");
   conn_.prepare("get_outgoing_freqs",
-  "SELECT * FROM friendreqs "
+  "SELECT to_user FROM friendreqs "
   "WHERE from_user = $1;");
   conn_.prepare("add_friend",
   "INSERT INTO friends "
