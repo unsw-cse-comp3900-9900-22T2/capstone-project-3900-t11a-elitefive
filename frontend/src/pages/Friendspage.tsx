@@ -129,7 +129,7 @@ export default function FriendsPage({}: Props) {
             </Box>
             {
               friends.map((user) => (
-                <FriendListComponent name={user.username}/>
+                <FriendListComponent to={user.id} name={user.username} refresh={refresh}/>
               ))
             }
           </BoxContainer>
