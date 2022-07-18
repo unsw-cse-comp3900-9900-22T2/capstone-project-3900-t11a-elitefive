@@ -44,12 +44,14 @@ void BackendServer() {
 	// Post Requests
 	registerPage(app, db);
 	login(app, db, tokens);
+	friendaction(app, db, tokens);
 
 	// Get Requests
 	api_search_snapshot(app, db);
 	api_search_all(app, db);
 	api_profile(app, db, tokens);
 	api_replay(app, db);
+	api_friends(app, db, tokens);
 
 	// Test functionality (REMOVE LATER)
 	api_david(app);
