@@ -16,6 +16,8 @@ struct SocketData{
 
 // Helper functions
 auto parse_move(std::string_view message) -> std::string;
+auto parse_uid(std::string_view message) -> int;
+
 auto json_confirm_move(std::string const& move) -> std::string;
 auto json_board_move(std::string const& move) -> std::string;
 auto json_game_winner(std::string const& player) -> std::string;
@@ -64,6 +66,12 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 		},
 		.message = [this, publish](auto *ws, std::string_view message, uWS::OpCode opCode) {
 			// std::cout << "Lobby: Recieved message\n";
+
+			int uid = parse_uid(message);
+			int players_turn = this->game_->whose_turn();
+			int uid_turn = this->game_->give_uid(players_turn);
+			if (uid_turn == uid) return; // Not the players turn
+			
 			// Get move
 			std::string move = parse_move(message);
 
@@ -227,6 +235,17 @@ auto parse_move(std::string_view message) -> std::string {
 	auto data = nlohmann::json::parse(datastring);
 	return data["move"];
 }
+
+auto parse_uid(std::string_view message) -> int {
+	std::cout << "Message Recieved: " << message << "\n";
+	auto json = nlohmann::json::parse(message);
+	std::string datastring = json["data"];
+	auto data = nlohmann::json::parse(datastring);
+	std::string suid = data["uid"];
+	return atoi(suid.c_str());
+}
+
+
 
 
 

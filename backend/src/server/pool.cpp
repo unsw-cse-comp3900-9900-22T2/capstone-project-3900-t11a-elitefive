@@ -62,7 +62,7 @@ auto Pool::create_waiting_room(uWS::App &app, DatabaseManager *db, std::vector<R
 			// TODO: DELETE THESE HARDCODED VALUES AND USE ABOVE JSON
 			std::cout << "\n\n\t\t=== WARNING ===\nBACKEND NOT READING FRONTEND JSON. GO IN CODE AND CHANGE!\n\t\t=== WARNING ===\n\n";
 			std::string s_ranked = "false";
-			std::string s_ai = "true";
+			std::string s_ai = "false";
 
 			bool ranked_flag = convert_to_bool(s_ranked);
 			bool ai_flag = convert_to_bool(s_ai);
