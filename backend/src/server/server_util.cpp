@@ -20,7 +20,7 @@ auto generate_session_token(int id) -> std::string {
             }
         token.push_back(char(r));
     }
-	return token;    
+	return token;
 }
 
 auto profile_to_json(User *user, PlayerStats *stats, std::map<std::string, int> elos, std::vector<User*> friends) -> json {
