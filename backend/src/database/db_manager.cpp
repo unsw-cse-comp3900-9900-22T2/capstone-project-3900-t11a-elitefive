@@ -278,13 +278,14 @@ auto DatabaseManager::prepare_statements() -> void {
   "JOIN s2 ON s1.match = s2.match) "
   "ORDER BY id;");
   conn_.prepare("get_latest_elo",
-  "SELECT end_elo "
+  "SELECT COALESCE("
+  "(SELECT end_elo "
   "FROM outcomes "
   "JOIN matches ON outcomes.match = matches.id "
   "WHERE player = $1 AND ranked = true "
   "AND game = $2 "
   "ORDER BY end_time DESC "
-  "LIMIT 1");
+  "LIMIT 1), 1000);");
   conn_.prepare("get_stats",
   "SELECT game, ranked, outcome, count(outcome) "
   "FROM outcomes "
