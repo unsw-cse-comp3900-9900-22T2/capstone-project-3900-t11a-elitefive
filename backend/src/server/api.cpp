@@ -35,14 +35,12 @@ auto registerPage(uWS::App &app, DatabaseManager &db) -> void {
 					// Register Success
 					payload["event"] = "register";
 					payload["action"] = "register";
-					payload["payload"] = {};
 					payload["payload"]["outcome"] = "success";
 				}
 				else {
 					// Register Failure
 					payload["event"] = "register";
 					payload["action"] = "register";
-					payload["payload"] = {};
 					payload["payload"]["outcome"] = "failure";
 				}
 				// Respond
@@ -75,7 +73,6 @@ auto login(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std::stri
 						std::cout << "LOGIN: incorrect login\n";
 						payload["event"] = "login";
 						payload["action"] = "login";
-						payload["payload"] = {};
 						payload["payload"]["outcome"] = "failure";
 						payload["payload"]["message"] = "incorrect password";
 					} else {
@@ -87,7 +84,6 @@ auto login(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std::stri
 						}
 						payload["event"] = "login";
 						payload["action"] = "login";
-						payload["payload"] = {};
 						payload["payload"]["outcome"] = "success";
 						payload["payload"]["uid"] = std::to_string(user->id);
 						payload["payload"]["email"] = user->email;
@@ -98,7 +94,6 @@ auto login(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std::stri
 					std::cout << "LOGIN: Doesn't exist\n";
 					payload["event"] = "login";
 					payload["action"] = "login";
-					payload["payload"] = {};
 					payload["payload"]["outcome"] = "failure";
 					payload["payload"]["message"] = "email not in database";
 				}
@@ -110,63 +105,75 @@ auto login(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std::stri
 	});
 }
 
-auto addfriend(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std::string> &session_tokens) -> void {
-	// 	app.post("/login", [&app, &db, &session_tokens](auto *res, auto *req){
-	// 	// Get data from request
-	// 	res->onData([&db, res, &session_tokens](std::string_view data, bool last) {
-	// 		auto buffer = std::string("");
-	// 		auto message = std::string("");
-			
-	// 		buffer.append(data.data(), data.length());
-	// 		if (last) {
-	// 			auto user_json = json::parse(data);
-	// 			auto email = std::string(user_json["email"]);
-	// 			auto password = std::string(user_json["password"]); 
-		
-	// 			auto user = db.get_user(email);
-	// 			// Manage JSON
-	// 			json payload;
-	// 			if (user != NULL){
-	// 				// Incorrect password
-	// 				if (hash_password(password) != user->password_hash){
-	// 					std::cout << "LOGIN: incorrect login\n";
-	// 					payload["event"] = "login";
-	// 					payload["action"] = "login";
-	// 					payload["payload"] = {};
-	// 					payload["payload"]["outcome"] = "failure";
-	// 					payload["payload"]["message"] = "incorrect password";
-	// 				} else {
-	// 					// Login success
-	// 					std::cout << "LOGIN: successful login\n";
-	// 					if (session_tokens.find(user->id) == session_tokens.end()){
-	// 						auto session_token = generate_session_token(user->id);
-	// 						session_tokens[user->id] = session_token;
-	// 					}
-	// 					payload["event"] = "login";
-	// 					payload["action"] = "login";
-	// 					payload["payload"] = {};
-	// 					payload["payload"]["outcome"] = "success";
-	// 					payload["payload"]["uid"] = std::to_string(user->id);
-	// 					payload["payload"]["email"] = user->email;
-	// 					payload["payload"]["session"] = session_tokens[user->id];
-	// 				}
-	// 			// Email doesn'e exist
-	// 			} else{
-	// 				std::cout << "LOGIN: Doesn't exist\n";
-	// 				payload["event"] = "login";
-	// 				payload["action"] = "login";
-	// 				payload["payload"] = {};
-	// 				payload["payload"]["outcome"] = "failure";
-	// 				payload["payload"]["message"] = "email not in database";
-	// 			}
+auto friendaction(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std::string> &session_tokens) -> void {
+	app.post("/friend", [&app, &db, &session_tokens](auto *res, auto *req){
+		// Get data from request
+		res->onData([&db, res, &session_tokens](std::string_view data, bool last) {
+			auto buffer = std::string("");
+			auto message = std::string("");
+			buffer.append(data.data(), data.length());
+			if (last) {
+				auto data_json = json::parse(data);
+				auto from = std::string(data_json["from"]);
+				auto to = std::string(data_json["to"]);
+				auto action = std::string(data_json["action"]);
+				auto from_id = stoi(from);
 				
-	// 			res->end(payload.dump());
-	// 		}
-	// 	});
-	// 	res->onAborted([]() -> void {});
-	// });
+				// Manage JSON
+				json payload;
+				payload["event"] = "friend";
+				payload["action"] = action;
+				if (action == "add") {
+					auto to_user = db.get_user_username(to);
+					if (to_user == nullptr){
+						// If username does not exist.
+						std::cout << "ADD FRIEND: Username does not exist" << std::endl;
+						payload["payload"]["outcome"] = "failure";
+						payload["payload"]["message"] = "username does not exist";
+					} else {
+						// Exists. Check if already friends.
+						if (db.are_friends(from_id, to_user->id)) {
+							payload["payload"]["outcome"] = "failure";
+							payload["payload"]["message"] = "already friends";
+						} else {
+							// Add friend.
+							bool success = db.send_friend_req(from_id, to_user->id);
+							if (success) {
+								payload["payload"]["outcome"] = "success";
+								payload["payload"]["to_id"] = to_user->id;
+								payload["payload"]["to_username"] = to_user->username;
+							} else {
+								payload["payload"]["outcome"] = "failure";
+								payload["payload"]["message"] = "a problem occurred";
+							}
+						}
+					}
+				} else {
+					bool success = false;
+					auto to_id = stoi(to);
+					if (action == "accept") {
+						success = db.accept_friend_req(from_id, to_id);
+					} else if (action == "deny") {
+						success = db.deny_friend_req(from_id, to_id);
+					} else if (action == "delete") {
+						success = db.delete_friend(from_id, to_id);
+					} else if (action == "cancel") {
+						success = db.revoke_friend_req(from_id, to_id);
+					}
+					// Check if successful.
+					if (success) {
+						payload["payload"]["outcome"] = "success";
+					} else {
+						payload["payload"]["outcome"] = "failure";
+						payload["payload"]["message"] = "a problem occurred";
+					}
+				}
+				res->end(payload.dump());
+			}
+		});
+		res->onAborted([]() -> void {});
+	});
 }
-auto removefriend(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std::string> &session_tokens) -> void;
 
 // GET REQUESTS
 auto api_profile(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std::string> &session_tokens) -> void {
@@ -313,10 +320,6 @@ auto api_db(uWS::App &app, DatabaseManager &db) -> void {
 					p.outcome << std::endl;
 			}
 		}
-		// Does user exist.
-		std::cout << db.does_user_exist("David") << std::endl;
-		std::cout << db.does_user_exist("JackyJ") << std::endl;
-		std::cout << db.does_user_exist("DNE") << std::endl;
 		// Latest ELO
 		std::cout << db.get_latest_elo(1, "CLASSIC") << std::endl;
 		std::cout << db.get_latest_elo(5, "CLASSIC") << std::endl;

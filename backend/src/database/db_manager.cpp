@@ -31,12 +31,12 @@ auto DatabaseManager::get_user(int id) -> User* {
   return new User(res[0]);
 }
 
-auto DatabaseManager::does_user_exist(std::string username) -> int {
+auto DatabaseManager::get_user_username(std::string username) -> User* {
   auto res = execute("username_get_user", username);
   if (res.size() != 1) {
-    return -1;
+    return NULL;
   }
-  return atoi(res[0][0].c_str());
+  return new User(res[0]);
 }
 
 auto DatabaseManager::save_match(std::string gameType, bool is_ranked, std::map<int, int> playersELO, int winner, std::string move_seq,
@@ -160,6 +160,11 @@ auto DatabaseManager::get_friends(int id) -> std::vector<User*> {
   return friends;
 }
 
+auto DatabaseManager::are_friends(int id1, int id2) -> bool {
+  auto res = execute("are_friends", id1, id2);
+  return res.size() != 0;
+}
+
 auto DatabaseManager::get_incoming_freqs(int id) -> std::vector<User*> {
   auto incoming = std::vector<User*>();
   auto res = execute("get_incoming_freqs", id);
@@ -198,6 +203,10 @@ auto DatabaseManager::accept_friend_req(int accepter, int accepted) -> bool {
 
 auto DatabaseManager::deny_friend_req(int denier, int denied) -> bool {
   return execute0("delete_friend_req", denied, denier);
+}
+
+auto DatabaseManager::revoke_friend_req(int revoker, int revoked) -> bool {
+  return execute0("delete_friend_req", revoker, revoked);
 }
 
 // Prepare the statements on instantiation.
@@ -289,6 +298,10 @@ auto DatabaseManager::prepare_statements() -> void {
   "WHERE player = $1 AND ranked = true "
   "GROUP BY game, end_elo, end_time "
   "ORDER BY game, end_time");
+  conn_.prepare("are_friends",
+  "SELECT * FROM friends "
+  "WHERE (friend1 = $1 AND friend2 = $2) "
+  "OR (friend1 = $2 AND friend1 = $1);");
   conn_.prepare("get_friends_uid",
   "SELECT * FROM friends "
   "WHERE friend1 = $1 OR friend2 = $1;");

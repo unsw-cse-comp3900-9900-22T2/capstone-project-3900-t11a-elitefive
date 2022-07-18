@@ -18,7 +18,7 @@ class DatabaseManager {
     auto insert_user(std::string username, std::string email, std::string password) -> bool;
     auto get_user(std::string email) -> User*;
     auto get_user(int id) -> User*;
-    auto does_user_exist(std::string username) -> int;
+    auto get_user_username(std::string username) -> User*;
     // MATCHES
     auto save_match(std::string gameType, bool is_ranked, std::map<int, int> playersELO, int winner, std::string move_seq,
       std::vector<uint64_t> snapshots) -> int;
@@ -34,12 +34,14 @@ class DatabaseManager {
     auto get_elo_progress(int id) -> std::map<std::string, std::vector<int>>;
     // FRIENDS
     auto get_friends(int id) -> std::vector<User*>;
+    auto are_friends(int id1, int id2) -> bool;
     auto get_incoming_freqs(int id) -> std::vector<User*>;
     auto get_outgoing_freqs(int id) -> std::vector<User*>;
     auto delete_friend(int from, int to) -> bool;
     auto send_friend_req(int from, int to) -> bool;
-    auto accept_friend_req(int from, int to) -> bool;
-    auto deny_friend_req(int from, int to) -> bool;
+    auto accept_friend_req(int accepter, int accepted) -> bool;
+    auto deny_friend_req(int denier, int denied) -> bool;
+    auto revoke_friend_req(int revoker, int revoked) -> bool;
   private:
     auto prepare_statements() -> void;
     // Execute query with return result.

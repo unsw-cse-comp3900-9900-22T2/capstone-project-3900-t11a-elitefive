@@ -44,6 +44,7 @@ void BackendServer() {
 	// Post Requests
 	registerPage(app, db);
 	login(app, db, tokens);
+	friendaction(app, db, tokens);
 
 	// Get Requests
 	api_search_snapshot(app, db);
