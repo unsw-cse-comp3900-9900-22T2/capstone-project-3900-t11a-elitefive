@@ -52,7 +52,7 @@ export default function Dashboard({}: Props) {
       <ProfileWidget/>
       <Container1>
         <LargeButton onClick={navigateToGamepage}>
-          <Typography variant="h3">{"Play AI"}</Typography>
+          <Typography variant="h3">{"Play"}</Typography>
         </LargeButton>
         <LargeButton>
           <Typography variant="h3">{"Leaderboard"}</Typography>
