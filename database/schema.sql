@@ -82,9 +82,3 @@ insert into users (username, email, password_hash) values
 ('James', 'james@teamrocket.com', '619227d5cf63bffd286a6529f58fb3e679169230eb7b0151871b8f6583f24bc6');
 
 insert into friends (friend1, friend2) values (9, 10);
-
--- Bots
-INSERT INTO users (username) values 
-('BOT1'),
-('BOT2'),
-('BOT3');

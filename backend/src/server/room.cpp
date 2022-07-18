@@ -80,7 +80,6 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 				std::string winner = game_result(*this->game_);
 				publish(ws, json_game_winner(winner), opCode);
 				
-				
 				// Save Match to Database.
 				auto gen = MetaDataGenerator(*game_);
 				auto snapshots = gen.db_snapshot();
@@ -89,25 +88,9 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 				printf("DB Pointer: %p\n", db_);
 				// True/False flag for elo
 
-				// TODO: HARDCODED STARTING ELOS: This needs to be modified.
-				auto playersELO = std::map<int, int>{};	// Contains starting elo
-				for (auto const &uid : uids_) {
-					playersELO.insert({uid, 1000});
-				}
+				auto playersELO = calc_elos(winning_player);
 
-				std::map<int, int> endELO = playersELO; // Make copy and modify elo to pass to save_match
-				// Don't do calculation if there is a draw
-				if (this->ranked_ && winning_player != -1) {
-					std::cout << "\tRoom: Do elo calculation\n";
-					int player = 0;
-					for (auto &elo : endELO) {
-						if (player == winning_player) elo.second += 30;
-						else elo.second -= 30;
-						++player;
-					}
-				}
-
-				auto const match_id = db_->save_match("CLASSIC", this->ranked_, endELO, winning_uid, game_->move_sequence(), snapshots);
+				auto const match_id = db_->save_match("CLASSIC", this->ranked_, playersELO, winning_uid, game_->move_sequence(), snapshots);
 				std::cout << "Match ID: " << match_id << '\n';
 			}
 		},
@@ -162,25 +145,9 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 				int const winning_uid = this->game_->give_uid(winning_player);
 				std::cout << "Room: Winning player - " << winning_player << " with uid: " << winning_uid << '\n';
 				
-				// TODO: HARDCODED STARTING ELOS: This needs to be modified.
-				auto playersELO = std::map<int, int>{};	// Contains starting elo
-				for (auto const &uid : uids_) {
-					playersELO.insert({uid, 1000});
-				}
-
-				std::map<int, int> endELO = playersELO; // Make copy and modify elo to pass to save_match
-				// Don't do calculation if there is a draw
-				if (this->ranked_ && winning_player != -1) {
-					std::cout << "\tRoom: Do elo calculation\n";
-					int player = 0;
-					for (auto &elo : endELO) {
-						if (player == winning_player) elo.second += 30;
-						else elo.second -= 30;
-						++player;
-					}
-				}
+				auto playersELO = calc_elos(winning_player);
 				
-				auto const match_id = db_->save_match("CLASSIC", this->ranked_, endELO, winning_uid,game_->move_sequence(), snapshots);
+				auto const match_id = db_->save_match("CLASSIC", this->ranked_, playersELO, winning_uid,game_->move_sequence(), snapshots);
 				std::cout << "Match ID: " << match_id << '\n';
 			}
 			// auto const match_id = db.save_match("CLASSIC", game->move_sequence());
@@ -228,8 +195,6 @@ auto parse_move(std::string_view message) -> std::string {
 	return data["move"];
 }
 
-
-
 auto Room::json_confirm_move(std::string const& move) -> std::string {
 	json payload;
 	payload["event"] = "moveconfirm";
@@ -249,6 +214,26 @@ auto Room::json_game_winner(std::string const& player) -> std::string {
 	payload["event"] = "game_over";
 	payload["winner"] = player;
 	return payload.dump();
+}
+
+auto Room::calc_elos(int winning_player) -> std::map<int, int> {
+	auto playersELO = std::map<int, int>{};	// Contains starting elo
+	for (auto const &uid : uids_) {
+		playersELO.insert({uid, 1000});
+	}
+
+	std::map<int, int> endELO = playersELO; // Make copy and modify elo to pass to save_match
+	// Don't do calculation if there is a draw
+	if (this->ranked_ && winning_player != -1) {
+		std::cout << "\tRoom: Do elo calculation\n";
+		int player = 0;
+		for (auto &elo : endELO) {
+			if (player == winning_player) elo.second += 30;
+			else elo.second -= 30;
+			++player;
+		}
+	}
+	return playersELO;
 }
 
 // TODO: Make this a game function instead
