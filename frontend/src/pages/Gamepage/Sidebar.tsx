@@ -23,13 +23,14 @@ export default function Sidebar({}: Props) {
   const {  emit } = useSocket();
   const { getUID } = useAuth();
 
-  const otherPlayer = getPlayers().find((p: PlayerType) => p.uid != getUID())?.uid;
+  const currPlayer = getPlayers()[0]?.name;
+  const otherPlayer = getPlayers()[1]?.name;
 
   return (
     <Container>
       <Card3>
         <Typography sx={{ fontSize: 40 }} color="white" gutterBottom>
-          Player {getUID()}
+          Player { currPlayer }
         </Typography>
         <Typography sx={{ fontSize: 20 }} color="white" gutterBottom>
           1580

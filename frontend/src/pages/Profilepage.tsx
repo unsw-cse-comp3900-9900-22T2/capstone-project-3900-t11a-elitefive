@@ -72,14 +72,22 @@ export type profileDataType = {
   uid: number;
   username: string;
   email: string;
-  classic: statsDataType;
-  potholes: statsDataType;
-  triples: statsDataType;
+  ranked: {
+    CLASSIC: statsDataType;
+    POTHOLES: statsDataType;
+    TRIPLES: statsDataType;
+  };
+  casual: {
+    CLASSIC: statsDataType;
+    POTHOLES: statsDataType;
+    TRIPLES: statsDataType;
+  }
 }
+
 
 type statsDataType = {
   draws: number;
-  elo: number;
+  elo?: number;
   losses: number;
   wins: number;
 }
@@ -88,24 +96,43 @@ const DefaultProfileData = {
   "email": "",
   "username": "",
   "uid": 0,
-  "classic": {
-    "draws": 0,
-    "elo": 0,
-    "losses": 0,
-    "wins": 0
+  "ranked": {
+    "CLASSIC": {
+      "draws": 0,
+      "losses": 0,
+      "wins": 0,
+      "elo": 1000,
+    },
+    "POTHOLES": {
+      "draws": 0,
+      "losses": 0,
+      "wins": 0,
+      "elo": 1000
+    },
+    "TRIPLES": {
+      "draws": 0,
+      "losses": 0,
+      "wins": 0,
+      "elo": 1000
+    }
   },
-  "potholes": {
-    "draws": 0,
-    "elo": 0,
-    "losses": 0,
-    "wins": 0
-  },
-  "triples": {
-    "draws": 0,
-    "elo": 0,
-    "losses": 0,
-    "wins": 0
-  },
+  "casual": {
+    "CLASSIC": {
+      "draws": 0,
+      "losses": 0,
+      "wins": 0,
+    },
+    "POTHOLES": {
+      "draws": 0,
+      "losses": 0,
+      "wins": 0,
+    },
+    "TRIPLES": {
+      "draws": 0,
+      "losses": 0,
+      "wins": 0,
+    }
+  }
 }
 
 

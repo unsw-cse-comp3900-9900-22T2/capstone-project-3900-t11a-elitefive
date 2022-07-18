@@ -16,10 +16,15 @@ struct SocketData{
 
 // Helper functions
 auto parse_move(std::string_view message) -> std::string;
+auto parse_uid(std::string_view message) -> int;
+auto player_resigned(std::string_view message) -> bool;
+
 auto json_confirm_move(std::string const& move) -> std::string;
 auto json_board_move(std::string const& move) -> std::string;
 auto json_game_winner(std::string const& player) -> std::string;
-auto game_result(Game const& game) -> std::string;
+// auto game_result(Game const& game) -> std::string;
+// auto game_result(int const uid) -> std::string;
+
 
 // ======================================
 // 			Class implementation
@@ -61,9 +66,37 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 		.open = [this, publish](auto *ws) {
 			ws->subscribe(this->room_id());
 			std::cout << "\tLobby: Joined multiplayer lobby\n";
+
+			auto p0 = this->db_->get_user(this->game_->give_uid(0));
+			auto p1 = this->db_->get_user(this->game_->give_uid(1));
+			json payload;
+			payload["event"] = "player_names";
+			payload["player_name"] = {
+				p0->username,
+				p1->username
+			};
+
+			ws->send(payload.dump(), uWS::OpCode::TEXT);
 		},
 		.message = [this, publish](auto *ws, std::string_view message, uWS::OpCode opCode) {
 			// std::cout << "Lobby: Recieved message\n";
+			int uid = parse_uid(message);
+			if (player_resigned(message)) {
+				int player = this->game_->give_player_with_uid(uid);
+				int winning_player = this->game_->player_after(player);
+
+				save_match(winning_player);
+
+				int const winning_uid = this->game_->give_uid(winning_player);
+				std::string winner = game_result(winning_uid);
+				publish(ws, json_game_winner(winner), opCode);
+				return;
+			}
+
+			int players_turn = this->game_->whose_turn();
+			int uid_turn = this->game_->give_uid(players_turn);
+			if (uid_turn == uid) return; // Not the players turn
+			
 			// Get move
 			std::string move = parse_move(message);
 
@@ -77,21 +110,11 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 			// Postgame
 			auto const state = game_->status();
 			if (state != Game::state::ONGOING) {
-				std::string winner = game_result(*this->game_);
+				std::string winner = game_result();
 				publish(ws, json_game_winner(winner), opCode);
 				
-				// Save Match to Database.
-				auto gen = MetaDataGenerator(*game_);
-				auto snapshots = gen.db_snapshot();
 				int const winning_player = this->game_->which_player_won();
-				int const winning_uid = this->game_->give_uid(winning_player);
-				printf("DB Pointer: %p\n", db_);
-				// True/False flag for elo
-
-				auto playersELO = calc_elos(winning_player);
-
-				auto const match_id = db_->save_match("CLASSIC", this->ranked_, playersELO, winning_uid, game_->move_sequence(), snapshots);
-				std::cout << "Match ID: " << match_id << '\n';
+				save_match(winning_player);
 			}
 		},
 		.close = [this](auto *ws, int x , std::string_view str) {
@@ -116,6 +139,13 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 		},
 		.message = [this, publish](auto *ws, std::string_view message, uWS::OpCode opCode) {
 			std::cout << "Recieved message\n";
+			
+			if (player_resigned(message)) {
+				publish(ws, json_game_winner("COMPUTER"), opCode);
+				save_match(1);
+				return;
+			}
+			
 			// Get move
 			std::string move = parse_move(message);
 			
@@ -134,23 +164,11 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 			// Postgame
 			auto const state = game_->status();
 			if (state != Game::state::ONGOING) {
-				std::string winner = game_result(*this->game_);
+				std::string winner = game_result();
 				publish(ws, json_game_winner(winner), opCode);
-				
-				// Save Match to Database.
-				auto gen = MetaDataGenerator(*game_);
-				auto snapshots = gen.db_snapshot();
-				// True/False flag for elo
 				int const winning_player = this->game_->which_player_won();
-				int const winning_uid = this->game_->give_uid(winning_player);
-				std::cout << "Room: Winning player - " << winning_player << " with uid: " << winning_uid << '\n';
-				
-				auto playersELO = calc_elos(winning_player);
-				
-				auto const match_id = db_->save_match("CLASSIC", this->ranked_, playersELO, winning_uid,game_->move_sequence(), snapshots);
-				std::cout << "Match ID: " << match_id << '\n';
+				save_match(winning_player);
 			}
-			// auto const match_id = db.save_match("CLASSIC", game->move_sequence());
 		},
 		.close = [this](auto *ws, int x , std::string_view str) {
 			ws->unsubscribe(this->room_id());
@@ -187,12 +205,25 @@ auto Room::ai_response(std::string const& move) -> std::string {
 // ======================================
 // 			Helper functions
 // ======================================
+auto player_resigned(std::string_view message) -> bool {
+	auto json = nlohmann::json::parse(message);
+	return json["event"] == "retire";
+}
+
 auto parse_move(std::string_view message) -> std::string {
-	std::cout << "Message Recieved: " << message << "\n";
 	auto json = nlohmann::json::parse(message);
 	std::string datastring = json["data"];
 	auto data = nlohmann::json::parse(datastring);
 	return data["move"];
+}
+
+auto parse_uid(std::string_view message) -> int {
+	auto json = nlohmann::json::parse(message);
+	std::cout << json << '\n';
+	std::string datastring = json["data"];
+	auto data = nlohmann::json::parse(datastring);
+	std::string suid = data["uid"];
+	return atoi(suid.c_str());
 }
 
 auto Room::json_confirm_move(std::string const& move) -> std::string {
@@ -216,6 +247,19 @@ auto Room::json_game_winner(std::string const& player) -> std::string {
 	return payload.dump();
 }
 
+auto Room::save_match(int winning_player) -> void {
+	// Save Match to Database.
+	auto gen = MetaDataGenerator(*(this->game_));
+	auto snapshots = gen.db_snapshot();
+	// True/False flag for elo
+	int const winning_uid = this->game_->give_uid(winning_player);
+	// std::cout << "Room: Winning player - " << winning_player << " with uid: " << winning_uid << '\n';
+	
+	auto playersELO = calc_elos(winning_player);
+	auto const match_id = db_->save_match("CLASSIC", this->ranked_, playersELO, winning_uid, game_->move_sequence(), snapshots);
+	std::cout << "Match ID: " << match_id << '\n';
+}
+
 auto Room::calc_elos(int winning_player) -> std::map<int, int> {
 	auto playersELO = std::map<int, int>{};	// Contains starting elo
 	for (auto const &uid : uids_) {
@@ -235,22 +279,21 @@ auto Room::calc_elos(int winning_player) -> std::map<int, int> {
 	return playersELO;
 }
 
+
+
 // TODO: Make this a game function instead
-auto game_result(Game const& game) -> std::string {
-	// auto const state = game.status();
-	// std::string winner;
-	// if (state == Game::state::DRAW) {
-	// 	winner = "";
-	// } else if (game.whose_turn() == 1 && state == Game::state::WIN
-	// 		|| game.whose_turn() == 0 && state == Game::state::LOSS) {
-	// 	winner = "COMPUTER";
-	// } else {
-	// 	winner = "PLAYER";
-	// }
-	// return winner;
-	int winning_player = game.which_player_won();
-	if (winning_player == 0) return "PLAYER";
-	if (winning_player == 1) return "COMPUTER";
-	return "MISSINGNO";
+auto Room::game_result() -> std::string {
+	int winning_player = this->game_->which_player_won();
+	int uid = this->game_->give_uid(winning_player);
+	return game_result(uid);
+}
+
+auto Room::game_result(int const uid) -> std::string {
+	auto user = this->db_->get_user(uid);
+	if (!user) return "MISSINGNO";
+	return user->username;
+	// if (player == 0) return "PLAYER";
+	// if (player == 1) return "COMPUTER";
+	// return "MISSINGNO";
 }
 

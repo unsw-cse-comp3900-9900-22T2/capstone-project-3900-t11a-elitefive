@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import Board from '../components/Board';
-import { Typography } from '@mui/material';
+import { Box, Modal, Typography } from '@mui/material';
 import StyledInput from '../components/StyledInput';
 import {StyledButton} from '../components/ReusableButton-styled';
 import Button, {Button2, LargeButton} from '../components/ReusableButton';
@@ -14,6 +14,7 @@ import ReusableToggleButtonGroup from '../components/ReusableToggleButtonGroup';
 import ReusableToggleButton from '../components/ReusableToggleButton';
 import ToggleButton from '@mui/material/ToggleButton';
 import { useAuth } from '../global/GlobalAuth';
+import PopupContainer from '../components/PopupContainer';
 
 type Props = {}
 
@@ -51,6 +52,7 @@ export default function Gamemode({}: Props) {
     const [waitingRoomSock, setWaitingRoomSock] = useState<WebSocket|undefined>();
     const [vsAI, setVsAI] = useState(false);
     const [isRanked, setIsRanked] = useState(false);
+    const [isWaiting, setIsWaiting] = useState(false);
 
     const { getUID } = useAuth();
     
@@ -60,6 +62,7 @@ export default function Gamemode({}: Props) {
         console.log(uid);
         if(!uid) return;
         const ws = await JoinSocket(parseInt(uid));
+        setIsWaiting(true);
 
         setTimeout(() => {
           ws.send(JSON.stringify({
@@ -74,6 +77,11 @@ export default function Gamemode({}: Props) {
         setWaitingRoomSock(ws);
       }
     }
+
+    useEffect(() => {
+      console.log(`ai = ${vsAI}`)
+      console.log(`isranked = ${isRanked}`)
+    },[vsAI, isRanked])
 
     const JoinSocket = (uid: number): Promise<WebSocket> => {
       return new Promise((resolve, reject) => {
@@ -120,15 +128,42 @@ export default function Gamemode({}: Props) {
         <Container>
           <YavalathButtonFixed/>
           <ProfileWidget/>
+          <Modal open={isWaiting} onClose={() => {} }>
+            <PopupContainer>
+              <Box height="100%" display="flex" justifyContent="center" alignItems="center">
+              <Typography variant="h5">waiting for other players...</Typography>
+              </Box>
+            </PopupContainer>
+          </Modal>
           <Typography variant="h3">{"Select Game Mode"}</Typography>
-          <ReusableToggleButtonGroup>
-            <ToggleButton value="Vs Ai" onClick={() => {setVsAI(true)}}>Vs Ai</ToggleButton>
-            <ToggleButton value="Vs Human" onClick={() => {setVsAI(false)}}>Vs Human</ToggleButton>
-          </ReusableToggleButtonGroup>
-          <ReusableToggleButtonGroup>
-            <ToggleButton value="Ranked" onClick={() => {setIsRanked(true)}}>Ranked</ToggleButton>
-            <ToggleButton value="Casual" onClick={() => {setIsRanked(false)}}>Casual</ToggleButton>
-          </ReusableToggleButtonGroup>
+          <Box display="flex">
+            <Button 
+              onClick={() => {setVsAI(true)}}
+              background={vsAI ? "var(--accent-darker)" : "var(--accent-dark)"}
+            >
+              Vs AI
+            </Button>
+            <Button 
+              onClick={() => {setVsAI(false)}}
+              background={!vsAI ? "var(--accent-darker)" : "var(--accent-dark)"}
+            >
+              Vs Human
+            </Button>
+          </Box>
+          <Box display="flex">
+            <Button
+              onClick={() => {setIsRanked(true)}}
+              background={isRanked ? "var(--accent-darker)" : "var(--accent-dark)"}
+            >
+              Ranked
+            </Button>
+            <Button 
+              onClick={() => {setIsRanked(false)}}
+              background={!isRanked ? "var(--accent-darker)" : "var(--accent-dark)"}
+            >
+              casual
+            </Button>
+          </Box>
           <Container1>
             <LargeButton onClick={handleJoinWaitingRoom}>
               <Typography variant="h3">{"Classic"}</Typography>

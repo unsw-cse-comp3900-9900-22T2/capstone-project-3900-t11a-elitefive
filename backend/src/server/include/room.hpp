@@ -33,6 +33,9 @@ class Room {
             return json_confirm_move(move); // TODO: UNREACHABLE IDEALLY
         }
 
+        auto game_result() -> std::string;
+		auto game_result(int const uid) -> std::string;
+
     private:
         auto generate_game() -> void;       // Init game
         auto create_socket_ai(uWS::App &app) -> void;    // Create room to verse ai
@@ -46,6 +49,7 @@ class Room {
         auto json_game_winner(std::string const& player) -> std::string;
 
         auto calc_elos(int winning_player) -> std::map<int, int>;
+        auto save_match(int winning_player) -> void;
 };
 
 #endif
