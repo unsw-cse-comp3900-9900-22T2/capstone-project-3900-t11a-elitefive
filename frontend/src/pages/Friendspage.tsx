@@ -156,7 +156,7 @@ export default function FriendsPage({}: Props) {
           <BoxContainer>
             {
               outgoing.map((user) => (
-                <FriendRequest id={user.id} name={user.username} variant="outgoing" refresh={refresh}/>
+                <FriendRequest id={user.id} name={user.username} variant="incoming" refresh={refresh}/>
               ))
             }
           </BoxContainer>
@@ -166,7 +166,7 @@ export default function FriendsPage({}: Props) {
           <BoxContainer>
             {
               incoming.map((user) => (
-                <FriendRequest id={user.id} name={user.username} variant="incoming" refresh={refresh}/>
+                <FriendRequest id={user.id} name={user.username} variant="outgoing" refresh={refresh}/>
               ))
             }
           </BoxContainer>
