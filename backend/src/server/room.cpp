@@ -139,9 +139,9 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 		},
 		.message = [this, publish](auto *ws, std::string_view message, uWS::OpCode opCode) {
 			std::cout << "Recieved message\n";
-			
 			if (player_resigned(message)) {
-				publish(ws, json_game_winner("COMPUTER"), opCode);
+				std::string winner = game_result(6);
+				publish(ws, json_game_winner(winner), opCode);
 				save_match(1);
 				return;
 			}
