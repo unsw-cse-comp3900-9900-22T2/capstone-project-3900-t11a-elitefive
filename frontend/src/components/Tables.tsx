@@ -7,62 +7,103 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
+import { useParams } from 'react-router-dom';
+import { useGameState } from '../global/GlobalGameState';
+import { useEffect } from 'react';
 
-interface Column {
-  id: 'p1' | 'p2';
-  label: string;
-  minWidth?: number;
-  align?: 'right';
-  format?: (value: number) => string;
+
+
+
+
+export type matchDataType = {
+  gamemode: string;
+  holes: string;
+  match_id: number;
+  move_seq: Array<Array<string>>;
+  moves: string;
+  nplayers: number;
+  players: Array<playersDataType>;
 }
 
-const columns: readonly Column[] = [
-  { id: 'p1', label: 'Player 1', minWidth: 100 },
-  { id: 'p2', label: 'Player 2', minWidth: 100 },
-];
-
-interface Data {
-  p1: string;
-  p2: string;
+type playersDataType = {
+  elo_end: number;
+  elo_start: number;
+  outcome: string;
+  uid: number;
+  username: string;
 }
 
-function createData(
-  p1: string,
-  p2: string,
-): Data {
-  return { p1, p2 };
+const DefaultMatchData = {
+    "gamemode": "",
+    "holes": "",
+    "match_id": 0,
+    "move_seq": [
+        [
+            ""
+        ],
+        [
+            ""
+        ]
+    ],
+    "moves": "",
+    "nplayers": 0,
+    "players": [
+        {
+            "elo_end": 0,
+            "elo_start": 0,
+            "outcome": "",
+            "uid": 0,
+            "username": ""
+        },
+        {
+            "elo_end": 0,
+            "elo_start": 0,
+            "outcome": "",
+            "uid": 0,
+            "username": ""
+        }
+    ],
 }
-
-const rows = [
-  createData('A1', 'B2'),
-  createData('A1', 'B2'),
-  createData('A1', 'B2'),
-  createData('A1', 'B2'),
-  createData('A1', 'B2'),
-  createData('A1', 'B2'),
-  createData('A1', 'B2'),
-  createData('A1', 'B2'),
-  createData('A1', 'B2'),
-  createData('A1', 'B2'),
-  createData('A1', 'B2'),
-  createData('A1', 'B2'),
-  createData('A1', 'B2'),
-  createData('A1', 'B2'),
-  createData('A1', 'B2'),
-];
 
 export default function StickyHeadTable() {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [matchData, setMatchData] = React.useState<matchDataType>(DefaultMatchData);
 
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
+  const{ matchid } = useParams();
+  const { setWinner } = useGameState();
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
+  useEffect(() => {
+    fetch(`/api/replay?matchid=${matchid}`)
+    .then(resp => resp.json())
+    .then(data => {
+      setMatchData(data);
+    })
+  },[])
+
+  const row = matchData.move_seq.map(function (item, i) {
+    const cell = item.map(function (element, j) {
+      return (
+        <TableRow hover >
+          <TableCell
+          key={j}
+          style={{ minWidth: 100 }}
+          align={'center'}
+          >
+            {element}
+          </TableCell>
+        </TableRow>
+        );
+    });
+    return (
+      <TableCell 
+      key={i} 
+      style={{width: 100}} 
+      padding={'none'}
+      > 
+      {cell} 
+      </TableCell>
+    );
+  })
+
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
@@ -70,36 +111,19 @@ export default function StickyHeadTable() {
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
-              {columns.map((column) => (
-                <TableCell
-                  key={column.id}
-                  align={column.align}
-                  style={{ minWidth: column.minWidth }}
-                >
-                  {column.label}
-                </TableCell>
-              ))}
+                {matchData.players.map((x, index) => (
+                  <TableCell
+                  key={index}
+                  style={{ minWidth: 100}}
+                  align={'center'}
+                  >
+                    {x.username}
+                  </TableCell>
+                ))}
             </TableRow>
           </TableHead>
-          <TableBody>
-            {rows
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row) => {
-                return (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={row.p1}>
-                    {columns.map((column) => {
-                      const value = row[column.id];
-                      return (
-                        <TableCell key={column.id} align={column.align}>
-                          {column.format && typeof value === 'number'
-                            ? column.format(value)
-                            : value}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                );
-              })}
+          <TableBody style={{verticalAlign:'top'}}>
+            {row}
           </TableBody>
         </Table>
       </TableContainer>
