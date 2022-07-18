@@ -3,7 +3,7 @@ import { useGameState, PlayerType } from './GlobalGameState';
 
 interface payload {
   // type: "init" | "terminating" | "acknowledged"
-  event: "move" | "moveconfirm" | "game_over"
+  event: "move" | "moveconfirm" | "game_over" | "player_names"
   contents?: string;
   tile?: string;
   winner?: string;
@@ -31,6 +31,7 @@ export const WSProvider = ({ children, gameId }: Props) => {
   const [socketConnected, setSocketConnected] = useState<boolean>(false);
   
   const { playMove, setHexTileState, playerJoin, getPlayerInfo, setWinner } = useGameState();
+  
   
   useEffect(() => {
     const WS = new WebSocket(`ws://localhost:8080/ws/game/${gameId}`);
@@ -73,6 +74,12 @@ export const WSProvider = ({ children, gameId }: Props) => {
             setWinner(winner);
           }
           WS.close();
+          break;
+        }
+        case "player_names": {
+          const payload = JSON.parse(message.data);
+          const { player_names } = payload;
+          console.log(player_names);
           break;
         }
       }

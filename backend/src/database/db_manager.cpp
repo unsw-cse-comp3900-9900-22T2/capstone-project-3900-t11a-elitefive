@@ -31,12 +31,12 @@ auto DatabaseManager::get_user(int id) -> User* {
   return new User(res[0]);
 }
 
-auto DatabaseManager::does_user_exist(std::string username) -> int {
+auto DatabaseManager::get_user_username(std::string username) -> User* {
   auto res = execute("username_get_user", username);
   if (res.size() != 1) {
-    return -1;
+    return NULL;
   }
-  return atoi(res[0][0].c_str());
+  return new User(res[0]);
 }
 
 auto DatabaseManager::save_match(std::string gameType, bool is_ranked, std::map<int, int> playersELO, int winner, std::string move_seq,
@@ -79,9 +79,10 @@ auto DatabaseManager::get_match(int id) -> Match* {
     // Add player
     auto p_id = atoi(row[3].c_str());
     auto p_username = row[4].c_str();
-    auto p_endelo = atoi(row[5].c_str());
-    auto p_outcome = row[6].c_str();
-    auto *player = new Player(p_id, p_username, p_endelo, p_outcome);
+    auto p_startelo = atoi(row[5].c_str());
+    auto p_endelo = atoi(row[6].c_str());
+    auto p_outcome = row[7].c_str();
+    auto *player = new Player(p_id, p_username, p_startelo, p_endelo, p_outcome);
     curmatch->players.push_back(*player);
   }
   return curmatch;
@@ -147,17 +148,40 @@ auto DatabaseManager::get_elo_progress(int id) -> std::map<std::string, std::vec
 
 auto DatabaseManager::get_friends(int id) -> std::vector<User*> {
   auto friends = std::vector<User*>();
-    auto res = execute("get_friends_uid", id);
-    for (auto row : res){
-      std::cout << row[0] << " "  << row[1] << "\n";
-      if (atoi(row[0].c_str()) != id) {
-        friends.push_back(get_user(atoi(row[0].c_str())));
-      }
-      if (atoi(row[1].c_str()) != id) {
-        friends.push_back(get_user(atoi(row[1].c_str())));
-      }
+  auto res = execute("get_friends_uid", id);
+  for (auto row : res) {
+    std::cout << row[0] << " "  << row[1] << "\n";
+    if (atoi(row[0].c_str()) != id) {
+      friends.push_back(get_user(atoi(row[0].c_str())));
     }
+    if (atoi(row[1].c_str()) != id) {
+      friends.push_back(get_user(atoi(row[1].c_str())));
+    }
+  }
   return friends;
+}
+
+auto DatabaseManager::are_friends(int id1, int id2) -> bool {
+  auto res = execute("are_friends", id1, id2);
+  return res.size() != 0;
+}
+
+auto DatabaseManager::get_incoming_freqs(int id) -> std::vector<User*> {
+  auto incoming = std::vector<User*>();
+  auto res = execute("get_incoming_freqs", id);
+  for (auto row : res) {
+    incoming.push_back(get_user(atoi(row[0].c_str())));
+  }
+  return incoming;
+}
+
+auto DatabaseManager::get_outgoing_freqs(int id) -> std::vector<User*> {
+  auto outgoing = std::vector<User*>();
+  auto res = execute("get_outgoing_freqs", id);
+  for (auto row : res) {
+    outgoing.push_back(get_user(atoi(row[0].c_str())));
+  }
+  return outgoing;
 }
 
 auto DatabaseManager::delete_friend(int from, int to) -> bool {
@@ -182,6 +206,10 @@ auto DatabaseManager::deny_friend_req(int denier, int denied) -> bool {
   return execute0("delete_friend_req", denied, denier);
 }
 
+auto DatabaseManager::revoke_friend_req(int revoker, int revoked) -> bool {
+  return execute0("delete_friend_req", revoker, revoked);
+}
+
 // Prepare the statements on instantiation.
 auto DatabaseManager::prepare_statements() -> void {
   conn_.prepare("insert_user",
@@ -200,9 +228,21 @@ auto DatabaseManager::prepare_statements() -> void {
   "INSERT INTO matches(game, ranked, replay) "
   "VALUES ($1, $2, $3) "
   "RETURNING id;");
+  // TODO: The COALESCE section for start_elo is a monstrosity...
   conn_.prepare("get_match",
   "SELECT matches.id, game, replay, outcomes.player, "
-  "username, end_elo, outcome "
+  "username, "
+  "COALESCE("
+  "(SELECT o.end_elo FROM matches m "
+  "JOIN outcomes o ON m.id = o.match "
+  "WHERE m.game = matches.game AND "
+  "m.ranked = matches.ranked AND "
+  "o.player = outcomes.player AND "
+  "m.end_time < matches.end_time "
+  "ORDER BY m.end_time "
+  "DESC LIMIT 1), 1000) "
+  "AS start_elo, "
+  "end_elo, outcome "
   "FROM matches "
   "JOIN outcomes ON matches.id = outcomes.match "
   "JOIN users ON outcomes.player = users.id "
@@ -210,13 +250,35 @@ auto DatabaseManager::prepare_statements() -> void {
   // TODO: Refactor the two below - similar SQL.
   conn_.prepare("get_matches",
   "SELECT matches.id, game, replay, outcomes.player, "
-  "username, end_elo, outcome "
+  "username, "
+  "COALESCE("
+  "(SELECT o.end_elo FROM matches m "
+  "JOIN outcomes o ON m.id = o.match "
+  "WHERE m.game = matches.game AND "
+  "m.ranked = matches.ranked AND "
+  "o.player = outcomes.player AND "
+  "m.end_time < matches.end_time "
+  "ORDER BY m.end_time "
+  "DESC LIMIT 1), 1000) "
+  "AS start_elo, "
+  "end_elo, outcome "
   "FROM matches "
   "JOIN outcomes ON matches.id = outcomes.match "
   "JOIN users ON outcomes.player = users.id;");
   conn_.prepare("get_matches_user",
   "SELECT matches.id, game, replay, outcomes.player, "
-  "username, end_elo, outcome "
+  "username, "
+  "COALESCE("
+  "(SELECT o.end_elo FROM matches m "
+  "JOIN outcomes o ON m.id = o.match "
+  "WHERE m.game = matches.game AND "
+  "m.ranked = matches.ranked AND "
+  "o.player = outcomes.player AND "
+  "m.end_time < matches.end_time "
+  "ORDER BY m.end_time "
+  "DESC LIMIT 1), 1000) "
+  "AS start_elo, "
+  "end_elo, outcome "
   "FROM matches "
   "JOIN outcomes ON matches.id = outcomes.match "
   "JOIN users ON outcomes.player = users.id "
@@ -226,7 +288,18 @@ auto DatabaseManager::prepare_statements() -> void {
   "WHERE outcomes.player = $1);");
   conn_.prepare("get_matches_snapshot1",
   "SELECT matches.id, game, replay, outcomes.player, "
-  "username, end_elo, outcome "
+  "username, "
+  "COALESCE("
+  "(SELECT o.end_elo FROM matches m "
+  "JOIN outcomes o ON m.id = o.match "
+  "WHERE m.game = matches.game AND "
+  "m.ranked = matches.ranked AND "
+  "o.player = outcomes.player AND "
+  "m.end_time < matches.end_time "
+  "ORDER BY m.end_time "
+  "DESC LIMIT 1), 1000) "
+  "AS start_elo, "
+  "end_elo, outcome "
   "FROM matches "
   "JOIN outcomes ON matches.id = outcomes.match "
   "JOIN users ON outcomes.player = users.id "
@@ -242,7 +315,18 @@ auto DatabaseManager::prepare_statements() -> void {
   "SELECT * FROM snapshots "
   "WHERE move_num = $3 AND boardstate = $4) "
   "SELECT matches.id, game, replay, outcomes.player, "
-  "username, end_elo, outcome "
+  "username, "
+  "COALESCE("
+  "(SELECT o.end_elo FROM matches m "
+  "JOIN outcomes o ON m.id = o.match "
+  "WHERE m.game = matches.game AND "
+  "m.ranked = matches.ranked AND "
+  "o.player = outcomes.player AND "
+  "m.end_time < matches.end_time "
+  "ORDER BY m.end_time "
+  "DESC LIMIT 1), 1000) "
+  "AS start_elo, "
+  "end_elo, outcome "
   "FROM matches "
   "JOIN outcomes ON matches.id = outcomes.match "
   "JOIN users ON outcomes.player = users.id "
@@ -251,13 +335,14 @@ auto DatabaseManager::prepare_statements() -> void {
   "JOIN s2 ON s1.match = s2.match) "
   "ORDER BY id;");
   conn_.prepare("get_latest_elo",
-  "SELECT end_elo "
+  "SELECT COALESCE("
+  "(SELECT end_elo "
   "FROM outcomes "
   "JOIN matches ON outcomes.match = matches.id "
   "WHERE player = $1 AND ranked = true "
   "AND game = $2 "
   "ORDER BY end_time DESC "
-  "LIMIT 1");
+  "LIMIT 1), 1000);");
   conn_.prepare("get_stats",
   "SELECT game, ranked, outcome, count(outcome) "
   "FROM outcomes "
@@ -271,14 +356,18 @@ auto DatabaseManager::prepare_statements() -> void {
   "WHERE player = $1 AND ranked = true "
   "GROUP BY game, end_elo, end_time "
   "ORDER BY game, end_time");
+  conn_.prepare("are_friends",
+  "SELECT * FROM friends "
+  "WHERE (friend1 = $1 AND friend2 = $2) "
+  "OR (friend1 = $2 AND friend1 = $1);");
   conn_.prepare("get_friends_uid",
   "SELECT * FROM friends "
   "WHERE friend1 = $1 OR friend2 = $1;");
   conn_.prepare("get_incoming_freqs",
-  "SELECT * FROM friendreqs "
+  "SELECT from_user FROM friendreqs "
   "WHERE to_user = $1;");
   conn_.prepare("get_outgoing_freqs",
-  "SELECT * FROM friendreqs "
+  "SELECT to_user FROM friendreqs "
   "WHERE from_user = $1;");
   conn_.prepare("add_friend",
   "INSERT INTO friends "
@@ -373,9 +462,10 @@ auto DatabaseManager::parse_matches(pqxx::result res) -> std::vector<Match> {
     // Add player
     auto p_id = atoi(row[3].c_str());
     auto p_username = row[4].c_str();
-    auto p_endelo = atoi(row[5].c_str());
-    auto p_outcome = row[6].c_str();
-    auto *player = new Player(p_id, p_username, p_endelo, p_outcome);
+    auto p_startelo = atoi(row[5].c_str());
+    auto p_endelo = atoi(row[6].c_str());
+    auto p_outcome = row[7].c_str();
+    auto *player = new Player(p_id, p_username, p_startelo, p_endelo, p_outcome);
     curmatch->players.push_back(*player);
   }
   // Push last.

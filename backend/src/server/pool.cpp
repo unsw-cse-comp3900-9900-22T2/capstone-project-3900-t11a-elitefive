@@ -56,16 +56,16 @@ auto Pool::create_waiting_room(uWS::App &app, DatabaseManager *db, std::vector<R
 			int uid = atoi(suid.c_str());
 
 			// TODO: UNCOMMENT THIS OUT TO USE PROVIDED FRONTEND DATA
-			// std::string s_ranked = data["ranked"];
-			// std::string s_ai = data["ai"];
+			bool ranked_flag = data["ranked"];
+			bool ai_flag = data["ai"];
 
 			// TODO: DELETE THESE HARDCODED VALUES AND USE ABOVE JSON
-			std::cout << "\n\n\t\t=== WARNING ===\nBACKEND NOT READING FRONTEND JSON. GO IN CODE AND CHANGE!\n\t\t=== WARNING ===\n\n";
-			std::string s_ranked = "false";
-			std::string s_ai = "true";
+			// std::cout << "\n\n\t\t=== WARNING ===\nBACKEND NOT READING FRONTEND JSON. GO IN CODE AND CHANGE!\n\t\t=== WARNING ===\n\n";
+			// std::string s_ranked = "false";
+			// std::string s_ai = "true";
 
-			bool ranked_flag = convert_to_bool(s_ranked);
-			bool ai_flag = convert_to_bool(s_ai);
+			// bool ranked_flag = convert_to_bool(s_ranked);
+			// bool ai_flag = convert_to_bool(s_ai);
 
 			// Put them into waiting lobby
 			if (ai_flag == false) {
@@ -114,7 +114,7 @@ auto Pool::create_waiting_room(uWS::App &app, DatabaseManager *db, std::vector<R
 				}
 			}
 			else { // Versing AI
-				int computer_uid = 1; // TODO: HARDCODED
+				int computer_uid = 6; // TODO: HARDCODED
 				uint32_t room_id = ((uint32_t) uid << 17) | (uint32_t) computer_uid;
 				
 				for (auto &room : rooms) {

@@ -32,20 +32,4 @@ auto check_password(std::string email, std::string password) -> bool {
     return false;
 }
 
-auto friends_to_json(int id, std::vector<User*> friends) -> std::string {
-    json payload;
-    payload["event"] = "friends";
-    payload["action"] = "get";
-    payload["payload"] = {};
-    payload["payload"]["user"] = std::to_string(id);
-    payload["payload"]["friends"] = {};
-    for (auto fri : friends) {
-        json fjson;
-        fjson["uid"] = std::to_string(fri->id);
-        fjson["username"] = fri->username;
-        payload["payload"]["friends"].push_back(fjson);
-    }
-    return payload.dump();
-}
-
 #endif
