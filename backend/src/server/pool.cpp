@@ -15,6 +15,13 @@ struct SocketData{
 	//Empty because we don't need any currently.
 };
 
+auto convert_to_bool(std::string const& key) -> bool {
+	if (key == "true") return true;
+	if (key == "false") return false;
+	std::cout << "DATA FROM FRONTEND IS INCORRECT\n";
+	exit(1);
+}
+
 Pool::Pool(uWS::App &app, DatabaseManager *db, std::vector<Room *> &rooms)
 : room_id_{"WAITING_ROOM"}
 {
@@ -33,7 +40,6 @@ auto Pool::create_waiting_room(uWS::App &app, DatabaseManager *db, std::vector<R
 		.open = [this, publish](auto *ws) {
 			ws->subscribe(this->room_id());
 			std::cout << "\tPool: Joined room\n";
-			// ws->publish(this->room_id(), "ALJKSDLKJA", uWS::OpCode{200});
 		},
 		.message = [this, publish, db, &app, &rooms](auto *ws, std::string_view message, uWS::OpCode opCode) mutable {
 			std::cout << "\tPool: Recieved message\n";
@@ -42,36 +48,75 @@ auto Pool::create_waiting_room(uWS::App &app, DatabaseManager *db, std::vector<R
 			auto json_data = nlohmann::json::parse(message);
 			std::string datastring = json_data["data"];
 			auto data = nlohmann::json::parse(datastring);
-			// std::cout << data["move"] << '\n';
-			// std::string move = data["move"];
+
+			std::cout << "\t\tPool: Data Recieved - "  << data << '\n'; 
+			
+			// Parse data
 			std::string suid = data["uid"];
 			int uid = atoi(suid.c_str());
 
-			// int uid = 0;
-			// if (move == "a1") uid = 1;
-			// if (move == "a2") uid = 2;
-			// if (move == "a3") uid = 3;
-			// if (move == "a4") uid = 4;
-			
-			// std::cout << "Player joined: " << uid << '\n';
-			// Ignore player if they are already in queue
-			if (player_waiting_in_classic(uid)) {
-				std::cout << "\tPool: Already waiting in queue\n";
-				return;
-			}
-			if (players_waiting_classic() < 1) {
-				wait_for_classic(uid);
-			}
-			else {
-				// We can make a pairing
-				// Player 0: Opponent (First to ready up)
-				// Player 1: Current  (current person to trigger this)
-				int opponent = classic_.front();
-				classic_.pop_front();
+			// TODO: UNCOMMENT THIS OUT TO USE PROVIDED FRONTEND DATA
+			// std::string s_ranked = data["ranked"];
+			// std::string s_ai = data["ai"];
+
+			// TODO: DELETE THESE HARDCODED VALUES AND USE ABOVE JSON
+			std::cout << "\n\n\t\t=== WARNING ===\nBACKEND NOT READING FRONTEND JSON. GO IN CODE AND CHANGE!\n\t\t=== WARNING ===\n\n";
+			std::string s_ranked = "false";
+			std::string s_ai = "true";
+
+			bool ranked_flag = convert_to_bool(s_ranked);
+			bool ai_flag = convert_to_bool(s_ai);
+
+			// Put them into waiting lobby
+			if (ai_flag == false) {
+				// Ignore player if they are already in queue
+				if (player_waiting_in_classic(uid)) {
+					std::cout << "\tPool: Already waiting in queue\n";
+					return;
+				}
+				if (players_waiting_classic() < 1) {
+					wait_for_classic(uid);
+				}
+				else {
+					// We can make a pairing
+					// Player 0: Opponent (First to ready up)
+					// Player 1: Current  (current person to trigger this)
+					int opponent = classic_.front();
+					classic_.pop_front();
 
 
-				uint32_t room_id = ((uint32_t) opponent << 16) | (uint32_t) uid;
-				// printf("Pointer: %p\n", room);
+					uint32_t room_id = ((uint32_t) opponent << 16) | (uint32_t) uid;
+					// printf("Pointer: %p\n", room);
+					for (auto &room : rooms) {
+						if (room == nullptr) continue;
+						if (room->room_id() == std::to_string(room_id)) {
+							delete room;
+							room = nullptr;
+							// TODO: Properly erase from vector
+							break;
+						}
+					}
+					printf("DB Pointer: %p\n", db);
+					// false indicated human vs human instead of ai
+					rooms.push_back(new Room(app, db, ranked_flag, ai_flag, std::to_string(room_id), {opponent, uid}));
+					// printf("Pointer: %p\n", room);
+
+					
+					json payload;
+					payload["event"] = "match_created";
+					payload["uids"] = {opponent, uid};
+					payload["room_id"] = room_id;
+					payload["gamemode"] = "CLASSIC";
+					payload["elo"] = ranked_flag;
+					payload["ai"] = ai_flag;
+					publish(ws, payload.dump(), opCode);
+					std::cout << payload.dump() << '\n';
+				}
+			}
+			else { // Versing AI
+				int computer_uid = 1; // TODO: HARDCODED
+				uint32_t room_id = ((uint32_t) uid << 17) | (uint32_t) computer_uid;
+				
 				for (auto &room : rooms) {
 					if (room == nullptr) continue;
 					if (room->room_id() == std::to_string(room_id)) {
@@ -81,15 +126,16 @@ auto Pool::create_waiting_room(uWS::App &app, DatabaseManager *db, std::vector<R
 						break;
 					}
 				}
-				printf("DB Pointer: %p\n", db);
-				rooms.push_back(new Room(app, db, std::to_string(room_id), {opponent, uid}));
-				// printf("Pointer: %p\n", room);
-
 				
+				rooms.push_back(new Room(app, db, ranked_flag, ai_flag, std::to_string(room_id), {uid, computer_uid}));
+		
 				json payload;
 				payload["event"] = "match_created";
-				payload["uids"] = {opponent, uid};
+				payload["uids"] = {uid, computer_uid};
 				payload["room_id"] = room_id;
+				payload["gamemode"] = "CLASSIC";
+				payload["elo"] = ranked_flag;
+				payload["ai"] = ai_flag;
 				publish(ws, payload.dump(), opCode);
 				std::cout << payload.dump() << '\n';
 			}
@@ -99,6 +145,7 @@ auto Pool::create_waiting_room(uWS::App &app, DatabaseManager *db, std::vector<R
 		},
 		.close = [this](auto *ws, int x , std::string_view str) {
 			ws->unsubscribe(this->room_id());
+			// TODO - REMOVE FROM QUEUE?
 			// ws->close();
 			std::cout << "\tPool: Player left waiting room\n";
 		}

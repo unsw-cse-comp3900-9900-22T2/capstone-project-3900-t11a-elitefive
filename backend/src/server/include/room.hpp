@@ -15,9 +15,11 @@ class Room {
         std::unique_ptr<Game> game_;
         std::unique_ptr<AIGame> aigame_;
         DatabaseManager *db_;
+        bool ranked_;
+        bool computer_;
 
     public:
-        Room(uWS::App &app, DatabaseManager *db, std::string room_id, std::vector<int> uids);
+        Room(uWS::App &app, DatabaseManager *db, bool ranked, bool computer, std::string room_id, std::vector<int> uids);
 
         auto room_id() const -> std::string;
         auto room_code() const -> std::string;

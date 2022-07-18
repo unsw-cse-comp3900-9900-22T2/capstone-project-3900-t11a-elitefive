@@ -33,7 +33,7 @@ auto profile_to_json(User *user, PlayerStats *stats, std::vector<User*> friends)
             {"username",  user->username},
             {"email", user->email},
             {"classic", {{"elo", 0},  {"wins", 0},  {"losses", 0}, {"draws",0},}},
-            {"triples", {{"elo", 0},  {"wins", 0},  {"losses", 0}, {"draws",0},}},
+            {"triples", {{"elo", 100},  {"wins", 0},  {"losses", 0}, {"draws",0},}},
             {"potholes", {{"elo", 0},  {"wins", 0},  {"losses", 0}, {"draws",0},}},
             {"friends", {}}
             }
