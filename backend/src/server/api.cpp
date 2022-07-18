@@ -113,17 +113,16 @@ auto login(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std::stri
 // GET REQUESTS
 auto api_profile(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std::string> &session_tokens) -> void {
 	app.get("/api/profile", [&app, &db, &session_tokens](auto *res, auto *req) {
-	
-		// todo, parse request 
-		
+		auto suid = std::string(req->getQuery("uid")); 
+		auto uid = atoi(suid.c_str());
+
 		// hard coded user for functionality 
-		auto user = db.get_user(1);
-		auto stats = db.get_stats(1);
-		auto friends = db.get_friends(1);
+		auto user = db.get_user(uid);
+		auto stats = db.get_stats(uid);
+		auto friends = db.get_friends(uid);
 		
 		auto profile_json = profile_to_json(user, stats, friends);
 				
-		std::cout << profile_json << "\n";
 		res->end(profile_json);	
 	});	
 }
