@@ -46,6 +46,13 @@ class Game : public BaseGame {
 			return uids_[player];
 		}
 
+		auto give_player_with_uid(int uid) const -> int {
+			for (int i = 0; i < num_players(); ++i) {
+				if (give_uid(i) == uid) return i;
+			}
+			return -1; // This uid is not playing
+		}
+
 		// auto give_replay() -> 
 		// auto check() -> bool; 							// TODO: IMPLEMENT -> Valid move?
 		// auto over() -> bool; 							// TODO: IMPLEMENT -> Has the game ended?

@@ -17,11 +17,14 @@ struct SocketData{
 // Helper functions
 auto parse_move(std::string_view message) -> std::string;
 auto parse_uid(std::string_view message) -> int;
+auto player_resigned(std::string_view message) -> bool;
 
 auto json_confirm_move(std::string const& move) -> std::string;
 auto json_board_move(std::string const& move) -> std::string;
 auto json_game_winner(std::string const& player) -> std::string;
-auto game_result(Game const& game) -> std::string;
+// auto game_result(Game const& game) -> std::string;
+// auto game_result(int const uid) -> std::string;
+
 
 // ======================================
 // 			Class implementation
@@ -66,8 +69,17 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 		},
 		.message = [this, publish](auto *ws, std::string_view message, uWS::OpCode opCode) {
 			// std::cout << "Lobby: Recieved message\n";
-
 			int uid = parse_uid(message);
+
+			if (player_resigned(message)) {
+				int player = this->game_->give_player_with_uid(uid);
+				int winning_player = this->game_->player_after(player);
+				int winning_uid = this->game_->give_uid(winning_player);
+				std::string winner = game_result(winning_uid);
+				publish(ws, json_game_winner(winner), opCode);
+				return;
+			}
+
 			int players_turn = this->game_->whose_turn();
 			int uid_turn = this->game_->give_uid(players_turn);
 			if (uid_turn == uid) return; // Not the players turn
@@ -85,7 +97,7 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 			// Postgame
 			auto const state = game_->status();
 			if (state != Game::state::ONGOING) {
-				std::string winner = game_result(*this->game_);
+				std::string winner = game_result();
 				publish(ws, json_game_winner(winner), opCode);
 				
 				
@@ -159,7 +171,7 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 			// Postgame
 			auto const state = game_->status();
 			if (state != Game::state::ONGOING) {
-				std::string winner = game_result(*this->game_);
+				std::string winner = game_result();
 				publish(ws, json_game_winner(winner), opCode);
 				
 				// Save Match to Database.
@@ -228,8 +240,12 @@ auto Room::ai_response(std::string const& move) -> std::string {
 // ======================================
 // 			Helper functions
 // ======================================
+auto player_resigned(std::string_view message) -> bool {
+	auto json = nlohmann::json::parse(message);
+	return json["event"] == "retire";
+}
+
 auto parse_move(std::string_view message) -> std::string {
-	std::cout << "Message Recieved: " << message << "\n";
 	auto json = nlohmann::json::parse(message);
 	std::string datastring = json["data"];
 	auto data = nlohmann::json::parse(datastring);
@@ -237,8 +253,8 @@ auto parse_move(std::string_view message) -> std::string {
 }
 
 auto parse_uid(std::string_view message) -> int {
-	std::cout << "Message Recieved: " << message << "\n";
 	auto json = nlohmann::json::parse(message);
+	std::cout << json << '\n';
 	std::string datastring = json["data"];
 	auto data = nlohmann::json::parse(datastring);
 	std::string suid = data["uid"];
@@ -271,21 +287,18 @@ auto Room::json_game_winner(std::string const& player) -> std::string {
 }
 
 // TODO: Make this a game function instead
-auto game_result(Game const& game) -> std::string {
-	// auto const state = game.status();
-	// std::string winner;
-	// if (state == Game::state::DRAW) {
-	// 	winner = "";
-	// } else if (game.whose_turn() == 1 && state == Game::state::WIN
-	// 		|| game.whose_turn() == 0 && state == Game::state::LOSS) {
-	// 	winner = "COMPUTER";
-	// } else {
-	// 	winner = "PLAYER";
-	// }
-	// return winner;
-	int winning_player = game.which_player_won();
-	if (winning_player == 0) return "PLAYER";
-	if (winning_player == 1) return "COMPUTER";
-	return "MISSINGNO";
+auto Room::game_result() -> std::string {
+	int winning_player = this->game_->which_player_won();
+	int uid = this->game_->give_uid(winning_player);
+	return game_result(uid);
+}
+
+auto Room::game_result(int const uid) -> std::string {
+	auto user = this->db_->get_user(uid);
+	if (!user) return "MISSINGNO";
+	return user->username;
+	// if (player == 0) return "PLAYER";
+	// if (player == 1) return "COMPUTER";
+	// return "MISSINGNO";
 }
 
