@@ -164,6 +164,7 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 			// Postgame
 			auto const state = game_->status();
 			if (state != Game::state::ONGOING) {
+				this->game_->pass_turn();
 				std::string winner = game_result();
 				publish(ws, json_game_winner(winner), opCode);
 				int const winning_player = this->game_->which_player_won();
