@@ -48,6 +48,8 @@ class Room {
         auto json_board_move(std::string const& move) -> std::string;
         auto json_game_winner(std::string const& player) -> std::string;
 
+        auto calc_elos(int winning_player) -> std::map<int, int>;
+        auto save_match(int winning_player) -> void;
 };
 
 #endif

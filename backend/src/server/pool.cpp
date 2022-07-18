@@ -56,8 +56,8 @@ auto Pool::create_waiting_room(uWS::App &app, DatabaseManager *db, std::vector<R
 			int uid = atoi(suid.c_str());
 
 			// TODO: UNCOMMENT THIS OUT TO USE PROVIDED FRONTEND DATA
-			bool ranked_flag = data["ranked"];
-			bool ai_flag = data["ai"];
+			bool ranked_flag = data["ai"];
+			bool ai_flag = data["ranked"];
 
 			// TODO: DELETE THESE HARDCODED VALUES AND USE ABOVE JSON
 			// std::cout << "\n\n\t\t=== WARNING ===\nBACKEND NOT READING FRONTEND JSON. GO IN CODE AND CHANGE!\n\t\t=== WARNING ===\n\n";
