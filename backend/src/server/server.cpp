@@ -22,6 +22,8 @@
 #include "server_util.hpp"
 #include "metadatagen.hpp"
 
+#include <stdio.h>
+
 using json = nlohmann::json;
 
 void BackendServer() {
@@ -54,9 +56,10 @@ void BackendServer() {
 	api_db(app, db);
 
 	// Room room = Room(app, &db, "4732432", {1, 2});
-	Room *room = nullptr;
-	// std::vector<Room> rooms = std::vector<Room>{};
-	Pool pool = Pool(app, &database_connection, room);
+	// Room *room = nullptr;
+	std::vector<Room *> rooms = std::vector<Room *>{};
+	printf("Pointer: %p\n", &rooms);
+	Pool pool = Pool(app, &database_connection, rooms);
 	
 	// auto playersELO = std::map<int, int>{
 	// 	{1, 100},
