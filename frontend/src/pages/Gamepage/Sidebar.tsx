@@ -4,6 +4,8 @@ import BasicCard, {Card2, Card3} from '../../components/ReusableCard';
 import Typography from '@mui/material/Typography';
 import Button, {Button2} from '../../components/ReusableButton';
 import { useGameState } from '../../global/GlobalGameState';
+import { useSocket } from '../../global/GlobalWS';
+import { useAuth } from '../../global/GlobalAuth';
 
 type Props = {}
 
@@ -18,6 +20,8 @@ const Container = styled.div`
 
 export default function Sidebar({}: Props) {
   const { setWinner } = useGameState();
+  const {  emit } = useSocket();
+  const { getUID } = useAuth();
   return (
     <Container>
       <Card3>
@@ -45,7 +49,11 @@ export default function Sidebar({}: Props) {
         width={350} 
         height={40}
         background="red"
-        onClick={() => { setWinner("COMPUTER") }}
+        onClick={() => { 
+          emit("retire", JSON.stringify({
+            'uid': getUID()
+          }))
+        }}
       >
         Retire
       </Button>

@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import HexCell from './HexCell';
 import { useSocket } from '../global/GlobalWS';
 import { GameStateType, useGameState } from '../global/GlobalGameState';
+import { useAuth } from '../global/GlobalAuth';
 
 type Props = {
   width?: number;
@@ -51,6 +52,8 @@ export default function Board({ width, height, isStatic }: Props) {
 
   const { gamestate: GS, playMove } = useGameState();
   const { socket: WS, emit } = useSocket();
+
+  const { getUID } = useAuth();
   
   const renderRow = (row: GameStateType[] , x_offset: number) => {
     return (
@@ -65,7 +68,7 @@ export default function Board({ width, height, isStatic }: Props) {
                   // playMove("abc", hexKey);
                   // then sends WS emit method which will cause change
                   emit("move", JSON.stringify({
-                    'uid': "abc",
+                    'uid': getUID(),
                     'move': hexKey,
                   }));
                 }
