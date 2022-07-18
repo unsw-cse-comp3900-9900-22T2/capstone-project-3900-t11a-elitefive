@@ -26,7 +26,7 @@ type BoxContainerProps = {
 }
 
 const Container  = styled.div`
-  min-height: 100vh;
+  min-height: 100px;
 
   display: flex;
   flex-direction: Column;
@@ -37,17 +37,17 @@ const Container  = styled.div`
 `
 
 const Container1  = styled.div`
-  min-height: 100vh;
+  min-height: 450px;
 
   display: flex;
   flex-direction: row;
 
   justify-content: center;
-  align-items: center;
+
   grid-gap: 30px;
 `
 const StatContainer  = styled.div`
-  min-height: 100vh;
+  min-height: 450px;
 
   display: flex;
   flex-direction: column;
@@ -58,12 +58,21 @@ const StatContainer  = styled.div`
 `
 
 const MatchContainer  = styled.div`
-  min-height: 100vh;
+  min-height: 450px;
 
   display: flex;
   flex-direction: column;
 
-  justify-content: center;
+ 
+  align-items: center;
+  grid-gap: 10px;
+`
+const TextContainer = styled.div `
+
+  display: flex;
+  flex-direction: column;
+
+
   align-items: center;
   grid-gap: 10px;
 `
@@ -173,12 +182,14 @@ export default function Profilepage({}: Props) {
           <StatTab data={profileData}/>
         </StatContainer>
       </Container1>
-      <Typography variant="h3">{"Past Matches"}</Typography>
+      {/*<TextContainer>
+        <Typography variant="h3">{"Past Matches"}</Typography>
+      </TextContainer>
       <MatchContainer>
         <MatchCard/>
         <MatchCard/>
         <MatchCard/>
-      </MatchContainer>
+      </MatchContainer>*/}
     </Container>
   )
 }
