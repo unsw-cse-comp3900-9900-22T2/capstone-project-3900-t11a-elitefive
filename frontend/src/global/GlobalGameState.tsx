@@ -29,6 +29,7 @@ type GSType = {
   playMove: (uid: string, move: string) => void;
   setWinner: (user: string) => void;
   getPlayers: () => PlayerType[];
+  setPlayerName: (index: number, name: string) => void;
 }
 
 type TileState = {
@@ -51,11 +52,13 @@ export const GSContext = React.createContext<GSType>({
   playMove: () => {},
   setWinner: () => {},
   getPlayers: () => [],
+  setPlayerName: (index: number, name: string) => {},
 });
 
 export type PlayerType = {
   uid: string;
   color: string;
+  name?: string;
 }
 
 
@@ -123,6 +126,10 @@ export const GSProvider = ({ children }: Props) => {
     return Players.current
   }
 
+  const setPlayerName = (index: number, name: string) => {
+    Players.current[index].name = name;
+  } 
+
   return (
     <GSContext.Provider
       value={{
@@ -133,7 +140,8 @@ export const GSProvider = ({ children }: Props) => {
         getPlayerInfo,
         playMove,
         setWinner,
-        getPlayers
+        getPlayers,
+        setPlayerName,
       }}
     >
       {children}

@@ -7,6 +7,8 @@ import SnapshotPopup from '../components/SnapshotPopup';
 import YavalathButton from '../components/YavalathButton';
 
 import * as API from '../api/rest';
+import { useNavigate } from 'react-router-dom';
+import Button from '../components/ReusableButton';
 
 type Props = {}
 
@@ -118,6 +120,8 @@ export default function ReplaySearchpage({}: Props) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [sideBarData, setSideBarData] = useState<replayDataType|undefined>();
 
+  const navigate = useNavigate();
+
   // on mount
   useEffect(() => {
     fetchAllMatches();
@@ -166,6 +170,7 @@ export default function ReplaySearchpage({}: Props) {
           {replays && filterData(replays as replayDataType[], filter, secondaryFilter)?.map((data: replayDataType) => (
               <ReplayPreview {...data} setSideBarData={() => {
                 setSideBarData({...data})
+                console.log(data)
               }}/>
             ))
           }
@@ -176,7 +181,12 @@ export default function ReplaySearchpage({}: Props) {
           <Typography>{sideBarData.match_id}</Typography>
           <Typography>{sideBarData.gamemode}</Typography>
           <Typography>{sideBarData.mode}</Typography>
-          <Typography>{}</Typography>
+          <Typography>{`${sideBarData.players[0].username} vs ${sideBarData.players[1].username}`}</Typography>
+          <Typography>{`${sideBarData.players[0].username} : ${sideBarData.players[0].outcome}`}</Typography>
+          <Typography>{`${sideBarData.players[1].username} : ${sideBarData.players[1].outcome}`}</Typography>
+          <Button onClick={() => { navigate(`/replay/${sideBarData.match_id}`)}}>
+            Watch Replay
+          </Button>
         </SideBarContainer>
       )}
     </Box>

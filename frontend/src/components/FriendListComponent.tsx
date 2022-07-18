@@ -1,10 +1,13 @@
 import { Typography } from '@mui/material';
 import React from 'react'
 import styled from 'styled-components';
+import { useAuth } from '../global/GlobalAuth';
 import Button from './ReusableButton';
 
 type Props = {
-  name: string
+  to: string;
+  name: string;
+  refresh: () => void;
 }
 
 const Container = styled.div`
@@ -13,14 +16,33 @@ const Container = styled.div`
   margin: 20px;
 `;
 
-export default function FriendListComponent({ name }: Props) {
+export default function FriendListComponent({ to, name, refresh }: Props) {
+
+  const { getUID } = useAuth();
+
+  const postreq = (type: string) => () => {
+    const data = { action: type, from: getUID(), to: to.toString()}
+    fetch(`/friend`,{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+        body: JSON.stringify(data),
+    })
+    .then(resp => resp.json())
+    .then(data => {
+      console.log(data);
+      //forces a refresh
+      refresh();
+    })
+  }
   return (
     <Container>
       <Button background='var(--accent-purple)' width={70}>
         invite
       </Button>
       <Typography variant="h5">{name}</Typography>
-      <Button background='var(--accent-darker)'>
+      <Button background='var(--accent-darker)' onClick={postreq("delete")}>
         remove
       </Button>
     </Container>

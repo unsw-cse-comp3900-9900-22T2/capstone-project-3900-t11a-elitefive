@@ -78,6 +78,11 @@ export default function Gamemode({}: Props) {
       }
     }
 
+    useEffect(() => {
+      console.log(`ai = ${vsAI}`)
+      console.log(`isranked = ${isRanked}`)
+    },[vsAI, isRanked])
+
     const JoinSocket = (uid: number): Promise<WebSocket> => {
       return new Promise((resolve, reject) => {
         type Payload = {
@@ -131,14 +136,34 @@ export default function Gamemode({}: Props) {
             </PopupContainer>
           </Modal>
           <Typography variant="h3">{"Select Game Mode"}</Typography>
-          <ReusableToggleButtonGroup>
-            <ToggleButton value="Vs Ai" onClick={() => {setVsAI(true)}}>Vs Ai</ToggleButton>
-            <ToggleButton value="Vs Human" onClick={() => {setVsAI(false)}}>Vs Human</ToggleButton>
-          </ReusableToggleButtonGroup>
-          <ReusableToggleButtonGroup>
-            <ToggleButton value="Ranked" onClick={() => {setIsRanked(true)}}>Ranked</ToggleButton>
-            <ToggleButton value="Casual" onClick={() => {setIsRanked(false)}}>Casual</ToggleButton>
-          </ReusableToggleButtonGroup>
+          <Box display="flex">
+            <Button 
+              onClick={() => {setVsAI(true)}}
+              background={vsAI ? "var(--accent-darker)" : "var(--accent-dark)"}
+            >
+              Vs AI
+            </Button>
+            <Button 
+              onClick={() => {setVsAI(false)}}
+              background={!vsAI ? "var(--accent-darker)" : "var(--accent-dark)"}
+            >
+              Vs Human
+            </Button>
+          </Box>
+          <Box display="flex">
+            <Button
+              onClick={() => {setIsRanked(true)}}
+              background={isRanked ? "var(--accent-darker)" : "var(--accent-dark)"}
+            >
+              Ranked
+            </Button>
+            <Button 
+              onClick={() => {setIsRanked(false)}}
+              background={!isRanked ? "var(--accent-darker)" : "var(--accent-dark)"}
+            >
+              casual
+            </Button>
+          </Box>
           <Container1>
             <LargeButton onClick={handleJoinWaitingRoom}>
               <Typography variant="h3">{"Classic"}</Typography>

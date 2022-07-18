@@ -49,7 +49,7 @@ export default function StatTab({ data }: { data: profileDataType}) {
   };
 
   const renderTab = (type: string) => {
-    console.log(data["classic"])
+    console.log(data.ranked["CLASSIC"])
     return(
       <Box display="flex">
         <Box width="400px" margin = "0 20px">
@@ -60,10 +60,10 @@ export default function StatTab({ data }: { data: profileDataType}) {
           <Button background="purple" width={400}>Elo History Chart</Button>
         </Box>
         <Box>
-          <Typography variant="h4">{data[type].elo}</Typography>
-          <Typography variant="h4">{data[type].wins}</Typography>
-          <Typography variant="h4">{data[type].losses}</Typography>
-          <Typography variant="h4">{data[type].draws}</Typography>
+          <Typography variant="h4">{data.ranked[type].elo}</Typography>
+          <Typography variant="h4">{data.ranked[type].wins}</Typography>
+          <Typography variant="h4">{data.ranked[type].losses}</Typography>
+          <Typography variant="h4">{data.ranked[type].draws}</Typography>
         </Box>
       </Box>
     )
@@ -79,13 +79,13 @@ export default function StatTab({ data }: { data: profileDataType}) {
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
-        {renderTab("classic")}
+        {renderTab("CLASSIC")}
       </TabPanel>
       <TabPanel value={value} index={1}>
-        {renderTab("triples")}
+        {renderTab("TRIPLES")}
       </TabPanel>
       <TabPanel value={value} index={2}>
-        {renderTab("potholes")}
+        {renderTab("POTHOLES")}
       </TabPanel>
     </Box>
   );
