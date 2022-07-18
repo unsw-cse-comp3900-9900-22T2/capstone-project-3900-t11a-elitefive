@@ -110,6 +110,11 @@ auto login(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std::stri
 	});
 }
 
+auto addfriend(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std::string> &session_tokens) -> void;
+auto removefriend(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std::string> &session_tokens) -> void;
+
+
+
 // GET REQUESTS
 auto api_profile(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std::string> &session_tokens) -> void {
 	app.get("/api/profile", [&app, &db, &session_tokens](auto *res, auto *req) {
@@ -153,6 +158,8 @@ auto api_replay(uWS::App &app, DatabaseManager &db) -> void {
 		res->end(payload.dump());
 	});
 }
+
+auto api_friends_pending(uWS::App &app, DatabaseManager &db) -> void;
 
 // Gets all replays
 auto api_search_all(uWS::App &app, DatabaseManager &db) -> void {
