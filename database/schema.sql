@@ -82,3 +82,16 @@ insert into users (username, email, password_hash) values
 ('James', 'james@teamrocket.com', '619227d5cf63bffd286a6529f58fb3e679169230eb7b0151871b8f6583f24bc6');
 
 insert into friends (friend1, friend2) values (9, 10);
+
+-- Insert Matches.
+insert into matches(game, ranked, replay) values 
+('CLASSIC', true, 'e5a1d8a4c4d4h5d1f3a2d7a3');
+
+-- Insert Snapshots
+insert into snapshots(match, move_num, boardstate) values 
+(1, 1, 1073741824),
+(1, 2, 1),
+(1, 3, 1107296256),
+(1, 4, 9),
+(1, 5, 1107312640),
+

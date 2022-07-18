@@ -121,7 +121,7 @@ auto DatabaseManager::get_stats(int id) -> PlayerStats* {
   auto stats = std::map<std::string, int>{};
   for (auto const &row : res) {
     auto game = row[0].c_str();
-    auto ranked = row[1].c_str() == "t";
+    auto ranked = (std::string(row[1].c_str()) == "t");
     auto outcome = row[2].c_str();
     auto key = std::string(game).append(ranked ? " RANKED " : " UNRANKED ").append(outcome);
     auto count = atoi(row[3].c_str());
