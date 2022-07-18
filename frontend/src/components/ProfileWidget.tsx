@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Typography, Box } from '@mui/material';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
@@ -58,11 +58,16 @@ function DropDownMenu({}) {
 }
 
 type ProfileWidgetProps = {
-  name: string;
+
 }
 
-export default function ProfileWidget({ name }: ProfileWidgetProps) {
+export default function ProfileWidget({}: ProfileWidgetProps) {
   const [isHovered, setIsHovered ] = useState(false);
+  const [name, setName] = useState('Name');
+
+  const navigate = useNavigate();
+
+  const { getUID } = useAuth();
 
   const handleHoverStart = () => {
     setIsHovered(true);
@@ -72,13 +77,23 @@ export default function ProfileWidget({ name }: ProfileWidgetProps) {
     setIsHovered(false);
   }
 
+  useEffect(() => {
+    fetch(`/api/profile?uid=${getUID()}`)
+    .then(resp => resp.json())
+    .then(data => {
+      setName(data.payload.username);
+    })
+  },[])
+
 
   return (
     <Container
     onMouseEnter={handleHoverStart}
     onMouseLeave={handleHoverEnd}
     >
-      <ProfileWidgetContainer>
+      <ProfileWidgetContainer onClick={() => {
+        navigate(`/profile/${getUID()}`);
+      }}>
         <ImageContainer />
         <Box display="flex" flexDirection="column" marginTop="30px">
           <Typography variant="h4">{name}</Typography>

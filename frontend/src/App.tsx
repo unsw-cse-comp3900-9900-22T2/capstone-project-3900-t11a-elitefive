@@ -35,7 +35,7 @@ function App() {
               <Route path="/register" element={<Registerpage/>}/>
               <Route path="/login" element={<Loginpage/>}/>
               {/* <Route element={<ProtectedRoutes/>}> */}
-                <Route path="/profile" element={<Profilepage/>}/>
+                <Route path="/profile/:uid" element={<Profilepage/>}/>
                 <Route path="/friends" element={<FriendsPage/>}/>
                 <Route path="/dashboard" element={<Dashboard/>}/>
                 <Route path="/game/:gameid" element={<Gamepage/>}/>
