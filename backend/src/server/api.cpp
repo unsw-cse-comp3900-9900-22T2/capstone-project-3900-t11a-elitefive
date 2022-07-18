@@ -151,6 +151,7 @@ auto friendaction(uWS::App &app, DatabaseManager &db, std::unordered_map<int, st
 				} else {
 					bool success = false;
 					auto to_id = stoi(to);
+					auto to_user = db.get_user(to_id);
 					if (action == "accept") {
 						success = db.accept_friend_req(from_id, to_id);
 					} else if (action == "deny") {
@@ -163,6 +164,8 @@ auto friendaction(uWS::App &app, DatabaseManager &db, std::unordered_map<int, st
 					// Check if successful.
 					if (success) {
 						payload["payload"]["outcome"] = "success";
+						payload["payload"]["to_id"] = to_user->id;
+						payload["payload"]["to_username"] = to_user->username;
 					} else {
 						payload["payload"]["outcome"] = "failure";
 						payload["payload"]["message"] = "a problem occurred";
