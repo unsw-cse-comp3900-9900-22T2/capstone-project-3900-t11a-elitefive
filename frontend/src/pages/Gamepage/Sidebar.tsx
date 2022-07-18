@@ -3,7 +3,9 @@ import styled from 'styled-components';
 import BasicCard, {Card2, Card3} from '../../components/ReusableCard';
 import Typography from '@mui/material/Typography';
 import Button, {Button2} from '../../components/ReusableButton';
-import { useGameState } from '../../global/GlobalGameState';
+import { PlayerType, useGameState } from '../../global/GlobalGameState';
+import { useSocket } from '../../global/GlobalWS';
+import { useAuth } from '../../global/GlobalAuth';
 
 type Props = {}
 
@@ -17,12 +19,17 @@ const Container = styled.div`
 `;
 
 export default function Sidebar({}: Props) {
-  const { setWinner } = useGameState();
+  const { setWinner, getPlayers } = useGameState();
+  const {  emit } = useSocket();
+  const { getUID } = useAuth();
+
+  const otherPlayer = getPlayers().find((p: PlayerType) => p.uid != getUID())?.uid;
+
   return (
     <Container>
       <Card3>
         <Typography sx={{ fontSize: 40 }} color="white" gutterBottom>
-          Player 1
+          Player {getUID()}
         </Typography>
         <Typography sx={{ fontSize: 20 }} color="white" gutterBottom>
           1580
@@ -30,12 +37,12 @@ export default function Sidebar({}: Props) {
       </Card3>
       <Card2>
         <Typography sx={{ fontSize: 40 }} color="white" gutterBottom>
-          Your Turn
+          Your Turn 
         </Typography>
       </Card2>
       <Card3>
         <Typography sx={{ fontSize: 40 }} color="white" gutterBottom>
-          Player 2
+          Player { otherPlayer }
         </Typography>
         <Typography sx={{ fontSize: 20 }} color="white" gutterBottom>
           1530
@@ -45,7 +52,11 @@ export default function Sidebar({}: Props) {
         width={350} 
         height={40}
         background="red"
-        onClick={() => { setWinner("COMPUTER") }}
+        onClick={() => { 
+          emit("retire", JSON.stringify({
+            'uid': getUID()
+          }))
+        }}
       >
         Retire
       </Button>
