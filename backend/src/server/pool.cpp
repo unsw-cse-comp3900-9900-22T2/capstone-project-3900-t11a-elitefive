@@ -7,6 +7,7 @@
 #include <string>
 #include <queue>
 #include <unistd.h>
+#include <stdio.h>
 
 using json = nlohmann::json;
 
@@ -14,17 +15,18 @@ struct SocketData{
 	//Empty because we don't need any currently.
 };
 
-Pool::Pool(uWS::App &app, DatabaseManager *db)
+Pool::Pool(uWS::App &app, DatabaseManager *db, Room *room)
 : room_id_{"WAITING_ROOM"}
 {
-	create_waiting_room(app, db);
+	create_waiting_room(app, db, room);
 }
 
-auto Pool::create_waiting_room(uWS::App &app, DatabaseManager *db) -> void {
+auto Pool::create_waiting_room(uWS::App &app, DatabaseManager *db, Room *room) -> void {
 	auto publish = [this](auto *ws, std::string message, uWS::OpCode opCode) -> void {
 		ws->publish(this->room_id(), message, opCode);
 		ws->send(message, opCode);
 	};
+	printf("Pointer: %p\n", room);
 
 	app.ws<SocketData>("/ws/waitingroom",uWS::TemplatedApp<false>::WebSocketBehavior<SocketData> {
 		.open = [this, publish](auto *ws) {
@@ -32,7 +34,7 @@ auto Pool::create_waiting_room(uWS::App &app, DatabaseManager *db) -> void {
 			std::cout << "Joined room\n";
 			// ws->publish(this->room_id(), "ALJKSDLKJA", uWS::OpCode{200});
 		},
-		.message = [this, publish, &db, &app](auto *ws, std::string_view message, uWS::OpCode opCode) {
+		.message = [this, publish, &db, &app, room](auto *ws, std::string_view message, uWS::OpCode opCode) mutable {
 			std::cout << "Recieved message\n";
 			
 			// NEED TO REPLACE WITH PROPER FRONTEND
@@ -68,8 +70,16 @@ auto Pool::create_waiting_room(uWS::App &app, DatabaseManager *db) -> void {
 
 
 				uint32_t room_id = ((uint32_t) opponent << 16) | (uint32_t) uid;
-				Room room = Room(app, db, std::to_string(room_id), {opponent, uid});
-		
+				printf("Pointer: %p\n", room);
+				if (room != nullptr) {
+					std::cout << "Room is not null\n";
+					delete room;
+					room = nullptr;
+				}
+				room = new Room(app, db, std::to_string(room_id), {opponent, uid});
+				printf("Pointer: %p\n", room);
+
+				
 				json payload;
 				payload["event"] = "match_created";
 				payload["uids"] = {opponent, uid};
@@ -83,8 +93,8 @@ auto Pool::create_waiting_room(uWS::App &app, DatabaseManager *db) -> void {
 		},
 		.close = [this](auto *ws, int x , std::string_view str) {
 			ws->unsubscribe(this->room_id());
-			ws->close();
-			std::cout << "Room is destroyed\n";
+			// ws->close();
+			std::cout << "Player left waiting room\n";
 		}
 	});
 }

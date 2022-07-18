@@ -20,6 +20,7 @@
 #include "pool.hpp"
 #include "api.hpp"
 #include "server_util.hpp"
+#include "metadatagen.hpp"
 
 using json = nlohmann::json;
 
@@ -53,7 +54,22 @@ void BackendServer() {
 	api_db(app, db);
 
 	// Room room = Room(app, &db, "4732432", {1, 2});
-	Pool pool = Pool(app, &database_connection);
+	Room *room = nullptr;
+	// std::vector<Room> rooms = std::vector<Room>{};
+	Pool pool = Pool(app, &database_connection, room);
+	
+	// auto playersELO = std::map<int, int>{
+	// 	{1, 100},
+	// 	{2, 200}
+	// };
+
+	// Game game = Game(2);
+	// game.play("a1");
+	// game.play("a2");
+	// auto gen = MetaDataGenerator(game);
+	// auto snapshots = gen.db_snapshot();
+	// auto const match_id = db.save_match("CLASSIC", false, playersELO, -1,
+	// 				game.move_sequence(), snapshots);
 
 	app.run();
 }

@@ -41,8 +41,11 @@ auto DatabaseManager::does_user_exist(std::string username) -> int {
 
 auto DatabaseManager::save_match(std::string gameType, bool is_ranked, std::map<int, int> playersELO, int winner, std::string move_seq,
     std::vector<uint64_t> snapshots) -> int {
+      std::cout << "DB: Inserting into database\n";
   // Insert Match
+      std::cout << "DB: Execute\n";
   auto res = execute("insert_match", gameType, is_ranked, move_seq);
+      std::cout << "DB: atoi\n";
   auto matchID = atoi(res[0][0].c_str());
   // Insert Players & Outcomes
   auto outcome_columns = std::vector<std::string>{"player", "match", "end_elo", "outcome"};
@@ -53,6 +56,7 @@ auto DatabaseManager::save_match(std::string gameType, bool is_ranked, std::map<
       auto outcome = (playersELO.count(winner) == 0) ? "DRAW" : (winner == player) ? "WIN" : "LOSS";
     outcome_entries.push_back(std::make_tuple(player, matchID, end_elo, outcome));
   }
+  std::cout << "DB: batch_insert outcomes\n";
   batch_insert("outcomes", outcome_columns, outcome_entries);
   // Insert Snapshots
   auto snapshot_columns = std::vector<std::string>{"match", "move_num", "boardstate"};
@@ -62,6 +66,7 @@ auto DatabaseManager::save_match(std::string gameType, bool is_ranked, std::map<
     snapshot_entries.push_back(std::make_tuple(matchID, move_num, snapshot));
     move_num++;
   }
+  std::cout << "DB: batch_insert snapshots\n";
   batch_insert("snapshots", snapshot_columns, snapshot_entries);
   return matchID;
 }
@@ -296,9 +301,13 @@ auto DatabaseManager::prepare_statements() -> void {
 
 template<typename... Args>
 auto DatabaseManager::execute(std::string statement, Args... args) -> pqxx::result {
+  std::cout << "DB: Execute\n";
   try {
+    std::cout << "DB: connection\n";
     pqxx::work w(conn_);
+    std::cout << "DB: prepared\n";
     auto result = w.exec_prepared(statement, args...);
+    std::cout << "DB: commit\n";
     w.commit();
     return result;
   } catch (const pqxx::pqxx_exception &e) {

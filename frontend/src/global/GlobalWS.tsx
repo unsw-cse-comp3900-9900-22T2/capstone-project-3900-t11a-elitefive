@@ -72,6 +72,7 @@ export const WSProvider = ({ children, gameId }: Props) => {
           if(winner) {
             setWinner(winner);
           }
+          WS.close();
           break;
         }
       }
