@@ -33,12 +33,14 @@ class Player {
   public:
     int id;
     std::string username;
+    int start_elo;
     int end_elo;
     std::string outcome;
 
-    Player(int id_, std::string username_, int end_elo_, std::string outcome_)
+    Player(int id_, std::string username_, int start_elo_, int end_elo_, std::string outcome_)
     : id{id_}
     , username{username_}
+    , start_elo{start_elo_}
     , end_elo{end_elo_}
     , outcome{outcome_} {}
 
@@ -46,8 +48,8 @@ class Player {
         json payload;
         payload["uid"] = id;
         payload["username"] = username;
+        payload["elo_start"] = start_elo;
         payload["elo_end"] = end_elo;
-        payload["elo_start"] = 0;
         payload["outcome"] = outcome;
         return payload;
     }

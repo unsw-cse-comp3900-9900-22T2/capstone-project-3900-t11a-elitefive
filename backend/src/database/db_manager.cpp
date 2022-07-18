@@ -79,9 +79,10 @@ auto DatabaseManager::get_match(int id) -> Match* {
     // Add player
     auto p_id = atoi(row[3].c_str());
     auto p_username = row[4].c_str();
-    auto p_endelo = atoi(row[5].c_str());
-    auto p_outcome = row[6].c_str();
-    auto *player = new Player(p_id, p_username, p_endelo, p_outcome);
+    auto p_startelo = atoi(row[5].c_str());
+    auto p_endelo = atoi(row[6].c_str());
+    auto p_outcome = row[7].c_str();
+    auto *player = new Player(p_id, p_username, p_startelo, p_endelo, p_outcome);
     curmatch->players.push_back(*player);
   }
   return curmatch;
@@ -227,9 +228,21 @@ auto DatabaseManager::prepare_statements() -> void {
   "INSERT INTO matches(game, ranked, replay) "
   "VALUES ($1, $2, $3) "
   "RETURNING id;");
+  // TODO: The COALESCE section for start_elo is a monstrosity...
   conn_.prepare("get_match",
   "SELECT matches.id, game, replay, outcomes.player, "
-  "username, end_elo, outcome "
+  "username, "
+  "COALESCE("
+  "(SELECT o.end_elo FROM matches m "
+  "JOIN outcomes o ON m.id = o.match "
+  "WHERE m.game = matches.game AND "
+  "m.ranked = matches.ranked AND "
+  "o.player = outcomes.player AND "
+  "m.end_time < matches.end_time "
+  "ORDER BY m.end_time "
+  "DESC LIMIT 1), 1000) "
+  "AS start_elo, "
+  "end_elo, outcome "
   "FROM matches "
   "JOIN outcomes ON matches.id = outcomes.match "
   "JOIN users ON outcomes.player = users.id "
@@ -237,13 +250,35 @@ auto DatabaseManager::prepare_statements() -> void {
   // TODO: Refactor the two below - similar SQL.
   conn_.prepare("get_matches",
   "SELECT matches.id, game, replay, outcomes.player, "
-  "username, end_elo, outcome "
+  "username, "
+  "COALESCE("
+  "(SELECT o.end_elo FROM matches m "
+  "JOIN outcomes o ON m.id = o.match "
+  "WHERE m.game = matches.game AND "
+  "m.ranked = matches.ranked AND "
+  "o.player = outcomes.player AND "
+  "m.end_time < matches.end_time "
+  "ORDER BY m.end_time "
+  "DESC LIMIT 1), 1000) "
+  "AS start_elo, "
+  "end_elo, outcome "
   "FROM matches "
   "JOIN outcomes ON matches.id = outcomes.match "
   "JOIN users ON outcomes.player = users.id;");
   conn_.prepare("get_matches_user",
   "SELECT matches.id, game, replay, outcomes.player, "
-  "username, end_elo, outcome "
+  "username, "
+  "COALESCE("
+  "(SELECT o.end_elo FROM matches m "
+  "JOIN outcomes o ON m.id = o.match "
+  "WHERE m.game = matches.game AND "
+  "m.ranked = matches.ranked AND "
+  "o.player = outcomes.player AND "
+  "m.end_time < matches.end_time "
+  "ORDER BY m.end_time "
+  "DESC LIMIT 1), 1000) "
+  "AS start_elo, "
+  "end_elo, outcome "
   "FROM matches "
   "JOIN outcomes ON matches.id = outcomes.match "
   "JOIN users ON outcomes.player = users.id "
@@ -253,7 +288,18 @@ auto DatabaseManager::prepare_statements() -> void {
   "WHERE outcomes.player = $1);");
   conn_.prepare("get_matches_snapshot1",
   "SELECT matches.id, game, replay, outcomes.player, "
-  "username, end_elo, outcome "
+  "username, "
+  "COALESCE("
+  "(SELECT o.end_elo FROM matches m "
+  "JOIN outcomes o ON m.id = o.match "
+  "WHERE m.game = matches.game AND "
+  "m.ranked = matches.ranked AND "
+  "o.player = outcomes.player AND "
+  "m.end_time < matches.end_time "
+  "ORDER BY m.end_time "
+  "DESC LIMIT 1), 1000) "
+  "AS start_elo, "
+  "end_elo, outcome "
   "FROM matches "
   "JOIN outcomes ON matches.id = outcomes.match "
   "JOIN users ON outcomes.player = users.id "
@@ -269,7 +315,18 @@ auto DatabaseManager::prepare_statements() -> void {
   "SELECT * FROM snapshots "
   "WHERE move_num = $3 AND boardstate = $4) "
   "SELECT matches.id, game, replay, outcomes.player, "
-  "username, end_elo, outcome "
+  "username, "
+  "COALESCE("
+  "(SELECT o.end_elo FROM matches m "
+  "JOIN outcomes o ON m.id = o.match "
+  "WHERE m.game = matches.game AND "
+  "m.ranked = matches.ranked AND "
+  "o.player = outcomes.player AND "
+  "m.end_time < matches.end_time "
+  "ORDER BY m.end_time "
+  "DESC LIMIT 1), 1000) "
+  "AS start_elo, "
+  "end_elo, outcome "
   "FROM matches "
   "JOIN outcomes ON matches.id = outcomes.match "
   "JOIN users ON outcomes.player = users.id "
@@ -405,9 +462,10 @@ auto DatabaseManager::parse_matches(pqxx::result res) -> std::vector<Match> {
     // Add player
     auto p_id = atoi(row[3].c_str());
     auto p_username = row[4].c_str();
-    auto p_endelo = atoi(row[5].c_str());
-    auto p_outcome = row[6].c_str();
-    auto *player = new Player(p_id, p_username, p_endelo, p_outcome);
+    auto p_startelo = atoi(row[5].c_str());
+    auto p_endelo = atoi(row[6].c_str());
+    auto p_outcome = row[7].c_str();
+    auto *player = new Player(p_id, p_username, p_startelo, p_endelo, p_outcome);
     curmatch->players.push_back(*player);
   }
   // Push last.
