@@ -150,7 +150,6 @@ auto DatabaseManager::get_friends(int id) -> std::vector<User*> {
   auto friends = std::vector<User*>();
   auto res = execute("get_friends_uid", id);
   for (auto row : res) {
-    std::cout << row[0] << " "  << row[1] << "\n";
     if (atoi(row[0].c_str()) != id) {
       friends.push_back(get_user(atoi(row[0].c_str())));
     }
