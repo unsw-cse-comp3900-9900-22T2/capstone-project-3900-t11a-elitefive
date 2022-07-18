@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { SetStateAction, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components';
 
 // local
@@ -114,6 +114,9 @@ export default function ReplayGamepage({}: Props) {
   const{ matchid } = useParams();
   const { setWinner } = useGameState();
 
+  const [replayStringArr, setReplayStringArr] = useState<string[]>([])
+  const [currIndex, setCurrIndex] = useState(0);
+
 
 
   useEffect(() => {
@@ -129,27 +132,28 @@ export default function ReplayGamepage({}: Props) {
          <Container>
            <YavalathButtonFixed/>
            <Container2>
-              <ReplayBoard/>
-              <Sidebar/>
+              <ReplayBoard replayStringArr={replayStringArr}/>
+              <Sidebar
+                matchData={matchData}
+                currIndex={currIndex}
+                replayStringArr={replayStringArr}
+                setCurrIndex={setCurrIndex}
+                setReplayStringArr={setReplayStringArr}
+              />
            </Container2>
          </Container>
   )
 }
 
-export function Sidebar({}: Props) {
-  const [matchData, setMatchData] = useState<matchDataType>(DefaultMatchData);
+type SideBarProps = {
+  matchData: matchDataType;
+  currIndex: number;
+  replayStringArr: string[];
+  setCurrIndex: React.Dispatch<SetStateAction<number>>
+  setReplayStringArr: React.Dispatch<SetStateAction<string[]>>
+}
 
-  const{ matchid } = useParams();
-  const { setWinner } = useGameState();
-
-
-  useEffect(() => {
-    fetch(`/api/replay?matchid=${matchid}`)
-    .then(resp => resp.json())
-    .then(data => {
-      setMatchData(data);
-    })
-  },[])
+export function Sidebar({ matchData, currIndex, replayStringArr, setCurrIndex, setReplayStringArr}: SideBarProps) {
 
   const navigate = useNavigate();
 
@@ -158,27 +162,21 @@ export function Sidebar({}: Props) {
     navigate('/dashboard');
   };
 
-  const moveArray = matchData.moves.match(/.{1,2}/g);
-
-  const stateArray = {move: ['']};
-
-  const state = {index:0};
+  const splitReplayString = matchData.moves.match(/.{2}/g);
 
 
   const moveNext = () => {
-    if (moveArray==null) return;
-    setState({index: (state.index +1) % moveArray.length})
-    let {move, moveArray[state.index]} = stateArray;
-    move.push(moveArray[state.index]);
-
+    if(!splitReplayString) return;
+    setCurrIndex(prev=>prev+1)
+    setReplayStringArr(splitReplayString.slice(0, currIndex+1))
+    console.log(replayStringArr);
   }
 
   const movePrev = () => {
-    if (moveArray==null || state.index==0) return;
-    setState({index: (state.index +1) % moveArray.length})
-    let {move, moveArray[state.index]} = stateArray;
-    move.push(moveArray[state.index]);
-
+    if (!splitReplayString) return;
+    setCurrIndex(prev=>prev-1)
+    setReplayStringArr(splitReplayString.slice(0, currIndex+1))
+    console.log(replayStringArr);
   }
 
   return (
@@ -192,7 +190,7 @@ export function Sidebar({}: Props) {
         <StickyHeadTable/>
       </Card2>
       <ContainerArrow>
-        <Button onClick={movePrev}>Back</Button>
+        {/* <Button onClick={movePrev}>Back</Button> */}
         <Button onClick={moveNext}>Next</Button>
       </ContainerArrow>
       <Button 

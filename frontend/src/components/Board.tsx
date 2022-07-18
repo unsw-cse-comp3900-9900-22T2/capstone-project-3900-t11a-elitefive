@@ -119,7 +119,13 @@ export default function Board({ width, height, isStatic }: Props) {
   )
 }
 
-export function ReplayBoard({ width, height}: Props) {
+type ReplayBoardProps = {
+  width?: number;
+  height?: number;
+  replayStringArr: string[];
+}
+
+export function ReplayBoard({ width, height, replayStringArr}: ReplayBoardProps) {
 
   const renderBoard = () => {
     const w = width ? width : DEFAULT_BOARD_WIDTH;
@@ -131,7 +137,20 @@ export function ReplayBoard({ width, height}: Props) {
         return (
           <ColumnContainer>
             <RowContainer x_offset={x_offset}>
-              {row.map(() => {return (<HexCell/>)})}
+              {row.map((id:string) => {
+                if(replayStringArr.includes(id)) {
+                  if(replayStringArr.indexOf(id) % 2 == 0) {
+                    return (
+                      <HexCell fill="blue"/>
+                    )
+                  } else {
+                    return (
+                      <HexCell fill="red"/>
+                    )
+                  }
+                }
+                return (<HexCell />)
+              })}
             </RowContainer>
           </ColumnContainer>
         )
