@@ -173,7 +173,6 @@ export default function ReplaySearchpage({}: Props) {
       </MainContainer>
       {sideBarData && (
         <SideBarContainer>
-
           <Typography>{sideBarData.match_id}</Typography>
           <Typography>{sideBarData.gamemode}</Typography>
           <Typography>{sideBarData.mode}</Typography>

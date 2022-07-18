@@ -37,8 +37,8 @@ function App() {
               {/* <Route element={<ProtectedRoutes/>}> */}
                 <Route path="/profile/:uid" element={<Profilepage/>}/>
                 <Route path="/friends" element={<FriendsPage/>}/>
-                <Route path="/game" element={<Gamepage/>}/>
                 <Route path="/dashboard" element={<Dashboard/>}/>
+                <Route path="/game/:gameid" element={<Gamepage/>}/>
                 <Route path="/gamemode" element={<Gamemode/>}/>
                 <Route path="/replays" element={<ReplaySearchpage/>}/>
                 <Route path="/replay/:replayid" element={<ReplayGamepage/>}/>

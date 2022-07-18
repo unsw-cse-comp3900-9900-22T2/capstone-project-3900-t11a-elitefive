@@ -17,6 +17,8 @@ RUN apt update -y && \
 RUN apt install -y \
       cmake \
       pkg-config
+RUN apt install -y libpq-dev
+RUN apt install -y libpqxx-dev
 
 EXPOSE 8080
 

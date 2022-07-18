@@ -40,7 +40,7 @@ export default function Dashboard({}: Props) {
 
   const navigateToGamepage = () => {
       // 👇️ navigate to /contacts
-      navigate('/game');
+      navigate('/gamemode');
   };
   const navigateToReplays = () => {
     // 👇️ navigate to /contacts

@@ -1,5 +1,6 @@
 #include <nlohmann/json.hpp>
 #include <string>
+#include <stdio.h>
 
 #include "App.h"
 #include "room.hpp"
@@ -31,9 +32,9 @@ Room::Room(uWS::App &app, DatabaseManager *db, std::string room_id, std::vector<
 , db_{db}
 {
 	generate_game();	// CLASSIC / POTHOLES / ETC
-	create_socket_ai(app);
-	// create_socket_player_verse_player(app);
-	std::cout << "Room is setup\n";
+	// create_socket_ai(app);
+	if (game_ == nullptr) exit(1);
+	create_socket_player_verse_player(app);
 }
 
 auto Room::generate_game() -> void {
@@ -44,27 +45,27 @@ auto Room::generate_game() -> void {
 
 auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 	auto publish = [this](auto *ws, std::string message, uWS::OpCode opCode) -> void {
+		// std::cout << "\tRoom: Publishing to - " << this->room_id() << '\n';
 		ws->publish(this->room_id(), message, opCode);
 	};
 
-	std::cout << "ROOM: Player verse player room being created\n";
-	app.ws<SocketData>("/ws/david", uWS::TemplatedApp<false>::WebSocketBehavior<SocketData> {
+	std::string room_link = this->room_code();
+	app.ws<SocketData>(room_link, uWS::TemplatedApp<false>::WebSocketBehavior<SocketData> {
 		.open = [this, publish](auto *ws) {
 			ws->subscribe(this->room_id());
-			std::cout << "Joined room\n";
+			std::cout << "\tLobby: Joined multiplayer lobby\n";
 		},
 		.message = [this, publish](auto *ws, std::string_view message, uWS::OpCode opCode) {
-			std::cout << "Recieved message\n";
+			// std::cout << "Lobby: Recieved message\n";
 			// Get move
 			std::string move = parse_move(message);
-			
+
 			// Make the move in game
 			std::string move_message = publish_move(move);
-			if (play_move(move) == false) return; 	// Ignore illegal player move
+			if (this->play_move(move) == false) return; 	// Ignore illegal player move
 			publish(ws, move_message, opCode);
 			// publish(ws, json_confirm_move(move), opCode);
 			// publish(ws, json_board_move(move), opCode);
-			std::cout << "Made a valid move\n";
 		
 			// Postgame
 			auto const state = game_->status();
@@ -79,16 +80,19 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 				}
 				auto gen = MetaDataGenerator(*game_);
 				auto snapshots = gen.db_snapshot();
-				auto const match_id = db_->save_match("CLASSIC", false, playersELO, -1,
-					game_->move_sequence(), snapshots);
+				int const winning_player = this->game_->which_player_won();
+				int const winning_uid = this->game_->give_uid(winning_player);
+				printf("DB Pointer: %p\n", db_);
+				auto const match_id = db_->save_match("CLASSIC", false, playersELO, winning_uid, game_->move_sequence(), snapshots);
 				std::cout << "Match ID: " << match_id << '\n';
 			}
 			// auto const match_id = db.save_match("CLASSIC", game->move_sequence());
 		},
 		.close = [this](auto *ws, int x , std::string_view str) {
 			ws->unsubscribe(this->room_id());
-			ws->close();
-			std::cout << "Room is destroyed\n";
+			// ws->close();
+			// ws->end();
+			std::cout << "Room: Player left lobby\n";
 		}
 	});
 }
@@ -151,7 +155,7 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 		.close = [this](auto *ws, int x , std::string_view str) {
 			ws->unsubscribe(this->room_id());
 			ws->close();
-			std::cout << "Room is destroyed\n";
+			std::cout << "Left ai room\n";
 		}
 	});
 }
@@ -165,7 +169,7 @@ auto Room::room_code() const -> std::string {
 }
 
 auto Room::play_move(std::string const& move) -> bool {
-	return game_->play(move);
+	return this->game_->play(move);
 }
 
 auto Room::ai_response(std::string const& move) -> std::string {
@@ -184,11 +188,14 @@ auto Room::ai_response(std::string const& move) -> std::string {
 // 			Helper functions
 // ======================================
 auto parse_move(std::string_view message) -> std::string {
+	std::cout << "Message Recieved: " << message << "\n";
 	auto json = nlohmann::json::parse(message);
 	std::string datastring = json["data"];
 	auto data = nlohmann::json::parse(datastring);
 	return data["move"];
 }
+
+
 
 auto Room::json_confirm_move(std::string const& move) -> std::string {
 	json payload;

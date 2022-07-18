@@ -14,7 +14,7 @@ class Pool {
 		std::string room_id_;
 		std::deque<int> classic_;
 	public:
-		Pool(uWS::App &app, DatabaseManager *db);
+		Pool(uWS::App &app, DatabaseManager *db, std::vector<Room *> &rooms);
 
 		auto room_id() const -> std::string;
 		auto players_waiting_classic() const -> int {
@@ -31,6 +31,6 @@ class Pool {
 		}
 
 	private:
-		auto create_waiting_room(uWS::App &app, DatabaseManager *db) -> void;
+		auto create_waiting_room(uWS::App &app, DatabaseManager *db, std::vector<Room *> &rooms) -> void;
 };
 #endif
