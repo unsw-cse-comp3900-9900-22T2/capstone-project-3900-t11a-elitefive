@@ -114,7 +114,7 @@ auto Pool::create_waiting_room(uWS::App &app, DatabaseManager *db, std::vector<R
 				}
 			}
 			else { // Versing AI
-				int computer_uid = 1; // TODO: HARDCODED
+				int computer_uid = 6; // TODO: HARDCODED
 				uint32_t room_id = ((uint32_t) uid << 17) | (uint32_t) computer_uid;
 				
 				for (auto &room : rooms) {
