@@ -78,10 +78,10 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 				}
 				auto gen = MetaDataGenerator(*game_);
 				auto snapshots = gen.db_snapshot();
-				std::cout << "Room: Save the match in db\n"; 
+				int const winning_player = this->game_->which_player_won();
+				int const winning_uid = this->game_->give_uid(winning_player);
 				printf("DB Pointer: %p\n", db_);
-				// ws->end();
-				auto const match_id = db_->save_match("CLASSIC", false, playersELO, -1, game_->move_sequence(), snapshots);
+				auto const match_id = db_->save_match("CLASSIC", false, playersELO, winning_uid, game_->move_sequence(), snapshots);
 				std::cout << "Match ID: " << match_id << '\n';
 			}
 			// auto const match_id = db.save_match("CLASSIC", game->move_sequence());
@@ -186,11 +186,14 @@ auto Room::ai_response(std::string const& move) -> std::string {
 // 			Helper functions
 // ======================================
 auto parse_move(std::string_view message) -> std::string {
+	std::cout << "Message Recieved: " << message << "\n";
 	auto json = nlohmann::json::parse(message);
 	std::string datastring = json["data"];
 	auto data = nlohmann::json::parse(datastring);
 	return data["move"];
 }
+
+
 
 auto Room::json_confirm_move(std::string const& move) -> std::string {
 	return "{\"event\": \"moveconfirm\", \"tile\": \"" + move + "\"}";
