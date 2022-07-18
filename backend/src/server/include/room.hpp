@@ -23,7 +23,7 @@ class Room {
         auto room_code() const -> std::string;
 
         auto publish_move(std::string const& move) {
-            if (game_ == nullptr) std::cout << "Lobby: WTF IS HAPPENING\n";
+            if (game_ == nullptr) std::cout << "Lobby: WHAT IS HAPPENING\n";
             auto player = game_->whose_turn();
             if (player == 0) return json_confirm_move(move);
             if (player == 1) return json_board_move(move);

@@ -12,7 +12,7 @@ Game::Game(int nplayers, std::vector<int> const uids)
 , gamestate_{Game::state::ONGOING}
 , move_sequence_{}
 {
-	std::cout << "Game: Hello I am making a game for players\n";
+	// std::cout << "Game: Hello I am making a game for players\n";
 }
 
 

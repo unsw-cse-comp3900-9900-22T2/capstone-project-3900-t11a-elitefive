@@ -27,14 +27,16 @@ auto Pool::create_waiting_room(uWS::App &app, DatabaseManager *db, std::vector<R
 		ws->send(message, opCode);
 	};
 	printf("Pointer: %p\n", &rooms);
+	printf("DB Pointer: %p\n", db);
+
 	app.ws<SocketData>("/ws/waitingroom",uWS::TemplatedApp<false>::WebSocketBehavior<SocketData> {
 		.open = [this, publish](auto *ws) {
 			ws->subscribe(this->room_id());
-			std::cout << "Joined room\n";
+			std::cout << "\tPool: Joined room\n";
 			// ws->publish(this->room_id(), "ALJKSDLKJA", uWS::OpCode{200});
 		},
-		.message = [this, publish, &db, &app, &rooms](auto *ws, std::string_view message, uWS::OpCode opCode) mutable {
-			std::cout << "Recieved message\n";
+		.message = [this, publish, db, &app, &rooms](auto *ws, std::string_view message, uWS::OpCode opCode) mutable {
+			std::cout << "\tPool: Recieved message\n";
 			
 			// NEED TO REPLACE WITH PROPER FRONTEND
 			auto json_data = nlohmann::json::parse(message);
@@ -51,10 +53,10 @@ auto Pool::create_waiting_room(uWS::App &app, DatabaseManager *db, std::vector<R
 			// if (move == "a3") uid = 3;
 			// if (move == "a4") uid = 4;
 			
-			std::cout << "Player joined: " << uid << '\n';
+			// std::cout << "Player joined: " << uid << '\n';
 			// Ignore player if they are already in queue
 			if (player_waiting_in_classic(uid)) {
-				std::cout << "Already waiting in queue\n";
+				std::cout << "\tPool: Already waiting in queue\n";
 				return;
 			}
 			if (players_waiting_classic() < 1) {
@@ -73,14 +75,13 @@ auto Pool::create_waiting_room(uWS::App &app, DatabaseManager *db, std::vector<R
 				for (auto &room : rooms) {
 					if (room == nullptr) continue;
 					if (room->room_id() == std::to_string(room_id)) {
-						std::cout << "Room is not null\n";
 						delete room;
 						room = nullptr;
 						// TODO: Properly erase from vector
 						break;
 					}
 				}
-				printf("Pointer: %p\n", &rooms);
+				printf("DB Pointer: %p\n", db);
 				rooms.push_back(new Room(app, db, std::to_string(room_id), {opponent, uid}));
 				// printf("Pointer: %p\n", room);
 
@@ -99,7 +100,7 @@ auto Pool::create_waiting_room(uWS::App &app, DatabaseManager *db, std::vector<R
 		.close = [this](auto *ws, int x , std::string_view str) {
 			ws->unsubscribe(this->room_id());
 			// ws->close();
-			std::cout << "Player left waiting room\n";
+			std::cout << "\tPool: Player left waiting room\n";
 		}
 	});
 }
