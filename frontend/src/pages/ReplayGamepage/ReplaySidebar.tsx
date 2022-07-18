@@ -94,12 +94,20 @@ export default function Sidebar({}: Props) {
     })
   },[])
 
+  const navigate = useNavigate();
+
+  const navigateToDashboard = () => {
+    // 👇️ navigate to /contacts
+    navigate('/dashboard');
+  };
+
   return (
     <Container>
       <Typography sx={{ fontSize: 80 }} color="white" gutterBottom>
           Replay
         </Typography>
       <ReplayPlayerCard name1={matchData.players[0].username} name2={matchData.players[1].username}/>
+      {/* for loop to go through names*/}
       <Card2>
         <StickyHeadTable/>
       </Card2>
@@ -110,10 +118,9 @@ export default function Sidebar({}: Props) {
       <Button 
         width={350} 
         height={40}
-        background="red"
-        onClick={() => { setWinner("COMPUTER") }}
+        onClick={navigateToDashboard}
       >
-        Retire
+        Exit
       </Button>
     </Container>
   )

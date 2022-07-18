@@ -118,3 +118,30 @@ export default function Board({ width, height, isStatic }: Props) {
     </BoardContainer>
   )
 }
+
+export function ReplayBoard({ width, height}: Props) {
+
+  const renderBoard = () => {
+    const w = width ? width : DEFAULT_BOARD_WIDTH;
+
+      return defaultBoard.map((row, index) => {
+        // it works
+        const x_offset = Math.abs((index+1)- 5) * w/40
+        const y_offset = index * 90;
+        return (
+          <ColumnContainer>
+            <RowContainer x_offset={x_offset}>
+              {row.map(() => {return (<HexCell/>)})}
+            </RowContainer>
+          </ColumnContainer>
+        )
+      })
+  }
+
+  return (
+    
+    <BoardContainer>
+      {renderBoard()}
+    </BoardContainer>
+  )
+}
