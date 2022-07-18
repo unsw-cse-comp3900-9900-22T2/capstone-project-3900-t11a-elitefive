@@ -66,6 +66,17 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 		.open = [this, publish](auto *ws) {
 			ws->subscribe(this->room_id());
 			std::cout << "\tLobby: Joined multiplayer lobby\n";
+
+			auto p0 = this->db_->get_user(this->game_->give_uid(0));
+			auto p1 = this->db_->get_user(this->game_->give_uid(1));
+			json payload;
+			payload["event"] = "player_names";
+			payload["player_name"] = {
+				p0->username,
+				p1->username
+			};
+
+			ws->send(payload.dump(), uWS::OpCode::TEXT);
 		},
 		.message = [this, publish](auto *ws, std::string_view message, uWS::OpCode opCode) {
 			// std::cout << "Lobby: Recieved message\n";
