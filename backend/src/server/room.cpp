@@ -24,17 +24,24 @@ auto game_result(Game const& game) -> std::string;
 // ======================================
 // 			Class implementation
 // ======================================
-Room::Room(uWS::App &app, DatabaseManager *db, std::string room_id, std::vector<int> uids)
+Room::Room(uWS::App &app, DatabaseManager *db, bool ranked, bool computer, std::string room_id, std::vector<int> uids)
 : room_id_{room_id}
 , uids_{uids}
 , game_{nullptr}
 , aigame_{nullptr}
 , db_{db}
+, ranked_{ranked}
+, computer_{computer}
 {
 	generate_game();	// CLASSIC / POTHOLES / ETC
-	// create_socket_ai(app);
-	if (game_ == nullptr) exit(1);
-	create_socket_player_verse_player(app);
+	
+	if (computer_) {
+		create_socket_ai(app);
+	}
+	else { // Versing a human player
+		create_socket_player_verse_player(app);
+	}
+
 }
 
 auto Room::generate_game() -> void {
@@ -103,10 +110,7 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 	};
 
 	std::string room_link = this->room_code();
-	std::cout << "Room code: " << room_link << '\n';
-	std::string temp_link = "/ws/david";
-
-	app.ws<SocketData>(temp_link, uWS::TemplatedApp<false>::WebSocketBehavior<SocketData> {
+	app.ws<SocketData>(room_link, uWS::TemplatedApp<false>::WebSocketBehavior<SocketData> {
 		.open = [this, publish](auto *ws) {
 			ws->subscribe(this->room_id());
 			std::cout << "Joined room\n";

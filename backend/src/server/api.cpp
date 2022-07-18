@@ -175,9 +175,6 @@ auto api_search_all(uWS::App &app, DatabaseManager &db) -> void {
 auto api_search_snapshot(uWS::App &app, DatabaseManager &db) -> void {
 	// Query => /api/search/snapshot?moves=e5a1
 	app.get("/api/search/snapshot", [&app, &db](auto *res, auto *req) {
-		// for (auto header : *req){
-		// 	std::cout << header.first << ", " << header.second << "\n";
-		// };
 
 		// Get given snapshot move sequence from frontend get query
 		auto moves = std::string(req->getQuery("moves")); 
