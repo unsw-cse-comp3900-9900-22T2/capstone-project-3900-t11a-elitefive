@@ -175,7 +175,7 @@ export function Sidebar({ matchData, currIndex, replayStringArr, setCurrIndex, s
   const movePrev = () => {
     if (!splitReplayString) return;
     setCurrIndex(prev=>prev-1)
-    setReplayStringArr(splitReplayString.slice(0, currIndex+1))
+    setReplayStringArr(splitReplayString.slice(0, currIndex-1))
     console.log(replayStringArr);
   }
 
@@ -190,7 +190,7 @@ export function Sidebar({ matchData, currIndex, replayStringArr, setCurrIndex, s
         <StickyHeadTable/>
       </Card2>
       <ContainerArrow>
-        {/* <Button onClick={movePrev}>Back</Button> */}
+        <Button onClick={movePrev}>Back</Button>
         <Button onClick={moveNext}>Next</Button>
       </ContainerArrow>
       <Button 
