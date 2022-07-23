@@ -19,4 +19,5 @@ auto api_friends(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std
 // TESTING ENDPOINTS
 auto api_david(uWS::App &app) -> void;
 auto api_db(uWS::App &app, DatabaseManager &db) -> void;
+
 #endif

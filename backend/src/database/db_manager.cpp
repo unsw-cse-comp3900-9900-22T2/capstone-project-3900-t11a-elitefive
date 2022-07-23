@@ -209,6 +209,10 @@ auto DatabaseManager::revoke_friend_req(int revoker, int revoked) -> bool {
   return execute0("delete_friend_req", revoker, revoked);
 }
 
+auto DatabaseManager::insert_varification_code(int user, std::string var_code) -> bool {
+  return execute0("insert_var_code", user, var_code);
+}
+
 // Prepare the statements on instantiation.
 auto DatabaseManager::prepare_statements() -> void {
   conn_.prepare("insert_user",
@@ -380,6 +384,8 @@ auto DatabaseManager::prepare_statements() -> void {
   conn_.prepare("delete_friend_req",
   "DELETE FROM friendreqs "
   "WHERE from_user = $1 AND to_user = $2;");
+  conn_.prepare("insert_var_code",
+  "INSERT INTO varification_codes VALUES ($1, $2);");
 }
 
 template<typename... Args>
@@ -401,8 +407,8 @@ auto DatabaseManager::execute0(std::string statement, Args... args) -> bool {
     pqxx::work w(conn_);
     auto res = w.exec_prepared0(statement, args...);
     w.commit();
-    auto rows_deleted = res.affected_rows();
-    if (rows_deleted > 0){
+    auto rows_affected = res.affected_rows();
+    if (rows_affected > 0){
       return true;
     }
   } catch (const pqxx::pqxx_exception &e) {

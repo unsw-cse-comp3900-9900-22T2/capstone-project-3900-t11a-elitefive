@@ -6,6 +6,7 @@
 #include "metadatagen.hpp"
 
 #include <algorithm>
+#include <cstdlib>
 
 using json = nlohmann::json;
 
@@ -32,6 +33,13 @@ auto registerPage(uWS::App &app, DatabaseManager &db) -> void {
 				// Manage json
 				json payload;
 				if (db.insert_user(username, email, password)){
+				
+					// send varification email & stor code
+					auto var_code = generate_varification_code();
+					send_email_varification(email, username, var_code);
+					auto user = db.get_user(email);
+					db.insert_varification_code(user->id, var_code);
+					
 					// Register Success
 					payload["event"] = "register";
 					payload["action"] = "register";
@@ -289,6 +297,8 @@ auto api_search_snapshot(uWS::App &app, DatabaseManager &db) -> void {
 		res->end(payload.dump());
 	});
 }
+
+
 
 // TESTING ENDPOINTS
 auto api_david(uWS::App &app) -> void {

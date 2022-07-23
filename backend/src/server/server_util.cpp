@@ -23,6 +23,41 @@ auto generate_session_token(int id) -> std::string {
 	return token;
 }
 
+auto generate_varification_code() -> std::string {
+
+    srand(time(NULL) + rand());
+    auto token = std::string();
+    for(int i = 0;i < 16;i++)
+    {
+        int r = 'A' + (rand() % 25);
+        while(r < 16)
+            // caps letter
+            r = 'A' + (rand() % 25) ;
+            // integer
+            if (r % 3 == 1){
+                r = '0' + (rand() % 10) ;
+            }
+            // lowercase letter
+            if (r % 3 == 2){
+                r = 'a' + (rand() % 25) ;
+            }
+        token.push_back(char(r));
+    }
+	return token;
+}
+
+auto send_email_varification(std::string email, std::string username, std::string var_code) -> void{
+	
+	auto message = std::string("Hello ") + username + std::string("!! \\n")
+	+ std::string("Welcome to Yavalath.\\nYour email verification code is: " + var_code);
+
+	auto cmd = "/app/mail/send_email.sh " + email + " \"Welcome to Yavalath!\" \"" + message + " \"";
+		
+	std::system(cmd.c_str());
+}
+
+
+
 auto profile_to_json(User *user, PlayerStats *stats, std::map<std::string, int> elos, std::vector<User*> friends) -> json {
     json result;
     result["event"] = "profile";
