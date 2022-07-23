@@ -20,7 +20,4 @@ auto api_friends(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std
 auto api_david(uWS::App &app) -> void;
 auto api_db(uWS::App &app, DatabaseManager &db) -> void;
 
-// HELPERS
-auto send_email_varification(std::string email, std::string username) -> void;
-
 #endif

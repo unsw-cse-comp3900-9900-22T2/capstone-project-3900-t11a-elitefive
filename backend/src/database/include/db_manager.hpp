@@ -42,6 +42,8 @@ class DatabaseManager {
     auto accept_friend_req(int accepter, int accepted) -> bool;
     auto deny_friend_req(int denier, int denied) -> bool;
     auto revoke_friend_req(int revoker, int revoked) -> bool;
+    // MAIL
+    auto insert_varification_code(int user, std::string var_code) -> bool;
   private:
     auto prepare_statements() -> void;
     // Execute query with return result.

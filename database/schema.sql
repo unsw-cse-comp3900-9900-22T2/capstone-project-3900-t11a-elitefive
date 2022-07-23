@@ -6,7 +6,15 @@ create table users (
 	username text, 
 	email text unique,
 	password_hash text,
-	primary key (id)	
+	varified boolean default null,
+	primary key (id)
+);
+
+create table varification_codes (
+	userid integer,
+	code text, 
+	foreign key (userid) references users (id),
+	primary key (userid)
 );
 
 create table matches (

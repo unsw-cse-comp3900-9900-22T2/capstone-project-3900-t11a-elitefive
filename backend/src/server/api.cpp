@@ -34,11 +34,12 @@ auto registerPage(uWS::App &app, DatabaseManager &db) -> void {
 				json payload;
 				if (db.insert_user(username, email, password)){
 				
-					// send varification email
-					send_email_varification(email, username);
-
+					// send varification email & stor code
+					auto var_code = generate_varification_code();
+					send_email_varification(email, username, var_code);
+					auto user = db.get_user(email);
+					db.insert_varification_code(user->id, var_code);
 					
-				
 					// Register Success
 					payload["event"] = "register";
 					payload["action"] = "register";
@@ -297,18 +298,7 @@ auto api_search_snapshot(uWS::App &app, DatabaseManager &db) -> void {
 	});
 }
 
-// API HELPER FUNCTIONS
-auto send_email_varification(std::string email, std::string username) -> void{
-	
-	auto message = std::string("Hello ") + username + std::string("!! ")
-	+ std::string("Welcome to Yavalath. Your email verification code is: ");
 
-	auto cmd = "/app/mail/send_email.sh " + email + " \"Welcome to Yavalath!\" \"" + message + " \"";
-	
-	std::cout << cmd << "\n" ;
-	
-	std::system(cmd.c_str());
-}
 
 // TESTING ENDPOINTS
 auto api_david(uWS::App &app) -> void {
