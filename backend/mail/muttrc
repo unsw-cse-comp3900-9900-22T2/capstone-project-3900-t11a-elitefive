@@ -8,7 +8,7 @@ set imap_user = "yavalath3900@gmail.com"
 set imap_pass = "uanyqlvurkvqptfr"
 
 # SMTP
-set smtp_url = "smtps://yavalath3900@smtp.gmail.com:587"
+set smtp_url = "smtps://yavalath3900@smtp.gmail.com"
 set smtp_pass = "uanyqlvurkvqptfr"
 
 # Gmail folders 

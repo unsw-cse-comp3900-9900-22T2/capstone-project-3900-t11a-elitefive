@@ -24,8 +24,9 @@ RUN apt install -y libpqxx-dev
 RUN apt install -y mutt
 RUN mkdir /root/.config 
 RUN mkdir /root/.config/mutt
-COPY muttrc /root/.config/mutt
+COPY mail/muttrc /root/.config/mutt
 
 EXPOSE 8080
 
 WORKDIR /app
+
