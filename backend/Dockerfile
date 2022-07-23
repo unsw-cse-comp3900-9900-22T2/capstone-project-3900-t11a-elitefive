@@ -17,8 +17,14 @@ RUN apt update -y && \
 RUN apt install -y \
       cmake \
       pkg-config
+RUN apt update -y
 RUN apt install -y libpq-dev
 RUN apt install -y libpqxx-dev
+
+RUN apt install -y mutt
+RUN mkdir /root/.config 
+RUN mkdir /root/.config/mutt
+COPY muttrc /root/.config/mutt
 
 EXPOSE 8080
 
