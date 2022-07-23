@@ -8,7 +8,11 @@
 #include "aigame.hpp"
 #include "db_manager.hpp"
 
+
 class Room {
+    struct SocketData{
+        //Empty because we don't need any currently.
+    };
     private:
         std::string room_id_;
         std::vector<int> uids_; 
@@ -49,6 +53,17 @@ class Room {
 
         auto calc_elos(int winning_player) -> std::map<int, int>;
         auto save_match(int winning_player) -> void;
+
+    private:
+        template<typename Functor>
+        auto click_register_move(std::string const& move, Functor publish, uWS::WebSocket<false, true, SocketData> *ws, uWS::OpCode opCode) -> void;
+
+
+        auto click_from_players_turn(int uid) -> bool {
+			int players_turn = this->game_->whose_turn();
+			int uid_turn = this->game_->give_uid(players_turn);
+			return (uid_turn == uid);
+        }
 };
 
 #endif

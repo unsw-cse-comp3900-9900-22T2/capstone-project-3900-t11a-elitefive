@@ -11,9 +11,9 @@
 
 using json = nlohmann::json;
 
-struct SocketData{
-	//Empty because we don't need any currently.
-};
+// struct SocketData{
+// 	//Empty because we don't need any currently.
+// };
 
 // Helper functions
 auto parse_move(std::string_view message) -> std::string;
@@ -25,6 +25,7 @@ auto json_board_move(std::string const& move) -> std::string;
 auto json_game_winner(std::string const& player) -> std::string;
 // auto game_result(Game const& game) -> std::string;
 // auto game_result(int const uid) -> std::string;
+
 
 
 // ======================================
@@ -98,19 +99,12 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 				return;
 			}
 
-			int players_turn = this->game_->whose_turn();
-			int uid_turn = this->game_->give_uid(players_turn);
-			if (uid_turn == uid) return; // Not the players turn
+			if (click_from_players_turn(uid) == false) return; // Not the players turn
 			
 			// Get move
-			std::string move = parse_move(message);
+			std::string const move = parse_move(message);
+			click_register_move(move, publish, ws, opCode);
 
-			// Make the move in game
-			std::string move_message = publish_move(move);
-			if (this->play_move(move) == false) return; 	// Ignore illegal player move
-			publish(ws, move_message, opCode);
-			// publish(ws, json_confirm_move(move), opCode);
-			// publish(ws, json_board_move(move), opCode);
 		
 			// Postgame
 			auto const state = game_->status();
@@ -138,7 +132,7 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 
 	std::string room_link = this->room_code();
 	app.ws<SocketData>(room_link, uWS::TemplatedApp<false>::WebSocketBehavior<SocketData> {
-		.open = [this, publish](auto *ws) {
+		.open = [this, publish](uWS::WebSocket<false, true, SocketData> *ws) {
 			ws->subscribe(this->room_id());
 			std::cout << "Joined room\n";
 		},
@@ -323,3 +317,10 @@ auto Room::game_result(int const uid) -> std::string {
 	// return "MISSINGNO";
 }
 
+template<typename Functor>
+auto Room::click_register_move(std::string const& move, Functor publish, uWS::WebSocket<false, true, SocketData> *ws, uWS::OpCode opCode) -> void {
+	// Make the move in game
+	std::string move_message = publish_move(move);	// Pre-set json string for publish
+	if (this->play_move(move) == false) return; 	// Ignore illegal player move
+	publish(ws, move_message, opCode);
+}
