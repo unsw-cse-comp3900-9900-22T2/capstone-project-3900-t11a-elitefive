@@ -126,10 +126,10 @@ auto AIGame::minmax(int depth) -> int {
 	auto memo = Memo();
 	int final_move = -1;
 	std::cout << "Minmax at: " << this->num_moves() << '\n';
-	if (this->num_moves() <= 21) depth = 6;
-	if (this->num_moves() <= 17) depth = 5;
-	if (this->num_moves() <= 7) depth = 4;
-	if (this->num_moves() <= 5) depth = 3;
+	if (depth > 6 && this->num_moves() <= 31) depth = 6;
+	if (depth > 5 && this->num_moves() <= 25) depth = 5;
+	if (depth > 4 && this->num_moves() <= 17) depth = 4;
+	if (depth > 3 && this->num_moves() <= 5) depth = 3;
 	for (int inc_depth = 3; inc_depth <= depth; ++inc_depth) {
 		std::cout << "\tCalculating depth: " << inc_depth << ' ';
 		auto const score = run_minmax(inc_depth, this->whose_turn(), memo, -99999, 99999);

@@ -13,8 +13,12 @@ class Pool {
 	private:
 		std::string room_id_;
 		std::deque<int> classic_;
+
+		DatabaseManager *db;
+		uWS::App *app;
+		std::vector<Room *> rooms;
 	public:
-		Pool(uWS::App &app, DatabaseManager *db, std::vector<Room *> &rooms);
+		Pool(uWS::App *app, DatabaseManager *db);
 
 		auto room_id() const -> std::string;
 		auto players_waiting_classic() const -> int {
@@ -31,6 +35,18 @@ class Pool {
 		}
 
 	private:
-		auto create_waiting_room(uWS::App &app, DatabaseManager *db, std::vector<Room *> &rooms) -> void;
+		auto create_new_room(uint32_t room_id, bool ranked, bool ai, std::vector<int> const& uids) -> void {
+			replace_room_id(room_id);
+			uWS::App &applicaiton = *app;
+			rooms.push_back(new Room(applicaiton, db, ranked, ai, std::to_string(room_id), uids));
+		}
+
+		auto replace_room_id(uint32_t roomid) -> void;	// Delete old rooms with the same `roomid`
+		auto create_waiting_room() -> void;				// Create the socketed room
+
+		auto player_vs_player_waiting_lobby(std::string const& gamemode, bool ranked_flag, int uid) -> json;
+
+		auto start_player_vs_player_game(std::string const& gamemode, bool ranked_flag, int uid) -> json;
+		auto start_player_vs_ai_game(std::string const& gamemode, bool ranked_flag, int uid) -> json;
 };
 #endif
