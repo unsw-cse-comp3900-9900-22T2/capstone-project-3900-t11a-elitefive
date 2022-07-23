@@ -1,6 +1,7 @@
 #include <nlohmann/json.hpp>
 #include <string>
 #include <stdio.h>
+#include <future>
 
 #include "App.h"
 #include "room.hpp"
@@ -145,7 +146,12 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 				save_match(1);
 				return;
 			}
-			
+
+			int uid = parse_uid(message);
+			int players_turn = this->game_->whose_turn();
+			int uid_turn = this->game_->give_uid(players_turn);
+			if (uid_turn != uid) return; // Not the players turn
+
 			// Get move
 			std::string move = parse_move(message);
 			
@@ -156,7 +162,16 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 
 			// Handle AI moves
 			if (game_->status() == Game::state::ONGOING) {	// TODO: Change this to a native call
-				std::string reply = ai_response(move);
+				//  std::future<std::string> reply_future = std::async(Room::ai_response, move, *aigame_);
+				// std::string reply = Room::ai_response(move, *aigame_);
+				auto reply = Room::ai_response(move, aigame_.get(), game_.get(), ws);
+				// auto reply_future = std::async(Room::test, 3);
+				// auto function = static_cast<std::string(*)(std::string &move, AIGame &aigame)>(Room::ai_response);
+				// auto reply_future = std::thread(Room::ai_response, move, aigame_.get(), game_.get(), ws);
+				// reply_future.join();
+				// std::string reply = reply_future.get();
+				// game_->play(reply);
+				// aigame_->play(reply);
 				publish(ws, json_board_move(reply), opCode);
 				// gameover = (game_->status() == Game::state::ONGOING);
 			}
@@ -170,6 +185,7 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 				int const winning_player = this->game_->which_player_won();
 				save_match(winning_player);
 			}
+			std::cout << "\t\tRoom: finished on message\n";
 		},
 		.close = [this](auto *ws, int x , std::string_view str) {
 			ws->unsubscribe(this->room_id());
@@ -191,15 +207,20 @@ auto Room::play_move(std::string const& move) -> bool {
 	return this->game_->play(move);
 }
 
-auto Room::ai_response(std::string const& move) -> std::string {
-	AIGame &aigame = *aigame_;	
-	aigame.play(move);
-	auto const response_move = aigame.minmax(3); // depth 3 (could increase but test with that)
-	aigame.play(response_move);
-	aigame.clear();
+auto Room::ai_response(std::string move, AIGame *aigame, Game *game, void *ws) -> std::string {
+	std::cout << "\t\tStarted calculating\n";
+	// AIGame &aigame = *aigame_;	
+	aigame->play(move);
+	// std::cout << *aigame << '\n';
+	auto const response_move = aigame->minmax(7); // depth 3 (could increase but test with that)
+	aigame->play(response_move);
+	aigame->clear();
+	game->play(response_move);
+	// std::cout << "\t\tEnding calculating\n";
+	// std::cout << *aigame << '\n';
 	
 	// Reflect move in the game
-	game_->play(response_move);
+	// game_->play(response_move);
 	return Game::indexToCoord(response_move);
 }
 

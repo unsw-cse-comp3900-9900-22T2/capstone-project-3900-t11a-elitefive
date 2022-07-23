@@ -11,6 +11,8 @@
 
 using json = nlohmann::json;
 
+auto game_selection(int opponent_uid, int uid, std::string room_id, std::string gamemode, bool ranked_flag, bool ai_flag) -> json;
+
 struct SocketData{
 	//Empty because we don't need any currently.
 };
@@ -26,6 +28,17 @@ Pool::Pool(uWS::App &app, DatabaseManager *db, std::vector<Room *> &rooms)
 : room_id_{"WAITING_ROOM"}
 {
 	create_waiting_room(app, db, rooms);
+}
+
+auto game_selection(int opponent_uid, int uid, std::string room_id, std::string gamemode, bool ranked_flag, bool ai_flag) -> json {
+	json payload;
+	payload["event"] = "match_created";
+	payload["uids"] = {opponent_uid, uid};
+	payload["room_id"] = room_id;
+	payload["gamemode"] = gamemode;
+	payload["elo"] = ranked_flag;
+	payload["ai"] = ai_flag;
+	return payload;
 }
 
 auto Pool::create_waiting_room(uWS::App &app, DatabaseManager *db, std::vector<Room *> &rooms) -> void {
@@ -58,6 +71,7 @@ auto Pool::create_waiting_room(uWS::App &app, DatabaseManager *db, std::vector<R
 			// TODO: UNCOMMENT THIS OUT TO USE PROVIDED FRONTEND DATA
 			bool ranked_flag = data["ai"];
 			bool ai_flag = data["ranked"];
+			std::string gamemode = "CLASSIC";
 
 			// TODO: DELETE THESE HARDCODED VALUES AND USE ABOVE JSON
 			// std::cout << "\n\n\t\t=== WARNING ===\nBACKEND NOT READING FRONTEND JSON. GO IN CODE AND CHANGE!\n\t\t=== WARNING ===\n\n";
@@ -99,17 +113,11 @@ auto Pool::create_waiting_room(uWS::App &app, DatabaseManager *db, std::vector<R
 					printf("DB Pointer: %p\n", db);
 					// false indicated human vs human instead of ai
 					rooms.push_back(new Room(app, db, ranked_flag, ai_flag, std::to_string(room_id), {opponent, uid}));
+					std::cout << "Created room: " << std::to_string(room_id) << " Opp: " << opponent << " Self: " << uid << '\n'; 
 					// printf("Pointer: %p\n", room);
 
 					
-					json payload;
-					payload["event"] = "match_created";
-					payload["uids"] = {opponent, uid};
-					payload["room_id"] = room_id;
-					payload["gamemode"] = "CLASSIC";
-					payload["elo"] = ranked_flag;
-					payload["ai"] = ai_flag;
-					publish(ws, payload.dump(), opCode);
+					json payload = game_selection(opponent, uid, std::to_string(room_id), gamemode, ranked_flag, ai_flag);
 					std::cout << payload.dump() << '\n';
 				}
 			}
@@ -139,14 +147,9 @@ auto Pool::create_waiting_room(uWS::App &app, DatabaseManager *db, std::vector<R
 				publish(ws, payload.dump(), opCode);
 				std::cout << payload.dump() << '\n';
 			}
-
-
-
 		},
 		.close = [this](auto *ws, int x , std::string_view str) {
 			ws->unsubscribe(this->room_id());
-			// TODO - REMOVE FROM QUEUE?
-			// ws->close();
 			std::cout << "\tPool: Player left waiting room\n";
 		}
 	});

@@ -42,8 +42,7 @@ class Room {
         auto create_socket_player_verse_player(uWS::App &app) -> void;
 
         auto play_move(std::string const& move) -> bool;
-        auto ai_response(std::string const& move) -> std::string;
-
+        auto static ai_response(std::string move, AIGame *aigame, Game *game, void *ws) -> std::string;
         auto json_confirm_move(std::string const& move) -> std::string;
         auto json_board_move(std::string const& move) -> std::string;
         auto json_game_winner(std::string const& player) -> std::string;
