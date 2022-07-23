@@ -58,7 +58,6 @@ auto Room::generate_game() -> void {
 
 auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 	auto publish = [this](auto *ws, std::string message, uWS::OpCode opCode) -> void {
-		// std::cout << "\tRoom: Publishing to - " << this->room_id() << '\n';
 		ws->publish(this->room_id(), message, opCode);
 	};
 
@@ -68,13 +67,18 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 			ws->subscribe(this->room_id());
 			std::cout << "\tLobby: Joined multiplayer lobby\n";
 
-			auto p0 = this->db_->get_user(this->game_->give_uid(0));
-			auto p1 = this->db_->get_user(this->game_->give_uid(1));
+			// TODO: Hack to display names
+			User *p0 = this->db_->get_user(this->game_->give_uid(0));
+			User *p1 = this->db_->get_user(this->game_->give_uid(1));
 			json payload;
 			payload["event"] = "player_names";
 			payload["player_name"] = {
 				p0->username,
 				p1->username
+			};
+			payload["elos"] = {
+				db_->get_latest_elo(p0->id, "CLASSIC"),	// TODO: Do not hardcode
+				db_->get_latest_elo(p1->id, "CLASSIC")	// TODO: Do not hardcode
 			};
 
 			ws->send(payload.dump(), uWS::OpCode::TEXT);
