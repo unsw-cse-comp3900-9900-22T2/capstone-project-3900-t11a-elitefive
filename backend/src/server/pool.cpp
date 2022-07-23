@@ -11,23 +11,36 @@
 
 using json = nlohmann::json;
 
+struct SocketData{
+	//Empty because we don't need any currently.
+};
+
 // Helper functions
-auto game_selection(int opponent_uid, int uid, std::string room_id, std::string gamemode, bool ranked_flag, bool ai_flag) -> json;
+auto make_json_game_selection(int opponent_uid, int uid, std::string room_id, std::string gamemode, bool ranked_flag, bool ai_flag) -> json;
 auto parse_pool_data(std::string_view const& message) -> json;
 
-auto Pool::replace_room_id(uint32_t roomid) -> void {
-		// printf("Pointer: %p\n", room);
-		for (auto &room : rooms) {
-			if (room == nullptr) continue;
-			if (room->room_id() == std::to_string(roomid)) {
-				delete room;
-				room = nullptr;
-				// TODO: Properly erase from vector
-				break;
-			}
-		}
+Pool::Pool(uWS::App *app, DatabaseManager *db)
+: room_id_{"WAITING_ROOM"}
+, classic_{}
+, db{db}
+, app{app}
+, rooms{}
+{
+	create_waiting_room();
 }
 
+auto Pool::replace_room_id(uint32_t roomid) -> void {
+	// printf("Pointer: %p\n", room);
+	for (auto &room : rooms) {
+		if (room == nullptr) continue;
+		if (room->room_id() == std::to_string(roomid)) {
+			delete room;
+			room = nullptr;
+			// TODO: Properly erase from vector
+			break;
+		}
+	}
+}
 
 auto Pool::start_player_vs_player_game(std::string const& gamemode, bool ranked_flag, int uid) -> json {
 	// We can make a pairing
@@ -35,22 +48,13 @@ auto Pool::start_player_vs_player_game(std::string const& gamemode, bool ranked_
 	// Player 1: Current  (current person to trigger this)
 	int opponent = classic_.front();
 	classic_.pop_front();
-
-	uint32_t room_id = ((uint32_t) opponent << 16) | (uint32_t) uid;
 	// {uid, computer_uid}
+	uint32_t room_id = ((uint32_t) opponent << 16) | (uint32_t) uid;
 	create_new_room(room_id, ranked_flag, false, {opponent, uid});
-
-
 	std::cout << "Created room: " << std::to_string(room_id) << " Opp: " << opponent << " Self: " << uid << '\n'; 
-	// printf("Pointer: %p\n", room);
-
-	
-	json payload = game_selection(opponent, uid, std::to_string(room_id), gamemode, ranked_flag, false);
-	std::cout << payload.dump() << '\n';
+	json payload = make_json_game_selection(opponent, uid, std::to_string(room_id), gamemode, ranked_flag, false);
 	return payload;
 }
-
-
 
 auto Pool::player_vs_player_waiting_lobby(std::string const& gamemode, bool ranked_flag, int uid) -> json {
 	// TODO: Do gamemode flags
@@ -74,38 +78,7 @@ auto Pool::start_player_vs_ai_game(std::string const& gamemode, bool ranked_flag
 	int computer_uid = 6; // TODO: HARDCODED AI VALUE
 	uint32_t room_id = ((uint32_t) uid << 17) | (uint32_t) computer_uid;
 	create_new_room(room_id, ranked_flag, true, {uid, computer_uid});
-
-	json payload;
-	payload["event"] = "match_created";
-	payload["uids"] = {uid, computer_uid};
-	payload["room_id"] = room_id;
-	payload["gamemode"] = gamemode;
-	payload["elo"] = ranked_flag;
-	payload["ai"] = true;
-	std::cout << payload.dump() << '\n';
-	return payload;
-}
-
-auto parse_pool_data(std::string_view const& message) -> json {
-	auto json_data = nlohmann::json::parse(message);
-	std::string datastring = json_data["data"];
-	json data = nlohmann::json::parse(datastring);
-	std::cout << "\t\tPool: Data Recieved - "  << data << '\n'; 
-	return data;
-}
-
-struct SocketData{
-	//Empty because we don't need any currently.
-};
-
-Pool::Pool(uWS::App *app, DatabaseManager *db)
-: room_id_{"WAITING_ROOM"}
-, classic_{}
-, db{db}
-, app{app}
-, rooms{}
-{
-	create_waiting_room();
+	return make_json_game_selection(computer_uid, uid, std::to_string(room_id), gamemode, ranked_flag, true);
 }
 
 auto Pool::create_waiting_room() -> void {
@@ -113,8 +86,6 @@ auto Pool::create_waiting_room() -> void {
 		ws->publish(this->room_id(), message, opCode);
 		ws->send(message, opCode);
 	};
-	// printf("Pointer: %p\n", &rooms);
-	// printf("DB Pointer: %p\n", db);
 
 	app->ws<SocketData>("/ws/waitingroom",uWS::TemplatedApp<false>::WebSocketBehavior<SocketData> {
 		.open = [this, publish](auto *ws) {
@@ -157,7 +128,9 @@ auto Pool::room_id() const -> std::string {
 	return room_id_;
 }
 
-auto game_selection(int opponent_uid, int uid, std::string room_id, std::string gamemode, bool ranked_flag, bool ai_flag) -> json {
+
+// Private Helper functions
+auto make_json_game_selection(int opponent_uid, int uid, std::string room_id, std::string gamemode, bool ranked_flag, bool ai_flag) -> json {
 	json payload;
 	payload["event"] = "match_created";
 	payload["uids"] = {opponent_uid, uid};
@@ -165,5 +138,14 @@ auto game_selection(int opponent_uid, int uid, std::string room_id, std::string 
 	payload["gamemode"] = gamemode;
 	payload["elo"] = ranked_flag;
 	payload["ai"] = ai_flag;
+	std::cout << payload.dump() << '\n';
 	return payload;
+}
+
+auto parse_pool_data(std::string_view const& message) -> json {
+	auto json_data = nlohmann::json::parse(message);
+	std::string datastring = json_data["data"];
+	json data = nlohmann::json::parse(datastring);
+	std::cout << "\t\tPool: Data Recieved - "  << data << '\n'; 
+	return data;
 }

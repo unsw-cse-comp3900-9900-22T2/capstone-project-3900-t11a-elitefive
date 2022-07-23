@@ -35,6 +35,7 @@ class Pool {
 		}
 
 	private:
+		auto create_waiting_room() -> void;				// Create the socketed room
 		auto create_new_room(uint32_t room_id, bool ranked, bool ai, std::vector<int> const& uids) -> void {
 			replace_room_id(room_id);
 			uWS::App &applicaiton = *app;
@@ -42,7 +43,6 @@ class Pool {
 		}
 
 		auto replace_room_id(uint32_t roomid) -> void;	// Delete old rooms with the same `roomid`
-		auto create_waiting_room() -> void;				// Create the socketed room
 
 		auto player_vs_player_waiting_lobby(std::string const& gamemode, bool ranked_flag, int uid) -> json;
 
