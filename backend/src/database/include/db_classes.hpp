@@ -59,12 +59,14 @@ class Match {
   public:
     int id;
     std::string game;
+    bool ranked;
     std::string replay;
     std::vector<Player> players;
 
-    Match(int id_, std::string game_, std::string replay_, std::vector<Player> players_)
+    Match(int id_, std::string game_, bool ranked_, std::string replay_, std::vector<Player> players_)
     : id{id_}
     , game{game_}
+    , ranked{ranked_}
     , replay{replay_}
     , players{players_} {}
 
@@ -72,6 +74,7 @@ class Match {
         json payload;
         payload["match_id"] = id;
         payload["gamemode"] = game;
+        payload["ranked"] = ranked;
         payload["moves"] = replay;
         payload["players"] = {};
         for (auto const& player : players) {

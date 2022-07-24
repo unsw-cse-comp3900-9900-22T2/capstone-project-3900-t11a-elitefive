@@ -73,15 +73,16 @@ auto DatabaseManager::get_match(int id) -> Match* {
   }
   auto match = atoi(res[0][0].c_str());
   auto game = res[0][1].c_str();
-  auto replay = res[0][2].c_str();
-  auto curmatch = new Match(match, game, replay, std::vector<Player>{});
+  auto ranked = std::string(res[0][2].c_str()) == "t";
+  auto replay = res[0][3].c_str();
+  auto curmatch = new Match(match, game, ranked, replay, std::vector<Player>{});
   for (auto const &row : res) {
     // Add player
-    auto p_id = atoi(row[3].c_str());
-    auto p_username = row[4].c_str();
-    auto p_startelo = atoi(row[5].c_str());
-    auto p_endelo = atoi(row[6].c_str());
-    auto p_outcome = row[7].c_str();
+    auto p_id = atoi(row[4].c_str());
+    auto p_username = row[5].c_str();
+    auto p_startelo = atoi(row[6].c_str());
+    auto p_endelo = atoi(row[7].c_str());
+    auto p_outcome = row[8].c_str();
     auto *player = new Player(p_id, p_username, p_startelo, p_endelo, p_outcome);
     curmatch->players.push_back(*player);
   }
@@ -233,7 +234,7 @@ auto DatabaseManager::prepare_statements() -> void {
   "RETURNING id;");
   // TODO: The COALESCE section for start_elo is a monstrosity...
   conn_.prepare("get_match",
-  "SELECT matches.id, game, replay, outcomes.player, "
+  "SELECT matches.id, game, ranked, replay, outcomes.player, "
   "username, "
   "COALESCE("
   "(SELECT o.end_elo FROM matches m "
@@ -252,7 +253,7 @@ auto DatabaseManager::prepare_statements() -> void {
   "WHERE matches.id = $1;");
   // TODO: Refactor the two below - similar SQL.
   conn_.prepare("get_matches",
-  "SELECT matches.id, game, replay, outcomes.player, "
+  "SELECT matches.id, game, ranked, replay, outcomes.player, "
   "username, "
   "COALESCE("
   "(SELECT o.end_elo FROM matches m "
@@ -269,7 +270,7 @@ auto DatabaseManager::prepare_statements() -> void {
   "JOIN outcomes ON matches.id = outcomes.match "
   "JOIN users ON outcomes.player = users.id;");
   conn_.prepare("get_matches_user",
-  "SELECT matches.id, game, replay, outcomes.player, "
+  "SELECT matches.id, game, ranked, replay, outcomes.player, "
   "username, "
   "COALESCE("
   "(SELECT o.end_elo FROM matches m "
@@ -290,7 +291,7 @@ auto DatabaseManager::prepare_statements() -> void {
   "JOIN outcomes ON matches.id = outcomes.match "
   "WHERE outcomes.player = $1);");
   conn_.prepare("get_matches_snapshot1",
-  "SELECT matches.id, game, replay, outcomes.player, "
+  "SELECT matches.id, game, ranked, replay, outcomes.player, "
   "username, "
   "COALESCE("
   "(SELECT o.end_elo FROM matches m "
@@ -317,7 +318,7 @@ auto DatabaseManager::prepare_statements() -> void {
   "s2 AS ("
   "SELECT * FROM snapshots "
   "WHERE move_num = $3 AND boardstate = $4) "
-  "SELECT matches.id, game, replay, outcomes.player, "
+  "SELECT matches.id, game, ranked, replay, outcomes.player, "
   "username, "
   "COALESCE("
   "(SELECT o.end_elo FROM matches m "
@@ -460,16 +461,17 @@ auto DatabaseManager::parse_matches(pqxx::result res) -> std::vector<Match> {
         matches.push_back(*curmatch);
       }
       auto game = row[1].c_str();
-      auto replay = row[2].c_str();
-      curmatch = new Match(match, game, replay, std::vector<Player>{});
+      auto ranked = std::string(row[2].c_str()) == "t";
+      auto replay = row[3].c_str();
+      curmatch = new Match(match, game, ranked, replay, std::vector<Player>{});
       curmatchID = match;
     }
     // Add player
-    auto p_id = atoi(row[3].c_str());
-    auto p_username = row[4].c_str();
-    auto p_startelo = atoi(row[5].c_str());
-    auto p_endelo = atoi(row[6].c_str());
-    auto p_outcome = row[7].c_str();
+    auto p_id = atoi(row[4].c_str());
+    auto p_username = row[5].c_str();
+    auto p_startelo = atoi(row[6].c_str());
+    auto p_endelo = atoi(row[7].c_str());
+    auto p_outcome = row[8].c_str();
     auto *player = new Player(p_id, p_username, p_startelo, p_endelo, p_outcome);
     curmatch->players.push_back(*player);
   }
