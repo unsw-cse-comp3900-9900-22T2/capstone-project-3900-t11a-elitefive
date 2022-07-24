@@ -13,6 +13,7 @@ class Room {
     struct SocketData{
         //Empty because we don't need any currently.
     };
+    typedef uWS::WebSocket<false, true, SocketData> *WebSocket;
     private:
         std::string room_id_;
         std::vector<int> uids_; 
@@ -25,8 +26,9 @@ class Room {
     public:
         Room(uWS::App &app, DatabaseManager *db, bool ranked, bool computer, std::string room_id, std::vector<int> uids);
 
-        auto room_id() const -> std::string;
-        auto room_code() const -> std::string;
+        auto room_id() const -> std::string { return room_id_; }
+        auto room_code() const -> std::string { return std::string{"/ws/game/" + this->room_id()}; }
+        auto play_move(std::string const& move) -> bool { return this->game_->play(move); }
 
         auto publish_move(std::string const& move) {
             if (game_ == nullptr) std::cout << "Lobby: WHAT IS HAPPENING\n";
@@ -45,7 +47,6 @@ class Room {
         auto create_socket_ai(uWS::App &app) -> void;    // Create room to verse ai
         auto create_socket_player_verse_player(uWS::App &app) -> void;
 
-        auto play_move(std::string const& move) -> bool;
         auto static ai_response(std::string move, AIGame *aigame, Game *game, void *ws) -> std::string;
         auto json_confirm_move(std::string const& move) -> std::string;
         auto json_board_move(std::string const& move) -> std::string;
@@ -55,8 +56,9 @@ class Room {
         auto save_match(int winning_player) -> void;
 
     private:
-        template<typename Functor>
-        auto click_register_move(std::string const& move, Functor publish, uWS::WebSocket<false, true, SocketData> *ws, uWS::OpCode opCode) -> void;
+        auto publish(uWS::WebSocket<false, true, SocketData> *ws, std::string const& message, uWS::OpCode opCode) -> void;
+
+        auto click_register_move(std::string const& move, uWS::WebSocket<false, true, SocketData> *ws, uWS::OpCode opCode) -> void;
 
 
         auto click_from_players_turn(int uid) -> bool {

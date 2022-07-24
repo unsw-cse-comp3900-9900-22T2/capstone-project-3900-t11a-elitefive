@@ -11,10 +11,6 @@
 
 using json = nlohmann::json;
 
-// struct SocketData{
-// 	//Empty because we don't need any currently.
-// };
-
 // Helper functions
 auto parse_move(std::string_view message) -> std::string;
 auto parse_uid(std::string_view message) -> int;
@@ -26,7 +22,9 @@ auto json_game_winner(std::string const& player) -> std::string;
 // auto game_result(Game const& game) -> std::string;
 // auto game_result(int const uid) -> std::string;
 
-
+auto Room::publish(WebSocket ws, std::string const& message, uWS::OpCode opCode) -> void {
+	ws->publish(this->room_id(), message, opCode);
+}
 
 // ======================================
 // 			Class implementation
@@ -58,13 +56,9 @@ auto Room::generate_game() -> void {
 }
 
 auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
-	auto publish = [this](auto *ws, std::string message, uWS::OpCode opCode) -> void {
-		ws->publish(this->room_id(), message, opCode);
-	};
-
 	std::string room_link = this->room_code();
 	app.ws<SocketData>(room_link, uWS::TemplatedApp<false>::WebSocketBehavior<SocketData> {
-		.open = [this, publish](auto *ws) {
+		.open = [this](WebSocket ws) {
 			ws->subscribe(this->room_id());
 			std::cout << "\tLobby: Joined multiplayer lobby\n";
 
@@ -84,9 +78,11 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 
 			ws->send(payload.dump(), uWS::OpCode::TEXT);
 		},
-		.message = [this, publish](auto *ws, std::string_view message, uWS::OpCode opCode) {
+		.message = [this](WebSocket ws, std::string_view message, uWS::OpCode opCode) {
 			// std::cout << "Lobby: Recieved message\n";
 			int uid = parse_uid(message);
+
+			// Pre-game checks
 			if (player_resigned(message)) {
 				int player = this->game_->give_player_with_uid(uid);
 				int winning_player = this->game_->player_after(player);
@@ -98,17 +94,14 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 				publish(ws, json_game_winner(winner), opCode);
 				return;
 			}
-
 			if (click_from_players_turn(uid) == false) return; // Not the players turn
 			
-			// Get move
+			// Player move
 			std::string const move = parse_move(message);
-			click_register_move(move, publish, ws, opCode);
+			click_register_move(move, ws, opCode);
 
-		
-			// Postgame
-			auto const state = game_->status();
-			if (state != Game::state::ONGOING) {
+			// Postgame Checks
+			if (game_->status() != Game::state::ONGOING) {
 				std::string winner = game_result();
 				publish(ws, json_game_winner(winner), opCode);
 				
@@ -116,7 +109,7 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 				save_match(winning_player);
 			}
 		},
-		.close = [this](auto *ws, int x , std::string_view str) {
+		.close = [this](WebSocket ws, int x , std::string_view str) {
 			ws->unsubscribe(this->room_id());
 			// ws->close();
 			// ws->end();
@@ -125,18 +118,16 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 	});
 }
 
-auto Room::create_socket_ai(uWS::App &app) -> void {
-	auto publish = [this](auto *ws, std::string message, uWS::OpCode opCode) -> void {
-		ws->publish(this->room_id(), message, opCode);
-	};
+// ==== AI ROOM CODE ====
 
+auto Room::create_socket_ai(uWS::App &app) -> void {
 	std::string room_link = this->room_code();
 	app.ws<SocketData>(room_link, uWS::TemplatedApp<false>::WebSocketBehavior<SocketData> {
-		.open = [this, publish](uWS::WebSocket<false, true, SocketData> *ws) {
+		.open = [this](uWS::WebSocket<false, true, SocketData> *ws) {
 			ws->subscribe(this->room_id());
 			std::cout << "Joined room\n";
 		},
-		.message = [this, publish](auto *ws, std::string_view message, uWS::OpCode opCode) {
+		.message = [this](WebSocket ws, std::string_view message, uWS::OpCode opCode) {
 			std::cout << "Recieved message\n";
 			if (player_resigned(message)) {
 				std::string winner = game_result(6);
@@ -177,7 +168,6 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 			// Postgame
 			auto const state = game_->status();
 			if (state != Game::state::ONGOING) {
-				this->game_->pass_turn();
 				std::string winner = game_result();
 				publish(ws, json_game_winner(winner), opCode);
 				int const winning_player = this->game_->which_player_won();
@@ -185,24 +175,12 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 			}
 			std::cout << "\t\tRoom: finished on message\n";
 		},
-		.close = [this](auto *ws, int x , std::string_view str) {
+		.close = [this](WebSocket ws, int x , std::string_view str) {
 			ws->unsubscribe(this->room_id());
 			ws->close();
 			std::cout << "Left ai room\n";
 		}
 	});
-}
-
-auto Room::room_id() const -> std::string {
-	return room_id_;
-}
-
-auto Room::room_code() const -> std::string {
-	return std::string{"/ws/game/" + this->room_id()};
-}
-
-auto Room::play_move(std::string const& move) -> bool {
-	return this->game_->play(move);
 }
 
 auto Room::ai_response(std::string move, AIGame *aigame, Game *game, void *ws) -> std::string {
@@ -312,13 +290,9 @@ auto Room::game_result(int const uid) -> std::string {
 	auto user = this->db_->get_user(uid);
 	if (!user) return "MISSINGNO";
 	return user->username;
-	// if (player == 0) return "PLAYER";
-	// if (player == 1) return "COMPUTER";
-	// return "MISSINGNO";
 }
 
-template<typename Functor>
-auto Room::click_register_move(std::string const& move, Functor publish, uWS::WebSocket<false, true, SocketData> *ws, uWS::OpCode opCode) -> void {
+auto Room::click_register_move(std::string const& move, uWS::WebSocket<false, true, SocketData> *ws, uWS::OpCode opCode) -> void {
 	// Make the move in game
 	std::string move_message = publish_move(move);	// Pre-set json string for publish
 	if (this->play_move(move) == false) return; 	// Ignore illegal player move
