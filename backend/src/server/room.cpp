@@ -147,7 +147,7 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 			// Make the move in game
 			if (play_move(move) == false) return; 	// Ignore illegal player move
 			publish(ws, json_confirm_move(move), opCode);
-			publish(ws, json_player3("a1"), opCode);
+			// publish(ws, json_player3("a1"), opCode);
 
 			std::cout << "Made a valid move\n";
 
@@ -291,6 +291,7 @@ auto Room::calc_elos(int winning_player) -> std::map<int, int> {
 // TODO: Make this a game function instead
 auto Room::game_result() -> std::string {
 	int winning_player = this->game_->which_player_won();
+	std::cout << "WINNING PLAYER: " << winning_player << '\n';
 	int uid = this->game_->give_uid(winning_player);
 	return game_result(uid);
 }
