@@ -43,8 +43,8 @@ Pool::Pool(uWS::App *app, DatabaseManager *db)
 			json data = parse_pool_data(message);
 			
 			std::string gamemode = "TRIPLES";	// TODO: Need information from frontend
-			bool ranked_flag = data["ai"];
-			bool ai_flag = data["ranked"];
+			bool ranked_flag = data["ranked"];
+			bool ai_flag = data["ai"];
 
 			// Player who is selecting option
 			std::string suid = data["uid"];
