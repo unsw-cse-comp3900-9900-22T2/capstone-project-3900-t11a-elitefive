@@ -39,9 +39,12 @@ export const WSProvider = ({ children, gameId }: Props) => {
     const WS = new WebSocket(`ws://localhost:8080/ws/game/${gameId}`);
     WS.onopen = () => {
       setSocketConnected(true);
-      playerJoin({uid: "abc", color: "red"});
-      playerJoin({uid: "BOT", color: "blue"});
-      playerJoin({uid: "p3", color: "orange"});
+      // playerJoin({uid: "abc", color: "#ea5f95"});
+      // playerJoin({uid: "BOT", color: "#4ee478"});
+      // playerJoin({uid: "p3", color: "#14d0e1"});
+      playerJoin({uid: "abc", color: "#f33880"});
+      playerJoin({uid: "BOT", color: "#1de254"});
+      playerJoin({uid: "p3", color: "#00b9ca"});
     }
     WS.onmessage = (message) => {
       const payload:payload = JSON.parse(message.data) as payload

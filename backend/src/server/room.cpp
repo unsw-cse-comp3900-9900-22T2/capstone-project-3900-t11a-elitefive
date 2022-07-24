@@ -16,9 +16,10 @@ auto parse_move(std::string_view message) -> std::string;
 auto parse_uid(std::string_view message) -> int;
 auto player_resigned(std::string_view message) -> bool;
 
-auto json_confirm_move(std::string const& move) -> std::string;
-auto json_board_move(std::string const& move) -> std::string;
-auto json_game_winner(std::string const& player) -> std::string;
+// auto json_confirm_move(std::string const& move) -> std::string;
+// auto json_player3(std::string const& move) -> std::string;
+// auto json_board_move(std::string const& move) -> std::string;
+// auto json_game_winner(std::string const& player) -> std::string;
 // auto game_result(Game const& game) -> std::string;
 // auto game_result(int const uid) -> std::string;
 
@@ -146,6 +147,8 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 			// Make the move in game
 			if (play_move(move) == false) return; 	// Ignore illegal player move
 			publish(ws, json_confirm_move(move), opCode);
+			publish(ws, json_player3("a1"), opCode);
+
 			std::cout << "Made a valid move\n";
 
 			// Handle AI moves
@@ -224,6 +227,13 @@ auto parse_uid(std::string_view message) -> int {
 }
 
 auto Room::json_confirm_move(std::string const& move) -> std::string {
+	json payload;
+	payload["event"] = "moveconfirm";
+	payload["tile"] = move;
+	return payload.dump();
+}
+
+auto Room::json_player3(std::string const& move) -> std::string {
 	json payload;
 	payload["event"] = "player3";
 	payload["tile"] = move;

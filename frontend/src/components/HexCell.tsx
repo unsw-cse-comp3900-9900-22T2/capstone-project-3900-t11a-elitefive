@@ -23,11 +23,11 @@ type StyledProps = {
 const DEFAULT_WIDTH = 100;
 const DEFAULT_HEIGHT = 110;
 
-const DEFAULT_STROKE = "#824ACB"
-const DEFAULT_FILL = "#404348"
+const DEFAULT_STROKE = "#7a7a7a"  // Hex outline
+const DEFAULT_FILL = "#2b3135"
 const DEFAULT_TRANSFORM = ""
 const DEFAULT_STROKE_WIDTH = 3;
-const DEFAULT_HOVER_FILL = "#4E5257";
+const DEFAULT_HOVER_FILL = "#575757"; // Hover colour
 
 
 const SVGContainer = styled.svg<StyledProps>`
