@@ -56,7 +56,7 @@ export default function Gamemode({}: Props) {
 
     const { getUID } = useAuth();
     
-    const handleJoinWaitingRoom = async () => {
+    const handleJoinWaitingRoom = (gamemode:string) => async () => {
       if(!waitingRoomSock) {
         const uid = getUID();
         console.log(uid);
@@ -70,6 +70,7 @@ export default function Gamemode({}: Props) {
               "uid": uid,
               "ranked": isRanked,
               "ai": vsAI,
+              "gamemode": gamemode,
             })
           }));
         },1000)
@@ -165,13 +166,13 @@ export default function Gamemode({}: Props) {
             </Button>
           </Box>
           <Container1>
-            <LargeButton onClick={handleJoinWaitingRoom}>
+            <LargeButton onClick={handleJoinWaitingRoom("CLASSIC")}>
               <Typography variant="h3">{"Classic"}</Typography>
             </LargeButton>
-            <LargeButton onClick={handleJoinWaitingRoom}>
-              <Typography variant="h3">{"Triplets"}</Typography>
+            <LargeButton onClick={handleJoinWaitingRoom("TRIPLES")}>
+              <Typography variant="h3">{"Triples"}</Typography>
             </LargeButton>
-            <LargeButton onClick={handleJoinWaitingRoom}>
+            <LargeButton onClick={handleJoinWaitingRoom("POTHOLES")}>
               <Typography variant="h3">{"Pothole"}</Typography>
             </LargeButton>
           </Container1>

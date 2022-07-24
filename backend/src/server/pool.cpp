@@ -42,7 +42,7 @@ Pool::Pool(uWS::App *app, DatabaseManager *db)
 			// Parse data
 			json data = parse_pool_data(message);
 			
-			std::string gamemode = "TRIPLES";	// TODO: Need information from frontend
+			std::string gamemode = data["gamemode"];	// TODO: Need information from frontend
 			bool ranked_flag = data["ranked"];
 			bool ai_flag = data["ai"];
 
