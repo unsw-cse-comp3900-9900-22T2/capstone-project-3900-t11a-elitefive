@@ -30,13 +30,29 @@ class Game : public BaseGame {
 			if (state == Game::state::DRAW) return -1; // No one won. Assume draw in this case
 			
 			// Game end on player 0's turn
-			if (this->whose_turn() == 1) {
-				if (state == Game::state::WIN) return 0;	// Player 0 won
-				if (state == Game::state::LOSS) return 1;	// Player 1 won
+			if (this->num_players() == 2) {
+				if (this->whose_turn() == 0) {
+					if (state == Game::state::WIN) return 0;	// Player 0 won
+					if (state == Game::state::LOSS) return 1;	// Player 1 won
+				}
+				if (this->whose_turn() == 1) {
+					if (state == Game::state::WIN) return 1;	// Player 1 won
+					if (state == Game::state::LOSS) return 0;	// Player 0 won
+				}
 			}
-			if (this->whose_turn() == 0) {
-				if (state == Game::state::WIN) return 1;	// Player 1 won
-				if (state == Game::state::LOSS) return 0;	// Player 0 won
+			else {
+				if (this->whose_turn() == 0) {
+					if (state == Game::state::WIN) return 0;	// Player 0 won
+					if (state == Game::state::LOSS) return 1;	// Player 1 won
+				}
+				if (this->whose_turn() == 1) {
+					if (state == Game::state::WIN) return 1;	// Player 1 won
+					if (state == Game::state::LOSS) return 2;	// Player 2 won
+				}
+				if (this->whose_turn() == 2) {
+					if (state == Game::state::WIN) return 2;	// Player 2 won
+					if (state == Game::state::LOSS) return 0;	// Player 0 won
+				}
 			}
 			
 			return -1; // No one won. Assume draw in this case

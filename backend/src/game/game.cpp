@@ -13,6 +13,9 @@ Game::Game(int nplayers, std::vector<int> const uids)
 , move_sequence_{}
 {
 	std::cout << "Game: Hello I am making a game for players\n";
+	for (int i : uids) {
+		std::cout << "\tUID" << i << '\n';
+	}
 }
 
 

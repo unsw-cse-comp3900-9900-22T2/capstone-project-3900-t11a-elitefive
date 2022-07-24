@@ -125,8 +125,13 @@ auto AIGame::states() const -> std::vector<std::vector<BitBoard>> const& {
 auto AIGame::minmax(int depth) -> int {
 	auto memo = Memo();
 	int final_move = -1;
+	std::cout << "Minmax at: " << this->num_moves() << '\n';
+	if (depth > 6 && this->num_moves() <= 31) depth = 6;
+	if (depth > 5 && this->num_moves() <= 25) depth = 5;
+	if (depth > 4 && this->num_moves() <= 17) depth = 4;
+	if (depth > 3 && this->num_moves() <= 5) depth = 3;
 	for (int inc_depth = 3; inc_depth <= depth; ++inc_depth) {
-		// std::cout << "\tCalculating depth: " << inc_depth << ' ';
+		std::cout << "\tCalculating depth: " << inc_depth << ' ';
 		auto const score = run_minmax(inc_depth, this->whose_turn(), memo, -99999, 99999);
 		for (auto const& state : this->states()) {
 			AIGame *position = memo.find(state);
@@ -138,6 +143,8 @@ auto AIGame::minmax(int depth) -> int {
 			}
 		}
 		std::cout << "\tDepth: " << inc_depth << "\tBest score: " << score << "\tMove: " << final_move << '\n';
+		if (std::abs(score) >= 1000) break;
+		// if (this->num_moves() <= 2) break;
 	}
 	// exit(1);
 	return final_move;
@@ -236,38 +243,49 @@ auto AIGame::run_minmax(int depth, int player, Memo &memo, int alpha, int beta) 
 	}
 }
 
+auto straight_line(axial::vector const& dir, int tile, BitBoard const& player_tiles, BitBoard const& opponent_tiles) -> int {
+	int count = 0;
+	// Make sure tile is INBOUNDS
+	axial::vector const target_vec = dir * 3;
+	axial::vector const vec_location = axial::vector(tile) + target_vec;
+	// Doesn't land on target
+	if (vec_location.distance() > 4) return 0; // Ignore tiles outside the board
+
+	if (!isSet(player_tiles, vec_location)) 		return 0; // You don't have a tile here
+	if (isSet(opponent_tiles, (tile + dir))) 		return 0; // Opponent tile blocks
+	if (isSet(opponent_tiles, tile + (dir * 2))) 	return 0; // Opponent tile blocks
+	
+	if (isSet(player_tiles, (tile + dir))) ++count; 	// Weight progress higher
+	if (isSet(player_tiles, tile + (dir * 2))) count = count + 20; // Weight progress higher
+
+	++count; // Potential for a connect 4
+	return count;
+}
 
 auto AIGame::heuristic(int const player) -> int {
 	// Assume current player is trying to win
 	Board const &board = this->board();
-	auto const free_spaces = board.free_tiles();
-	auto const player_tiles = board.player_tiles(player);
-	auto const opponent_tiles = board.opponent_tiles(player);
+	BitBoard const free_spaces = board.free_tiles();
+	BitBoard const player_tiles = board.player_tiles(player);
+	BitBoard const opponent_tiles = board.opponent_tiles(player);
 
-	auto const units = axial::vector::unit_directions();
-	auto count = 0;
+	auto count_lines = 0;
+	auto count_distance = 0;
 
 	std::vector<int> const& tiles = player_tiles.binary_to_vector();
-	for (auto const& tile : tiles) {
-		// std::cout << tile << '\n';
-		for (auto const& dir : units) {
-			// Make sure tile is INBOUNDS
-			auto const target_vec = dir * 3;
-			auto const vec_location = axial::vector(tile) + target_vec;
-			// Doesn't land on target
-			if (vec_location.distance() > 4) continue; // Ignore tiles outside the board
+	auto const units = axial::vector::unit_directions();
+	for (int const& tile : tiles) {
+		axial::vector curr_tile = axial::vector(tile);
+		for (axial::vector const& dir : units) {
+			count_lines += straight_line(dir, tile, player_tiles, opponent_tiles);
+		}
 
-			if (!isSet(player_tiles, vec_location)) 		continue; // You don't have a tile here
-			if (isSet(opponent_tiles, (tile + dir))) 		continue; // Opponent tile blocks
-			if (isSet(opponent_tiles, tile + (dir * 2))) 	continue; // Opponent tile blocks
-			
-			if (isSet(player_tiles, (tile + dir))) ++count; 	// Weight progress higher
-			if (isSet(player_tiles, tile + (dir * 2))) ++count; // Weight progress higher
-
-			++count; // Potential for a connect 4
+		// penalise tile location if it's far away
+		if (isSet(player_tiles, tile)) {
+			count_distance -= curr_tile.distance();
 		}
 	}
-	return count/2;
+	return (count_lines/2) + count_distance;
 }
 
 

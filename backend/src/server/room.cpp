@@ -1,6 +1,7 @@
 #include <nlohmann/json.hpp>
 #include <string>
 #include <stdio.h>
+#include <future>
 
 #include "App.h"
 #include "room.hpp"
@@ -10,21 +11,21 @@
 
 using json = nlohmann::json;
 
-struct SocketData{
-	//Empty because we don't need any currently.
-};
-
 // Helper functions
 auto parse_move(std::string_view message) -> std::string;
 auto parse_uid(std::string_view message) -> int;
 auto player_resigned(std::string_view message) -> bool;
 
-auto json_confirm_move(std::string const& move) -> std::string;
-auto json_board_move(std::string const& move) -> std::string;
-auto json_game_winner(std::string const& player) -> std::string;
+// auto json_confirm_move(std::string const& move) -> std::string;
+// auto json_player3(std::string const& move) -> std::string;
+// auto json_board_move(std::string const& move) -> std::string;
+// auto json_game_winner(std::string const& player) -> std::string;
 // auto game_result(Game const& game) -> std::string;
 // auto game_result(int const uid) -> std::string;
 
+auto Room::publish(WebSocket ws, std::string const& message, uWS::OpCode opCode) -> void {
+	ws->publish(this->room_id(), message, opCode);
+}
 
 // ======================================
 // 			Class implementation
@@ -56,31 +57,32 @@ auto Room::generate_game() -> void {
 }
 
 auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
-	auto publish = [this](auto *ws, std::string message, uWS::OpCode opCode) -> void {
-		// std::cout << "\tRoom: Publishing to - " << this->room_id() << '\n';
-		ws->publish(this->room_id(), message, opCode);
-	};
-
 	std::string room_link = this->room_code();
 	app.ws<SocketData>(room_link, uWS::TemplatedApp<false>::WebSocketBehavior<SocketData> {
-		.open = [this, publish](auto *ws) {
+		.open = [this](WebSocket ws) {
 			ws->subscribe(this->room_id());
 			std::cout << "\tLobby: Joined multiplayer lobby\n";
-
-			auto p0 = this->db_->get_user(this->game_->give_uid(0));
-			auto p1 = this->db_->get_user(this->game_->give_uid(1));
+			// TODO: Hack to display names
+			User *p0 = this->db_->get_user(this->game_->give_uid(0));
+			User *p1 = this->db_->get_user(this->game_->give_uid(1));
 			json payload;
 			payload["event"] = "player_names";
 			payload["player_name"] = {
 				p0->username,
 				p1->username
 			};
+			payload["elos"] = {
+				db_->get_latest_elo(p0->id, "CLASSIC"),	// TODO: Do not hardcode
+				db_->get_latest_elo(p1->id, "CLASSIC")	// TODO: Do not hardcode
+			};
 
 			ws->send(payload.dump(), uWS::OpCode::TEXT);
 		},
-		.message = [this, publish](auto *ws, std::string_view message, uWS::OpCode opCode) {
+		.message = [this](WebSocket ws, std::string_view message, uWS::OpCode opCode) {
 			// std::cout << "Lobby: Recieved message\n";
 			int uid = parse_uid(message);
+
+			// Pre-game checks
 			if (player_resigned(message)) {
 				int player = this->game_->give_player_with_uid(uid);
 				int winning_player = this->game_->player_after(player);
@@ -92,24 +94,14 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 				publish(ws, json_game_winner(winner), opCode);
 				return;
 			}
-
-			int players_turn = this->game_->whose_turn();
-			int uid_turn = this->game_->give_uid(players_turn);
-			if (uid_turn == uid) return; // Not the players turn
+			if (click_from_players_turn(uid) == false) return; // Not the players turn
 			
-			// Get move
-			std::string move = parse_move(message);
+			// Player move
+			std::string const move = parse_move(message);
+			click_register_move(move, ws, opCode);
 
-			// Make the move in game
-			std::string move_message = publish_move(move);
-			if (this->play_move(move) == false) return; 	// Ignore illegal player move
-			publish(ws, move_message, opCode);
-			// publish(ws, json_confirm_move(move), opCode);
-			// publish(ws, json_board_move(move), opCode);
-		
-			// Postgame
-			auto const state = game_->status();
-			if (state != Game::state::ONGOING) {
+			// Postgame Checks
+			if (game_->status() != Game::state::ONGOING) {
 				std::string winner = game_result();
 				publish(ws, json_game_winner(winner), opCode);
 				
@@ -117,7 +109,7 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 				save_match(winning_player);
 			}
 		},
-		.close = [this](auto *ws, int x , std::string_view str) {
+		.close = [this](WebSocket ws, int x , std::string_view str) {
 			ws->unsubscribe(this->room_id());
 			// ws->close();
 			// ws->end();
@@ -126,18 +118,16 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 	});
 }
 
-auto Room::create_socket_ai(uWS::App &app) -> void {
-	auto publish = [this](auto *ws, std::string message, uWS::OpCode opCode) -> void {
-		ws->publish(this->room_id(), message, opCode);
-	};
+// ==== AI ROOM CODE ====
 
+auto Room::create_socket_ai(uWS::App &app) -> void {
 	std::string room_link = this->room_code();
 	app.ws<SocketData>(room_link, uWS::TemplatedApp<false>::WebSocketBehavior<SocketData> {
-		.open = [this, publish](auto *ws) {
+		.open = [this](uWS::WebSocket<false, true, SocketData> *ws) {
 			ws->subscribe(this->room_id());
 			std::cout << "Joined room\n";
 		},
-		.message = [this, publish](auto *ws, std::string_view message, uWS::OpCode opCode) {
+		.message = [this](WebSocket ws, std::string_view message, uWS::OpCode opCode) {
 			std::cout << "Recieved message\n";
 			if (player_resigned(message)) {
 				std::string winner = game_result(6);
@@ -145,18 +135,34 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 				save_match(1);
 				return;
 			}
-			
+
+			int uid = parse_uid(message);
+			int players_turn = this->game_->whose_turn();
+			int uid_turn = this->game_->give_uid(players_turn);
+			if (uid_turn != uid) return; // Not the players turn
+
 			// Get move
 			std::string move = parse_move(message);
 			
 			// Make the move in game
 			if (play_move(move) == false) return; 	// Ignore illegal player move
 			publish(ws, json_confirm_move(move), opCode);
+			// publish(ws, json_player3("a1"), opCode);
+
 			std::cout << "Made a valid move\n";
 
 			// Handle AI moves
 			if (game_->status() == Game::state::ONGOING) {	// TODO: Change this to a native call
-				std::string reply = ai_response(move);
+				//  std::future<std::string> reply_future = std::async(Room::ai_response, move, *aigame_);
+				// std::string reply = Room::ai_response(move, *aigame_);
+				auto reply = Room::ai_response(move, aigame_.get(), game_.get(), ws);
+				// auto reply_future = std::async(Room::test, 3);
+				// auto function = static_cast<std::string(*)(std::string &move, AIGame &aigame)>(Room::ai_response);
+				// auto reply_future = std::thread(Room::ai_response, move, aigame_.get(), game_.get(), ws);
+				// reply_future.join();
+				// std::string reply = reply_future.get();
+				// game_->play(reply);
+				// aigame_->play(reply);
 				publish(ws, json_board_move(reply), opCode);
 				// gameover = (game_->status() == Game::state::ONGOING);
 			}
@@ -164,14 +170,14 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 			// Postgame
 			auto const state = game_->status();
 			if (state != Game::state::ONGOING) {
-				this->game_->pass_turn();
 				std::string winner = game_result();
 				publish(ws, json_game_winner(winner), opCode);
 				int const winning_player = this->game_->which_player_won();
 				save_match(winning_player);
 			}
+			std::cout << "\t\tRoom: finished on message\n";
 		},
-		.close = [this](auto *ws, int x , std::string_view str) {
+		.close = [this](WebSocket ws, int x , std::string_view str) {
 			ws->unsubscribe(this->room_id());
 			ws->close();
 			std::cout << "Left ai room\n";
@@ -179,27 +185,20 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 	});
 }
 
-auto Room::room_id() const -> std::string {
-	return room_id_;
-}
-
-auto Room::room_code() const -> std::string {
-	return std::string{"/ws/game/" + this->room_id()};
-}
-
-auto Room::play_move(std::string const& move) -> bool {
-	return this->game_->play(move);
-}
-
-auto Room::ai_response(std::string const& move) -> std::string {
-	AIGame &aigame = *aigame_;	
-	aigame.play(move);
-	auto const response_move = aigame.minmax(3); // depth 3 (could increase but test with that)
-	aigame.play(response_move);
-	aigame.clear();
+auto Room::ai_response(std::string move, AIGame *aigame, Game *game, void *ws) -> std::string {
+	std::cout << "\t\tStarted calculating\n";
+	// AIGame &aigame = *aigame_;	
+	aigame->play(move);
+	// std::cout << *aigame << '\n';
+	auto const response_move = aigame->minmax(7); // depth 3 (could increase but test with that)
+	aigame->play(response_move);
+	aigame->clear();
+	game->play(response_move);
+	// std::cout << "\t\tEnding calculating\n";
+	// std::cout << *aigame << '\n';
 	
 	// Reflect move in the game
-	game_->play(response_move);
+	// game_->play(response_move);
 	return Game::indexToCoord(response_move);
 }
 
@@ -230,6 +229,13 @@ auto parse_uid(std::string_view message) -> int {
 auto Room::json_confirm_move(std::string const& move) -> std::string {
 	json payload;
 	payload["event"] = "moveconfirm";
+	payload["tile"] = move;
+	return payload.dump();
+}
+
+auto Room::json_player3(std::string const& move) -> std::string {
+	json payload;
+	payload["event"] = "player3";
 	payload["tile"] = move;
 	return payload.dump();
 }
@@ -285,6 +291,7 @@ auto Room::calc_elos(int winning_player) -> std::map<int, int> {
 // TODO: Make this a game function instead
 auto Room::game_result() -> std::string {
 	int winning_player = this->game_->which_player_won();
+	std::cout << "WINNING PLAYER: " << winning_player << '\n';
 	int uid = this->game_->give_uid(winning_player);
 	return game_result(uid);
 }
@@ -293,8 +300,11 @@ auto Room::game_result(int const uid) -> std::string {
 	auto user = this->db_->get_user(uid);
 	if (!user) return "MISSINGNO";
 	return user->username;
-	// if (player == 0) return "PLAYER";
-	// if (player == 1) return "COMPUTER";
-	// return "MISSINGNO";
 }
 
+auto Room::click_register_move(std::string const& move, uWS::WebSocket<false, true, SocketData> *ws, uWS::OpCode opCode) -> void {
+	// Make the move in game
+	std::string move_message = publish_move(move);	// Pre-set json string for publish
+	if (this->play_move(move) == false) return; 	// Ignore illegal player move
+	publish(ws, move_message, opCode);
+}

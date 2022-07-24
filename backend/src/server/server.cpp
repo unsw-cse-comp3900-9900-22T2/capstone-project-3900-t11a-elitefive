@@ -59,11 +59,11 @@ void BackendServer() {
 
 	// Room room = Room(app, &db, "4732432", {1, 2});
 	// Room *room = nullptr;
-	std::vector<Room *> rooms = std::vector<Room *>{};
-	printf("Pointer: %p\n", &rooms);
+	// std::vector<Room *> rooms = std::vector<Room *>{};
+	// printf("Pointer: %p\n", &rooms);
 	printf("DB Pointer: %p\n", &database_connection);
 
-	Pool pool = Pool(app, &database_connection, rooms);
+	Pool pool = Pool(&app, &database_connection);
 	
 	// auto playersELO = std::map<int, int>{
 	// 	{1, 100},

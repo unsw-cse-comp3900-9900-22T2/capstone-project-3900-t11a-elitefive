@@ -8,7 +8,12 @@
 #include "aigame.hpp"
 #include "db_manager.hpp"
 
+
 class Room {
+    struct SocketData{
+        //Empty because we don't need any currently.
+    };
+    typedef uWS::WebSocket<false, true, SocketData> *WebSocket;
     private:
         std::string room_id_;
         std::vector<int> uids_; 
@@ -21,15 +26,16 @@ class Room {
     public:
         Room(uWS::App &app, DatabaseManager *db, bool ranked, bool computer, std::string room_id, std::vector<int> uids);
 
-        auto room_id() const -> std::string;
-        auto room_code() const -> std::string;
+        auto room_id() const -> std::string { return room_id_; }
+        auto room_code() const -> std::string { return std::string{"/ws/game/" + this->room_id()}; }
+        auto play_move(std::string const& move) -> bool { return this->game_->play(move); }
 
         auto publish_move(std::string const& move) {
             if (game_ == nullptr) std::cout << "Lobby: WHAT IS HAPPENING\n";
             auto player = game_->whose_turn();
             if (player == 0) return json_confirm_move(move);
             if (player == 1) return json_board_move(move);
-            if (player == 2) return json_confirm_move(move); // TODO: CHANGE
+            if (player == 2) return json_player3(move); // TODO: CHANGE
             return json_confirm_move(move); // TODO: UNREACHABLE IDEALLY
         }
 
@@ -41,15 +47,26 @@ class Room {
         auto create_socket_ai(uWS::App &app) -> void;    // Create room to verse ai
         auto create_socket_player_verse_player(uWS::App &app) -> void;
 
-        auto play_move(std::string const& move) -> bool;
-        auto ai_response(std::string const& move) -> std::string;
-
+        auto static ai_response(std::string move, AIGame *aigame, Game *game, void *ws) -> std::string;
         auto json_confirm_move(std::string const& move) -> std::string;
+        auto json_player3(std::string const& move) -> std::string;
         auto json_board_move(std::string const& move) -> std::string;
         auto json_game_winner(std::string const& player) -> std::string;
 
         auto calc_elos(int winning_player) -> std::map<int, int>;
         auto save_match(int winning_player) -> void;
+
+    private:
+        auto publish(uWS::WebSocket<false, true, SocketData> *ws, std::string const& message, uWS::OpCode opCode) -> void;
+
+        auto click_register_move(std::string const& move, uWS::WebSocket<false, true, SocketData> *ws, uWS::OpCode opCode) -> void;
+
+
+        auto click_from_players_turn(int uid) -> bool {
+			int players_turn = this->game_->whose_turn();
+			int uid_turn = this->game_->give_uid(players_turn);
+			return (uid_turn == uid);
+        }
 };
 
 #endif
