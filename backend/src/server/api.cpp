@@ -298,8 +298,6 @@ auto api_search_snapshot(uWS::App &app, DatabaseManager &db) -> void {
 	});
 }
 
-
-
 // TESTING ENDPOINTS
 auto api_david(uWS::App &app) -> void {
 	app.get("/api/david", [&app](auto *res, auto *req) {
