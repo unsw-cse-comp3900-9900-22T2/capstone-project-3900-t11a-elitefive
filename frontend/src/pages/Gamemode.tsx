@@ -68,8 +68,8 @@ export default function Gamemode({}: Props) {
           ws.send(JSON.stringify({
             "data": JSON.stringify({
               "uid": uid,
-              "ranked": vsAI,
-              "ai": isRanked,
+              "ranked": isRanked,
+              "ai": vsAI,
             })
           }));
         },1000)
