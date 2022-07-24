@@ -24,7 +24,9 @@ export default function Sidebar({}: Props) {
   const { getUID } = useAuth();
 
   const currPlayer = getPlayers()[0]?.name;
+  const currPlayerElo = getPlayers()[0]?.elo;
   const otherPlayer = getPlayers()[1]?.name;
+  const otherPlayerElo = getPlayers()[1]?.elo;
 
   return (
     <Container>
@@ -33,7 +35,7 @@ export default function Sidebar({}: Props) {
           Player { currPlayer }
         </Typography>
         <Typography sx={{ fontSize: 20 }} color="white" gutterBottom>
-          1580
+          {currPlayerElo}
         </Typography>
       </Card3>
       <Card2>
@@ -46,7 +48,7 @@ export default function Sidebar({}: Props) {
           Player { otherPlayer }
         </Typography>
         <Typography sx={{ fontSize: 20 }} color="white" gutterBottom>
-          1530
+          {otherPlayerElo}
         </Typography>
       </Card3>
       <Button 

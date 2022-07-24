@@ -32,7 +32,15 @@ export const WSProvider = ({ children, gameId }: Props) => {
   const [socket, setSocket] = useState<WebSocket| null>(null);
   const [socketConnected, setSocketConnected] = useState<boolean>(false);
   
-  const { playMove, setHexTileState, playerJoin, getPlayerInfo, setWinner, setPlayerName } = useGameState();
+  const { 
+    playMove, 
+    setHexTileState, 
+    playerJoin, 
+    getPlayerInfo, 
+    setWinner, 
+    setPlayerName, 
+    setPlayerElo
+  } = useGameState();
   const { getUID } = useAuth();
   
   useEffect(() => {
@@ -93,9 +101,12 @@ export const WSProvider = ({ children, gameId }: Props) => {
         }
         case "player_names": {
           const payload = JSON.parse(message.data);
-          const { player_name } = payload;
+          console.log(payload)
+          const { player_name, elos } = payload;
           setPlayerName(0, player_name[0]);
+          setPlayerElo(0, elos[0])
           setPlayerName(1, player_name[1]);
+          setPlayerElo(1, elos[1])
           break;
         }
       }
