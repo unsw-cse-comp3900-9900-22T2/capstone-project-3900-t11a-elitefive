@@ -5,7 +5,7 @@ import { useGameState, PlayerType } from './GlobalGameState';
 
 interface payload {
   // type: "init" | "terminating" | "acknowledged"
-  event: "move" | "moveconfirm" | "game_over" | "player_names"
+  event: "move" | "moveconfirm" | "game_over" | "player_names" | "player3"
   contents?: string;
   tile?: string;
   winner?: string;
@@ -41,6 +41,7 @@ export const WSProvider = ({ children, gameId }: Props) => {
       setSocketConnected(true);
       playerJoin({uid: "abc", color: "red"});
       playerJoin({uid: "BOT", color: "blue"});
+      playerJoin({uid: "p3", color: "orange"});
     }
     WS.onmessage = (message) => {
       const payload:payload = JSON.parse(message.data) as payload
@@ -67,6 +68,14 @@ export const WSProvider = ({ children, gameId }: Props) => {
           const hexKey = payload.tile;
           if (hexKey) {
             playMove("abc", hexKey);
+          }
+          break;
+        }
+        case "player3" : {
+          const payload:payload = JSON.parse(message.data) as payload
+          const hexKey = payload.tile;
+          if (hexKey) {
+            playMove("p3", hexKey);
           }
           break;
         }

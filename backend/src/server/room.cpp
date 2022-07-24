@@ -61,7 +61,6 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 		.open = [this](WebSocket ws) {
 			ws->subscribe(this->room_id());
 			std::cout << "\tLobby: Joined multiplayer lobby\n";
-
 			// TODO: Hack to display names
 			User *p0 = this->db_->get_user(this->game_->give_uid(0));
 			User *p1 = this->db_->get_user(this->game_->give_uid(1));
@@ -226,7 +225,7 @@ auto parse_uid(std::string_view message) -> int {
 
 auto Room::json_confirm_move(std::string const& move) -> std::string {
 	json payload;
-	payload["event"] = "moveconfirm";
+	payload["event"] = "player3";
 	payload["tile"] = move;
 	return payload.dump();
 }
