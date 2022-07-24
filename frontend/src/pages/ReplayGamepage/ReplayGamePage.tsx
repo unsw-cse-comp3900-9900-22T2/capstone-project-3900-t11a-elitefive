@@ -174,6 +174,7 @@ export function Sidebar({ matchData, currIndex, replayStringArr, setCurrIndex, s
 
   const movePrev = () => {
     if (!splitReplayString) return;
+    if(currIndex == 0) return;
     setCurrIndex(prev=>prev-1)
     setReplayStringArr(splitReplayString.slice(0, currIndex-1))
     console.log(replayStringArr);
