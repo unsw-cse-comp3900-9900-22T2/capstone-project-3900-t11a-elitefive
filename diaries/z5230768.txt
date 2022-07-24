@@ -107,3 +107,20 @@ easily track moves played in the game and give it to the database to store.
 - Fixed Backend directory structure to be more organised
 Also go vscode working with our project now.
 
+Week 7
+We all individually worked on our tasks and tickets to get functionality done for demo 2.
+- I refactored game logic code to be easier to deal with for ai purposes.
+- I reworked on AI logic to improve the logic and make it more difficult. The AI does a proper tree search now based on a
+simple heuristic.
+- Worked on API logic to serve data from database to frontend.
+- Developed websocketing logic for multiplayer gameplay.
+- Also made it so many users can play different games on the same server at the same time without interfering with each other.
+- Implemented basic elo and used Jacky J database calls.
+During this I also reviewed some of the frontend changes with Jacky X and gave pointers on what needed to be implemented and changed.
+
+Week 8
+Lots of ground work coding to serve functionality in our last sprint.
+- Refactoring the waiting room logic so we can expand it for more gamemodes and players.
+- Refactoring the multiplayer socketing code to handle different game modes.
+- Lots of improvements to AI to give settings for difficulty changes.
+- Changed some frontend colours and function calls that handle tile placements.
