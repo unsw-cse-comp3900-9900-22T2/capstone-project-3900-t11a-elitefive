@@ -31,7 +31,10 @@ class DatabaseManager {
     // PLAYER PROFILE
     auto get_latest_elo(int id, std::string gameType) -> int;
     auto get_stats(int id) -> PlayerStats*;
-    auto get_elo_progress(int id) -> std::map<std::string, std::vector<int>>;
+    auto get_elo_progress(int id, std::string mode) -> std::vector<int>;
+    // LEADERBOARD
+    auto get_global_leaderboard(std::string gameType) -> std::vector<LeaderboardEntry>;
+    auto get_friend_leaderboard(std::string gameType, int id) -> std::vector<LeaderboardEntry>;
     // FRIENDS
     auto get_friends(int id) -> std::vector<User*>;
     auto are_friends(int id1, int id2) -> bool;

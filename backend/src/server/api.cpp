@@ -187,13 +187,6 @@ auto friendaction(uWS::App &app, DatabaseManager &db, std::unordered_map<int, st
 }
 
 // GET REQUESTS
-auto hardcoded_elo_history() -> json {
-	json history;
-	history["CLASSIC"] = {1000, 1030, 1060, 1030, 1030, 1000, 970, 940, 940, 970, 1000, 1030, 1060};
-	history["TRIPLES"] = {1060, 1030, 1030, 1000, 970, 940, 940, 970, 1000};
-	history["POTHOLES"] = {940, 970, 1000, 1030, 1060, 1030, 1000, 1030, 1060, 1030, 1030, 1000, 970, 940};
-	return history;
-}
 
 auto api_profile(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std::string> &session_tokens) -> void {
 	app.get("/api/profile", [&app, &db, &session_tokens](auto *res, auto *req) {
@@ -208,12 +201,16 @@ auto api_profile(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std
 			{"TRIPLES", db.get_latest_elo(uid, "TRIPLES")},
 			{"POTHOLES", db.get_latest_elo(uid, "POTHOLES")},
 		};
+		auto elohistory = std::map<std::string, std::vector<int>>{
+			{"CLASSIC", db.get_elo_progress(uid, "CLASSIC")},
+			{"TRIPLES", db.get_elo_progress(uid, "TRIPLES")},
+			{"POTHOLES", db.get_elo_progress(uid, "POTHOLES")}
+		};
 		auto friends = db.get_friends(uid);
 		
 		json profile_json;
 		if (user != nullptr) {
-			profile_json = profile_to_json(user, stats, elos, friends);
-			profile_json["elo_history"] = hardcoded_elo_history();	// TODO: EPHISTORY
+			profile_json = profile_to_json(user, stats, elos, elohistory, friends);
 		}
 		res->end(profile_json.dump());	
 	});	
@@ -265,14 +262,39 @@ auto api_leaderboards(uWS::App &app, DatabaseManager &db) -> void {
 	app.get("/api/leaderboards", [&app, &db](auto *res, auto *req) {
 		auto suid = std::string(req->getQuery("uid")); 
 		auto uid = atoi(suid.c_str());
-
-		// TODO: Generate the proper JSON (EPLEADERBOARD)
-
-		// TODO: REMOVE THIS HARDCODED
-		json leaderboards = json::parse(R"(
-			{"global_leaderboard": {"classic": [{"uid": 3, "rank": 1, "username": "Mark", "elo": 1900, "wins": 12, "losses": 5}, {"uid": 1, "rank": 2, "username": "Amy", "elo": 1700, "wins": 32, "losses": 31}], "triples": [{"uid": 4, "rank": 1, "username": "Jerry", "elo": 1500, "wins": 22, "losses": 21}, {"uid": 2, "rank": 2, "username": "Peter", "elo": 1350, "wins": 24, "losses": 26}, {"uid": 6, "rank": 3, "username": "Harry", "elo": 1350, "wins": 24, "losses": 22}], "potholes": [{"uid": 2, "rank": 1, "username": "Peter", "elo": 1200, "wins": 21, "losses": 22}, {"uid": 5, "rank": 2, "username": "Amanda", "elo": 1100, "wins": 200, "losses": 201}]}, "friend_leaderboard": {"classic": [{"uid": 1, "rank": 2, "username": "Amy", "elo": 1700, "wins": 32, "losses": 31}], "triples": [{"uid": 2, "rank": 2, "username": "Peter", "elo": 1350, "wins": 24, "losses": 26}, {"uid": 6, "rank": 3, "username": "Harry", "elo": 1350, "wins": 24, "losses": 22}], "potholes": [{"uid": 2, "rank": 1, "username": "Peter", "elo": 1200, "wins": 21, "losses": 22}]}}
-		)");
-		res->end(leaderboards.dump());	
+		// Generate the leaderboards json.
+		auto g_classic = db.get_global_leaderboard("CLASSIC");
+		auto g_triples = db.get_global_leaderboard("TRIPLES");
+		auto g_pothole = db.get_global_leaderboard("POTHOLES");
+		auto f_classic = db.get_friend_leaderboard("CLASSIC", uid);
+		auto f_triples = db.get_friend_leaderboard("TRIPLES", uid);
+		auto f_pothole = db.get_friend_leaderboard("POTHOLES", uid);
+		json leaderboards;
+		leaderboards["global_leaderboard"]["classic"] = {};
+		leaderboards["global_leaderboard"]["triples"] = {};
+		leaderboards["global_leaderboard"]["potholes"] = {};
+		leaderboards["friend_leaderboard"]["classic"] = {};
+		leaderboards["friend_leaderboard"]["triples"] = {};
+		leaderboards["friend_leaderboard"]["potholes"] = {};
+		for (auto const &entry : g_classic) {
+			leaderboards["global_leaderboard"]["classic"].push_back(entry.to_json());
+		}
+		for (auto const &entry : g_triples) {
+			leaderboards["global_leaderboard"]["triples"].push_back(entry.to_json());
+		}
+		for (auto const &entry : g_pothole) {
+			leaderboards["global_leaderboard"]["potholes"].push_back(entry.to_json());
+		}
+		for (auto const &entry : f_classic) {
+			leaderboards["friend_leaderboard"]["classic"].push_back(entry.to_json());
+		}
+		for (auto const &entry : f_triples) {
+			leaderboards["friend_leaderboard"]["triples"].push_back(entry.to_json());
+		}
+		for (auto const &entry : f_pothole) {
+			leaderboards["friend_leaderboard"]["potholes"].push_back(entry.to_json());
+		}
+		res->end(leaderboards.dump());
 	});
 }
 

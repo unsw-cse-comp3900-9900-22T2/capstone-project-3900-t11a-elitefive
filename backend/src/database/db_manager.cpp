@@ -132,19 +132,50 @@ auto DatabaseManager::get_stats(int id) -> PlayerStats* {
   return result;
 }
 
-auto DatabaseManager::get_elo_progress(int id) -> std::map<std::string, std::vector<int>> {
-  auto res = execute("get_elo_progress", id);
-  auto progress = std::map<std::string, std::vector<int>>{
-    {"CLASSIC", {}},
-    {"TRIPLES", {}},
-    {"POTHOLES", {}}
-  };
+auto DatabaseManager::get_elo_progress(int id, std::string mode) -> std::vector<int> {
+  auto res = execute("get_elo_progress", id, mode);
+  auto progress = std::vector<int>{1000};
   for (auto const &row : res) {
-    auto game = row[0].c_str();
-    auto elo = atoi(row[1].c_str());
-    progress[game].push_back(elo);
+    auto elo = atoi(row[0].c_str());
+    progress.push_back(elo);
   }
   return progress;
+}
+
+auto DatabaseManager::get_global_leaderboard(std::string gameType) -> std::vector<LeaderboardEntry> {
+  auto res = execute("get_global_leaderboard", gameType);
+  auto leaderboard = std::vector<LeaderboardEntry>{};
+  auto rank = 1;
+  for (auto const &row : res) {
+    auto uid = atoi(row[0].c_str());
+    auto username = row[1].c_str();
+    auto elo = atoi(row[2].c_str());
+    auto wins = atoi(row[3].c_str());
+    auto losses = atoi(row[4].c_str());
+    auto draws = atoi(row[5].c_str());
+    auto entry = new LeaderboardEntry(rank, uid, username, elo, wins, losses, draws);
+    leaderboard.push_back(*entry);
+    rank++;
+  }
+  return leaderboard;
+}
+
+auto DatabaseManager::get_friend_leaderboard(std::string gameType, int id) -> std::vector<LeaderboardEntry> {
+  auto res = execute("get_friend_leaderboard", gameType, id);
+  auto leaderboard = std::vector<LeaderboardEntry>{};
+  auto rank = 1;
+  for (auto const &row : res) {
+    auto uid = atoi(row[0].c_str());
+    auto username = row[1].c_str();
+    auto elo = atoi(row[2].c_str());
+    auto wins = atoi(row[3].c_str());
+    auto losses = atoi(row[4].c_str());
+    auto draws = atoi(row[5].c_str());
+    auto entry = new LeaderboardEntry(rank, uid, username, elo, wins, losses, draws);
+    leaderboard.push_back(*entry);
+    rank++;
+  }
+  return leaderboard;
 }
 
 auto DatabaseManager::get_friends(int id) -> std::vector<User*> {
@@ -191,6 +222,9 @@ auto DatabaseManager::delete_friend(int from, int to) -> bool {
 }
 
 auto DatabaseManager::send_friend_req(int from, int to) -> bool {
+  if (from == to) {
+    return false;
+  }
   return execute0("send_friend_req", from, to);
 }
 
@@ -354,12 +388,89 @@ auto DatabaseManager::prepare_statements() -> void {
   "WHERE player = $1 "
   "GROUP BY game, ranked, outcome;");
   conn_.prepare("get_elo_progress",
-  "SELECT game, end_elo "
+  "SELECT end_elo "
   "FROM outcomes "
   "JOIN matches ON outcomes.match = matches.id "
-  "WHERE player = $1 AND ranked = true "
-  "GROUP BY game, end_elo, end_time "
-  "ORDER BY game, end_time");
+  "WHERE player = $1 AND game = $2 AND ranked = true "
+  "ORDER BY end_time");
+  conn_.prepare("get_global_leaderboard",
+  "SELECT users.id, users.username, COALESCE("
+  "(SELECT o.end_elo FROM matches m "
+  "JOIN outcomes o ON m.id = o.match "
+  "JOIN users u ON o.player = u.id "
+  "WHERE u.id = users.id AND m.game = matches.game "
+  "ORDER BY m.end_time DESC "
+  "LIMIT 1), 1000) as elo, "
+  "(SELECT COUNT(outcome) "
+  "FROM matches m "
+  "JOIN outcomes o ON m.id = o.match "
+  "WHERE o.player = users.id "
+  "AND outcome = 'WIN' "
+  "AND m.game = matches.game) "
+  "as wins, "
+  "(SELECT COUNT(outcome) "
+  "FROM matches m "
+  "JOIN outcomes o ON m.id = o.match "
+  "WHERE o.player = users.id "
+  "AND outcome = 'LOSS' "
+  "AND m.game = matches.game) "
+  "as losses, "
+  "(SELECT COUNT(outcome) "
+  "FROM matches m "
+  "JOIN outcomes o ON m.id = o.match "
+  "WHERE o.player = users.id "
+  "AND outcome = 'DRAW' "
+  "AND m.game = matches.game) "
+  "as draws "
+  "FROM users "
+  "JOIN outcomes ON outcomes.player = users.id "
+  "JOIN matches ON outcomes.match = matches.id "
+  "WHERE game = $1 "
+  "AND users.id NOT IN (6, 7, 8) "
+  "GROUP BY game, users.id "
+  "ORDER BY elo DESC, username;");
+  conn_.prepare("get_friend_leaderboard",
+  "SELECT users.id, users.username, COALESCE("
+  "(SELECT o.end_elo FROM matches m "
+  "JOIN outcomes o ON m.id = o.match "
+  "JOIN users u ON o.player = u.id "
+  "WHERE u.id = users.id AND m.game = matches.game "
+  "ORDER BY m.end_time DESC "
+  "LIMIT 1), 1000) as elo, "
+  "(SELECT COUNT(outcome) "
+  "FROM matches m "
+  "JOIN outcomes o ON m.id = o.match "
+  "WHERE o.player = users.id "
+  "AND outcome = 'WIN' "
+  "AND m.game = matches.game) "
+  "as wins, "
+  "(SELECT COUNT(outcome) "
+  "FROM matches m "
+  "JOIN outcomes o ON m.id = o.match "
+  "WHERE o.player = users.id "
+  "AND outcome = 'LOSS' "
+  "AND m.game = matches.game) "
+  "as losses, "
+  "(SELECT COUNT(outcome) "
+  "FROM matches m "
+  "JOIN outcomes o ON m.id = o.match "
+  "WHERE o.player = users.id "
+  "AND outcome = 'DRAW' "
+  "AND m.game = matches.game) "
+  "as draws "
+  "FROM users "
+  "JOIN outcomes ON outcomes.player = users.id "
+  "JOIN matches ON outcomes.match = matches.id "
+  "WHERE game = $1 "
+  "AND users.id NOT IN (6, 7, 8) "
+  "AND (users.id IN "
+  "(SELECT friend1 FROM friends "
+  "WHERE friend2 = $2)) "
+  "OR (users.id IN "
+  "(SELECT friend2 FROM friends "
+  "WHERE friend1 = $2)) "
+  "GROUP BY game, users.id "
+  "ORDER BY elo DESC, username;");
   conn_.prepare("are_friends",
   "SELECT * FROM friends "
   "WHERE (friend1 = $1 AND friend2 = $2) "

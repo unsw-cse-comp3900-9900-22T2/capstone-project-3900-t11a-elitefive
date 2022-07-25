@@ -58,7 +58,8 @@ auto send_email_varification(std::string email, std::string username, std::strin
 
 
 
-auto profile_to_json(User *user, PlayerStats *stats, std::map<std::string, int> elos, std::vector<User*> friends) -> json {
+auto profile_to_json(User *user, PlayerStats *stats, std::map<std::string, int> elos,
+    std::map<std::string, std::vector<int>> elohistory, std::vector<User*> friends) -> json {
     json result;
     result["event"] = "profile";
     result["action"] = "get";
@@ -67,6 +68,7 @@ auto profile_to_json(User *user, PlayerStats *stats, std::map<std::string, int> 
     result["payload"]["email"] = user->email;
     result["payload"]["ranked"] = stats_to_json(true, stats, elos);
     result["payload"]["unranked"] = stats_to_json(false, stats, elos);
+    result["payload"]["elo_history"] = elo_history_to_json(elohistory);
     result["payload"]["friends"] = friends_to_json(friends);
     return result;
 }
@@ -81,6 +83,15 @@ auto stats_to_json(bool ranked, PlayerStats *stats, std::map<std::string, int> e
         if (ranked) {
             result[mode]["elo"] = elos.at(mode);
         }
+    }
+    return result;
+}
+
+auto elo_history_to_json(std::map<std::string, std::vector<int>> elohistory) -> json {
+    json result;
+    std::vector<std::string> modes = { "CLASSIC", "TRIPLES", "POTHOLES" };
+    for (auto const& mode : modes) {
+        result[mode] = elohistory.at(mode);
     }
     return result;
 }

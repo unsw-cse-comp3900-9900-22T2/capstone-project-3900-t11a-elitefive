@@ -115,11 +115,11 @@ insert into outcomes values
 (5, 5, 970, 'LOSS'),
 (1, 5, 1030, 'WIN'),
 (1, 6, 1000, 'LOSS'),
-(4, 6, 1000, 'WIN'),
-(2, 7, 1000, 'WIN'),
-(3, 7, 1000, 'LOSS'),
+(4, 6, 1090, 'WIN'),
+(2, 7, 1030, 'WIN'),
+(3, 7, 910, 'LOSS'),
 (2, 8, 1000, 'LOSS'),
-(4, 8, 1000, 'WIN');
+(4, 8, 1120, 'WIN');
 
 -- Insert Snapshots
 insert into snapshots(match, move_num, boardstate) values 
