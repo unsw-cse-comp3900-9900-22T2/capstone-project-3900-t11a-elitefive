@@ -60,6 +60,14 @@ auto BaseGame::list_potholes() const -> std::vector<std::string> {
 	return holes;
 }
 
+auto BaseGame::list_potholes_string() const -> std::string {
+    std::string output = std::string{};
+    for (auto const& tile : list_potholes()) {
+        output.append(tile);
+    }
+    return output;
+}
+
 
 auto BaseGame::pass_turn() -> void {
 	player_turn_ = next_player();

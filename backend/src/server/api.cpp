@@ -232,6 +232,11 @@ auto api_replay(uWS::App &app, DatabaseManager &db) -> void {
 
 			payload["nplayers"] = nplayers;
 			payload["holes"] = {};
+
+			for (int i = 0; i < match->potholes.size(); i = i + 2) {
+				std::string hole = match->potholes.substr(i, 2);
+				payload["holes"].push_back(hole);
+			}
 						
 			auto meta = MetaDataGenerator(moves, nplayers);
 			payload["move_seq"] = {};
@@ -377,11 +382,12 @@ auto api_db(uWS::App &app, DatabaseManager &db) -> void {
 			{2, 1200}
 		};
 		auto winner = 1;
+		auto potholes = "";
 		auto move_seq = "12345";
 		auto snapshots = std::vector<uint64_t>{100, 200, 300, 400, 500};
-		auto matchID = db.save_match("POTHOLES", false, playersELO, winner, move_seq, snapshots);
-		db.save_match("CLASSIC", false, playersELO, winner, move_seq, snapshots);
-		db.save_match("TRIPLES", false, playersELO, winner, move_seq, snapshots);
+		auto matchID = db.save_match("POTHOLES", false, playersELO, winner, potholes, move_seq, snapshots);
+		db.save_match("CLASSIC", false, playersELO, winner, potholes, move_seq, snapshots);
+		db.save_match("TRIPLES", false, playersELO, winner, potholes, move_seq, snapshots);
 		auto matches = db.get_matches(1);
 		for (auto const &match : matches) {
 			std::cout << match.id << " " << match.game << " " <<

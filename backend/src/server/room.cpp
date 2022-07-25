@@ -285,7 +285,8 @@ auto Room::save_match(int winning_player) -> void {
 	// std::cout << "Room: Winning player - " << winning_player << " with uid: " << winning_uid << '\n';
 	
 	auto playersELO = calc_elos(winning_player);
-	auto const match_id = db_->save_match("CLASSIC", this->ranked_, playersELO, winning_uid, game_->move_sequence(), snapshots);
+	auto const match_id = db_->save_match("CLASSIC", this->ranked_, playersELO, winning_uid,
+		game_->list_potholes_string() ,game_->move_sequence(), snapshots);
 	std::cout << "Match ID: " << match_id << '\n';
 }
 
@@ -307,8 +308,6 @@ auto Room::calc_elos(int winning_player) -> std::map<int, int> {
 	}
 	return playersELO;
 }
-
-
 
 // TODO: Make this a game function instead
 auto Room::game_result() -> std::string {
