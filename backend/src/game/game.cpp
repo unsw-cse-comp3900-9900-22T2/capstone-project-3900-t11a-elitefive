@@ -3,11 +3,12 @@
 
 #include "game.hpp"
 #include "axial.hpp"
+#include "BitBoard.hpp"
 
-Game::Game(int nplayers) : Game(nplayers, std::vector<int>(nplayers, -1)) {} // When you don't care about uids. Usually for metadata stuff
+Game::Game(int nplayers, BitBoard potholes) : Game(nplayers, std::vector<int>(nplayers, -1), potholes) {} // When you don't care about uids. Usually for metadata stuff
 
-Game::Game(int nplayers, std::vector<int> const uids)
-: BaseGame{nplayers}
+Game::Game(int nplayers, std::vector<int> const uids, BitBoard potholes)
+: BaseGame{nplayers, potholes}
 , uids_{uids}
 , gamestate_{Game::state::ONGOING}
 , move_sequence_{}
@@ -35,6 +36,8 @@ auto Game::play(int index) -> bool {
 	board().set(index, this->whose_turn());
 	end_turn(index);
 	append_move(BaseGame::indexToCoord(index));
+	std::cout << board() << "DEBUG BOARD PRINT\n";
+	std::cout << "Game: Spaces - " << board().num_spaces() << " Moves: " << this->num_moves() << "\n";
 	return true;
 }
 
@@ -57,7 +60,6 @@ auto Game::move_sequence() const -> std::string {
 auto Game::all_moves() const -> const std::vector<std::string> {
 	return move_sequence_;
 }
-
 
 // Private
 auto Game::end_turn(int index) -> void {

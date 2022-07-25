@@ -92,7 +92,7 @@ auto Pool::start_player_vs_player_game(std::string const& gamemode, bool ranked_
 		classic_.pop_front();
 
 		uint32_t room_id = ((uint32_t) opponent << 16) | (uint32_t) uid;
-		create_new_room(room_id, ranked_flag, false, {opponent, uid});
+		create_new_room(room_id, ranked_flag, false, false, {opponent, uid});
 		// std::cout << "Created room: " << std::to_string(room_id) << " Opp: " << opponent << " Self: " << uid << '\n'; 
 		
 		json payload = make_json_game_selection({opponent, uid}, std::to_string(room_id), gamemode, ranked_flag, false);
@@ -105,8 +105,22 @@ auto Pool::start_player_vs_player_game(std::string const& gamemode, bool ranked_
 		triples_.pop_front();
 
 		uint32_t room_id = ((uint32_t) opp1 << 24) | ((uint32_t) opp2 << 16) | uid;
-		create_new_room(room_id, ranked_flag, false, {opp1, opp2, uid});
+		create_new_room(room_id, ranked_flag, false, false, {opp1, opp2, uid});
 		json payload = make_json_game_selection({opp1, opp2, uid}, std::to_string(room_id), gamemode, ranked_flag, false);
+		return payload;
+	}
+	else if (gamemode == "POTHOLES") {
+		// Grab from Queue
+		int opponent = potholes_.front();
+		potholes_.pop_front();
+
+		uint32_t room_id = ((uint32_t) opponent << 16) | (uint32_t) uid;
+		// ai: false
+		// potholes: true 
+		create_new_room(room_id, ranked_flag, false, true, {opponent, uid});
+		// std::cout << "Created room: " << std::to_string(room_id) << " Opp: " << opponent << " Self: " << uid << '\n'; 
+		
+		json payload = make_json_game_selection({opponent, uid}, std::to_string(room_id), gamemode, ranked_flag, false);
 		return payload;
 	}
 }
@@ -127,6 +141,10 @@ auto Pool::player_vs_player_waiting_lobby(std::string const& gamemode, bool rank
 		wait_for_triples(uid);
 		return {};	// Nothing to transmit to frontend
 	}
+	else if (gamemode == "POTHOLES" && players_waiting_potholes() < 1) {
+		wait_for_potholes(uid);
+		return {};
+	}
 	else {
 		return start_player_vs_player_game(gamemode, ranked_flag, uid);
 	}
@@ -136,7 +154,9 @@ auto Pool::start_player_vs_ai_game(std::string const& gamemode, bool ranked_flag
 	// Versing AI
 	int computer_uid = 6; // TODO: HARDCODED AI ID. Need to do selection
 	uint32_t room_id = ((uint32_t) uid << 17) | (uint32_t) computer_uid;
-	create_new_room(room_id, ranked_flag, true, {uid, computer_uid});
+	bool potholes = false;
+	if (gamemode == "POTHOLES") potholes = true;
+	create_new_room(room_id, ranked_flag, true, potholes, {uid, computer_uid});
 	return make_json_game_selection({computer_uid, uid}, std::to_string(room_id), gamemode, ranked_flag, true);
 }
 

@@ -8,9 +8,25 @@ Board::Board(int nplayers)
 : nplayers_{nplayers}
 , nspaces_{61} // Assume that it is a classic board
 , player_boards_{std::vector<BitBoard>{}}
+, potholes_{BitBoard()} // Empty
 {
 	for (int i = 0; i < nplayers; i++) {
 		player_boards_.push_back(BitBoard()); // Every player has an empty board
+	}
+}
+
+Board::Board(int nplayers, BitBoard const& potholes)
+: nplayers_{nplayers}
+, nspaces_{61} // Assume that it is a classic board
+, player_boards_{std::vector<BitBoard>{}}
+, potholes_{potholes} // Holes set
+{
+	for (int i = 0; i < nplayers; i++) {
+		player_boards_.push_back(BitBoard()); // Every player has an empty board
+	}
+	// Decrease number of tiles available based on potholes
+	for (int i = 0; i < 61; i++) {
+		if (potholes_.isSet(i) == true) nspaces_--;
 	}
 }
 
@@ -18,6 +34,7 @@ Board::Board(Board const& board)
 : nplayers_{board.num_players()}
 , nspaces_{board.num_spaces()}
 , player_boards_{std::vector<BitBoard>{}}
+, potholes_{board.potholes()}
 {
 	for (int i = 0; i < nplayers_; i++) {
 		player_boards_.push_back(board.player_tiles(i)); // Every player current board
@@ -68,7 +85,7 @@ auto Board::opponent_tiles(int player) const -> BitBoard {
 }
 
 auto Board::free_tiles() const -> BitBoard {
-	auto taken_spaces = BitBoard();
+	BitBoard taken_spaces = potholes();		// Empty if no potholes
 	for (auto const& player : player_boards_) {
 		taken_spaces = taken_spaces ^ player;
 	}
