@@ -30,7 +30,7 @@ auto Room::publish(WebSocket ws, std::string const& message, uWS::OpCode opCode)
 // ======================================
 // 			Class implementation
 // ======================================
-Room::Room(uWS::App &app, DatabaseManager *db, bool ranked, bool computer, std::string room_id, std::vector<int> uids)
+Room::Room(uWS::App &app, DatabaseManager *db, bool ranked, bool computer, bool potholes, std::string room_id, std::vector<int> uids)
 : room_id_{room_id}
 , uids_{uids}
 , game_{nullptr}
@@ -39,7 +39,7 @@ Room::Room(uWS::App &app, DatabaseManager *db, bool ranked, bool computer, std::
 , ranked_{ranked}
 , computer_{computer}
 {
-	generate_game();	// CLASSIC / POTHOLES / ETC
+	generate_game(potholes);	// CLASSIC / POTHOLES / ETC
 	
 	if (computer_) {
 		create_socket_ai(app);
@@ -50,10 +50,14 @@ Room::Room(uWS::App &app, DatabaseManager *db, bool ranked, bool computer, std::
 
 }
 
-auto Room::generate_game() -> void {
+auto Room::generate_game(bool potholes) -> void {
 	int nplayers = uids_.size();
-	this->game_ = std::make_unique<Game>(nplayers, uids_);
-	this->aigame_ = std::make_unique<AIGame>(nplayers);
+	BitBoard missing_tiles = BitBoard(); // Assume none
+	if (potholes) {
+		missing_tiles = BitBoard(743284239);
+	}
+	this->game_ = std::make_unique<Game>(nplayers, uids_, missing_tiles);
+	this->aigame_ = std::make_unique<AIGame>(nplayers, missing_tiles);
 }
 
 auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
@@ -75,6 +79,7 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 				db_->get_latest_elo(p0->id, "CLASSIC"),	// TODO: Do not hardcode
 				db_->get_latest_elo(p1->id, "CLASSIC")	// TODO: Do not hardcode
 			};
+			payload["potholes"] = this->game_->list_potholes();
 
 			ws->send(payload.dump(), uWS::OpCode::TEXT);
 		},
@@ -127,6 +132,22 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 		.open = [this](uWS::WebSocket<false, true, SocketData> *ws) {
 			ws->subscribe(this->room_id());
 			std::cout << "Joined room\n";
+			// TODO: Hack to display names
+			User *p0 = this->db_->get_user(this->game_->give_uid(0));
+			User *p1 = this->db_->get_user(this->game_->give_uid(1));
+			json payload;
+			payload["event"] = "player_names";
+			payload["player_name"] = {
+				p0->username,
+				p1->username
+			};
+			payload["elos"] = {
+				db_->get_latest_elo(p0->id, "CLASSIC"),	// TODO: Do not hardcode
+				db_->get_latest_elo(p1->id, "CLASSIC")	// TODO: Do not hardcode
+			};
+			payload["potholes"] = this->game_->list_potholes();
+
+			ws->send(payload.dump(), uWS::OpCode::TEXT);
 		},
 		.message = [this](WebSocket ws, std::string_view message, uWS::OpCode opCode) {
 			std::cout << "Recieved message\n";

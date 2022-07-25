@@ -1,8 +1,8 @@
 #include <assert.h> // TODO: REMOVE
 #include "basegame.hpp"
 
-BaseGame::BaseGame(int players)
-: board_{Board(players)}
+BaseGame::BaseGame(int players, BitBoard potholes)
+: board_{Board(players, potholes)}
 , player_turn_{0}
 , nmoves_{0}
 {}
@@ -46,6 +46,18 @@ auto BaseGame::previous_player() const -> int {
 
 auto BaseGame::num_players() const -> int {
 	return this->board_.num_players();
+}
+
+auto BaseGame::list_potholes() const -> std::vector<std::string> {
+	auto holes = std::vector<std::string>{};
+	BitBoard potholes = board().potholes();
+	for (int i = 0; i < 61; ++i) {
+		if (potholes.isSet(i)) {
+			holes.push_back(BaseGame::indexToCoord(i));
+		}
+	}
+
+	return holes;
 }
 
 

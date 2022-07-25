@@ -3,6 +3,7 @@
 
 #include <string.h>
 #include "basegame.hpp"
+#include "BitBoard.hpp"
 
 class Game : public BaseGame {
 	public:
@@ -11,10 +12,9 @@ class Game : public BaseGame {
 		std::vector<int> uids_; 
 		Game::state gamestate_;
 		std::vector<std::string> move_sequence_;
-
 	public:
-		Game(int nplayers);
-		Game(int nplayers, std::vector<int> const uids);
+		Game(int nplayers, BitBoard potholes = BitBoard());
+		Game(int nplayers, std::vector<int> const uids, BitBoard potholes = BitBoard());
 
 		auto play(std::string move) -> bool override;	// Does provide error checking
 		auto play(int index) -> bool override;			// Does NOT provide error checking

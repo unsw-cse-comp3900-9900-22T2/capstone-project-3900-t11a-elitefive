@@ -29,7 +29,7 @@ class AIGame : public BaseGame {
 		std::vector<std::vector<BitBoard>> states_;
 	public:
 		AIGame(): BaseGame{2}, move_{-1}, reason_{terminal::NONE}, eval_depth_{-1}, score_{0}, states_{}{}	// For the memo class
-		AIGame(int nplayers);
+		AIGame(int nplayers, BitBoard potholes = BitBoard());
 		AIGame(AIGame const& position, int move);
 
 		~AIGame() = default;

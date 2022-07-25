@@ -54,10 +54,10 @@ class Pool {
 		}
 
 	private:
-		auto create_new_room(uint32_t room_id, bool ranked, bool ai, std::vector<int> const& uids) -> void {
+		auto create_new_room(uint32_t room_id, bool ranked, bool ai, bool potholes, std::vector<int> const& uids) -> void {
 			replace_room_id(room_id);
 			uWS::App &applicaiton = *app;
-			rooms.push_back(new Room(applicaiton, db, ranked, ai, std::to_string(room_id), uids));
+			rooms.push_back(new Room(applicaiton, db, ranked, ai, potholes, std::to_string(room_id), uids));
 		}
 
 		auto replace_room_id(uint32_t roomid) -> void;	// Delete old rooms with the same `roomid`

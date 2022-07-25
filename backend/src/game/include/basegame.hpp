@@ -12,7 +12,7 @@ class BaseGame {
 		int player_turn_;
 		int nmoves_;
 	public:
-		BaseGame(int players);
+		BaseGame(int players, BitBoard potholes = BitBoard());
 		BaseGame(Board const& board, int turn, int moves);
 		virtual ~BaseGame() = default;
 
@@ -27,6 +27,7 @@ class BaseGame {
 		auto player_after(int curr_player) const -> int;
 		auto previous_player() const -> int;
 		auto num_players() const -> int;
+		auto list_potholes() const -> std::vector<std::string>;
 
 		// auto status() -> Game::state;
 		auto increase_move() -> void;

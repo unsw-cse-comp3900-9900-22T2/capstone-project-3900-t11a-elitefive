@@ -17,9 +17,11 @@ class Board {
 		int nplayers_;
 		int nspaces_;
 		std::vector<BitBoard> player_boards_;
+		BitBoard potholes_;
 
 	public:
 		Board(int nplayers);
+		Board(int nplayers, BitBoard const& potholes);
 		Board(Board const& board);
 		
 		// MODIFYING ACTIONS
@@ -31,6 +33,7 @@ class Board {
 		auto which_player_at(int location) const -> int;					// Tells you which player occupies tile, -1 if none
 		auto num_players() const -> int;
 		auto num_spaces() const -> int;
+		auto potholes() const -> BitBoard { return potholes_; }
 		
 		auto player_tiles(int player) const -> BitBoard;												// Gives you all 'set' tiles for player
 		auto opponent_tiles(int player) const -> BitBoard;												// Gives you all 'set' tiles for opponents
@@ -44,6 +47,7 @@ class Board {
 
 			auto tile_lookup = [board, board_width](int row, int col, int triangle_offset) {
 				auto position = row * 9 + col - triangle_offset;	// Where 9 is the board with
+				if (board.potholes().isSet(position) == true) return '\'';
 				auto player = board.which_player_at(position);
 				if (player == 0) return 'o';
 				if (player == 1) return 'x';

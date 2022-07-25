@@ -8,8 +8,8 @@
 // Helper functions
 auto isSet(BitBoard const& board, axial::vector const& vec) -> bool;
 
-AIGame::AIGame(int nplayers)
-: BaseGame{nplayers}
+AIGame::AIGame(int nplayers, BitBoard potholes)
+: BaseGame{nplayers, potholes}
 , move_{-1}
 , reason_{AIGame::terminal::NONE}
 , eval_depth_{-1}
