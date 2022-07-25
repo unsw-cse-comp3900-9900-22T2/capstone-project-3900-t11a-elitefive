@@ -187,13 +187,6 @@ auto friendaction(uWS::App &app, DatabaseManager &db, std::unordered_map<int, st
 }
 
 // GET REQUESTS
-auto hardcoded_elo_history() -> json {
-	json history;
-	history["CLASSIC"] = {1000, 1030, 1060, 1030, 1030, 1000, 970, 940, 940, 970, 1000, 1030, 1060};
-	history["TRIPLES"] = {1060, 1030, 1030, 1000, 970, 940, 940, 970, 1000};
-	history["POTHOLES"] = {940, 970, 1000, 1030, 1060, 1030, 1000, 1030, 1060, 1030, 1030, 1000, 970, 940};
-	return history;
-}
 
 auto api_profile(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std::string> &session_tokens) -> void {
 	app.get("/api/profile", [&app, &db, &session_tokens](auto *res, auto *req) {
@@ -208,12 +201,16 @@ auto api_profile(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std
 			{"TRIPLES", db.get_latest_elo(uid, "TRIPLES")},
 			{"POTHOLES", db.get_latest_elo(uid, "POTHOLES")},
 		};
+		auto elohistory = std::map<std::string, std::vector<int>>{
+			{"CLASSIC", db.get_elo_progress(uid, "CLASSIC")},
+			{"TRIPLES", db.get_elo_progress(uid, "TRIPLES")},
+			{"POTHOLES", db.get_elo_progress(uid, "POTHOLES")}
+		};
 		auto friends = db.get_friends(uid);
 		
 		json profile_json;
 		if (user != nullptr) {
-			profile_json = profile_to_json(user, stats, elos, friends);
-			profile_json["elo_history"] = hardcoded_elo_history();	// TODO: EPHISTORY
+			profile_json = profile_to_json(user, stats, elos, elohistory, friends);
 		}
 		res->end(profile_json.dump());	
 	});	

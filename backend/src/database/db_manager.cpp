@@ -132,17 +132,12 @@ auto DatabaseManager::get_stats(int id) -> PlayerStats* {
   return result;
 }
 
-auto DatabaseManager::get_elo_progress(int id) -> std::map<std::string, std::vector<int>> {
-  auto res = execute("get_elo_progress", id);
-  auto progress = std::map<std::string, std::vector<int>>{
-    {"CLASSIC", {}},
-    {"TRIPLES", {}},
-    {"POTHOLES", {}}
-  };
+auto DatabaseManager::get_elo_progress(int id, std::string mode) -> std::vector<int> {
+  auto res = execute("get_elo_progress", id, mode);
+  auto progress = std::vector<int>{1000};
   for (auto const &row : res) {
-    auto game = row[0].c_str();
-    auto elo = atoi(row[1].c_str());
-    progress[game].push_back(elo);
+    auto elo = atoi(row[0].c_str());
+    progress.push_back(elo);
   }
   return progress;
 }
@@ -393,12 +388,11 @@ auto DatabaseManager::prepare_statements() -> void {
   "WHERE player = $1 "
   "GROUP BY game, ranked, outcome;");
   conn_.prepare("get_elo_progress",
-  "SELECT game, end_elo "
+  "SELECT end_elo "
   "FROM outcomes "
   "JOIN matches ON outcomes.match = matches.id "
-  "WHERE player = $1 AND ranked = true "
-  "GROUP BY game, end_elo, end_time "
-  "ORDER BY game, end_time");
+  "WHERE player = $1 AND game = $2 AND ranked = true "
+  "ORDER BY end_time");
   conn_.prepare("get_global_leaderboard",
   "SELECT users.id, users.username, COALESCE("
   "(SELECT o.end_elo FROM matches m "
