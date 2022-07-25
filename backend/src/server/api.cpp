@@ -252,6 +252,21 @@ auto api_friends(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std
 	});
 }
 
+auto api_leaderboards(uWS::App &app, DatabaseManager &db) -> void {
+	app.get("/api/leaderboards", [&app, &db](auto *res, auto *req) {
+		auto suid = std::string(req->getQuery("uid")); 
+		auto uid = atoi(suid.c_str());
+
+		// TODO: Generate the proper JSON
+
+		// TODO: REMOVE THIS HARDCODED
+		json leaderboards = json::parse(R"(
+			{"global_leaderboard": {"classic": [{"uid": 3, "rank": 1, "username": "Mark", "elo": 1900, "wins": 12, "losses": 5}, {"uid": 1, "rank": 2, "username": "Amy", "elo": 1700, "wins": 32, "losses": 31}], "triples": [{"uid": 4, "rank": 1, "username": "Jerry", "elo": 1500, "wins": 22, "losses": 21}, {"uid": 2, "rank": 2, "username": "Peter", "elo": 1350, "wins": 24, "losses": 26}, {"uid": 6, "rank": 3, "username": "Harry", "elo": 1350, "wins": 24, "losses": 22}], "potholes": [{"uid": 2, "rank": 1, "username": "Peter", "elo": 1200, "wins": 21, "losses": 22}, {"uid": 5, "rank": 2, "username": "Amanda", "elo": 1100, "wins": 200, "losses": 201}]}, "friend_leaderboard": {"classic": [{"uid": 1, "rank": 2, "username": "Amy", "elo": 1700, "wins": 32, "losses": 31}], "triples": [{"uid": 2, "rank": 2, "username": "Peter", "elo": 1350, "wins": 24, "losses": 26}, {"uid": 6, "rank": 3, "username": "Harry", "elo": 1350, "wins": 24, "losses": 22}], "potholes": [{"uid": 2, "rank": 1, "username": "Peter", "elo": 1200, "wins": 21, "losses": 22}]}}
+		)");
+		res->end(leaderboards.dump());	
+	});
+}
+
 // Gets all replays
 auto api_search_all(uWS::App &app, DatabaseManager &db) -> void {
 	app.get("/api/search/all", [&app, &db](auto *res, auto *req) {
@@ -259,9 +274,7 @@ auto api_search_all(uWS::App &app, DatabaseManager &db) -> void {
 		std::string key = "all_matches";
 		payload[key] = {};
 		
-		std::cout << "Getting all matches\n";
 		auto matches = db.get_matches();
-		std::cout << "Retrieved\n";
 		for (auto const& match : matches) {
 			payload[key].push_back(match.to_json());
 		}
