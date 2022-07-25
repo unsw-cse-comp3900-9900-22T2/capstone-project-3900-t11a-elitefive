@@ -45,13 +45,13 @@ class Player {
     , outcome{outcome_} {}
 
     auto to_json() const -> json {
-        json payload;
-        payload["uid"] = id;
-        payload["username"] = username;
-        payload["elo_start"] = start_elo;
-        payload["elo_end"] = end_elo;
-        payload["outcome"] = outcome;
-        return payload;
+      json payload;
+      payload["uid"] = id;
+      payload["username"] = username;
+      payload["elo_start"] = start_elo;
+      payload["elo_end"] = end_elo;
+      payload["outcome"] = outcome;
+      return payload;
     }
 };
 
@@ -63,7 +63,8 @@ class Match {
     std::string replay;
     std::vector<Player> players;
 
-    Match(int id_, std::string game_, bool ranked_, std::string replay_, std::vector<Player> players_)
+    Match(int id_, std::string game_, bool ranked_,
+     std::string replay_, std::vector<Player> players_)
     : id{id_}
     , game{game_}
     , ranked{ranked_}
@@ -71,16 +72,16 @@ class Match {
     , players{players_} {}
 
     auto to_json() const -> json {
-        json payload;
-        payload["match_id"] = id;
-        payload["gamemode"] = game;
-        payload["ranked"] = ranked;
-        payload["moves"] = replay;
-        payload["players"] = {};
-        for (auto const& player : players) {
-            payload["players"].push_back(player.to_json());
-        }
-        return payload;
+      json payload;
+      payload["match_id"] = id;
+      payload["gamemode"] = game;
+      payload["ranked"] = ranked;
+      payload["moves"] = replay;
+      payload["players"] = {};
+      for (auto const& player : players) {
+          payload["players"].push_back(player.to_json());
+      }
+      return payload;
     }
 };
 
@@ -113,6 +114,39 @@ class PlayerStats {
 
     auto get_draws(std::string game, bool ranked) -> int {
       return get_WLD(game, ranked)[2];
+    }
+};
+
+class LeaderboardEntry {
+  public:
+    int rank;
+    int uid;
+    std::string username;
+    int elo;
+    int wins;
+    int losses;
+    int draws;
+
+    LeaderboardEntry(int rank_, int uid_, std::string username_,
+      int elo_, int wins_, int losses_, int draws_)
+    : rank{rank_}
+    , uid{uid_}
+    , username{username_}
+    , elo{elo_}
+    , wins{wins_}
+    , losses{losses_}
+    , draws{draws_} {}
+
+    auto to_json() const -> json {
+      json payload;
+      payload["rank"] = rank;
+      payload["uid"] = uid;
+      payload["username"] = username;
+      payload["elo"] = elo;
+      payload["wins"] = wins;
+      payload["losses"] = losses;
+      payload["draws"] = draws;
+      return payload;
     }
 };
 
