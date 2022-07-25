@@ -53,7 +53,8 @@ void BackendServer() {
 	api_replay(app, db);
 	api_friends(app, db, tokens);
 	api_leaderboards(app, db);
-	
+	api_social_feed(app, db);
+
 	// Test functionality (REMOVE LATER)
 	api_david(app);
 	api_db(app, db);

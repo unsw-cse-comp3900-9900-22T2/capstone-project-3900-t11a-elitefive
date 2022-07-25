@@ -79,7 +79,8 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 			ws->send(payload.dump(), uWS::OpCode::TEXT);
 		},
 		.message = [this](WebSocket ws, std::string_view message, uWS::OpCode opCode) {
-			// std::cout << "Lobby: Recieved message\n";
+			std::cout << "Lobby: Recieved message\n";
+			std::cout << "Lobby: " << message << '\n';
 			int uid = parse_uid(message);
 
 			// Pre-game checks

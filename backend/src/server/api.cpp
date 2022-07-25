@@ -187,6 +187,14 @@ auto friendaction(uWS::App &app, DatabaseManager &db, std::unordered_map<int, st
 }
 
 // GET REQUESTS
+auto hardcoded_elo_history() -> json {
+	json history;
+	history["CLASSIC"] = {1000, 1030, 1060, 1030, 1030, 1000, 970, 940, 940, 970, 1000, 1030, 1060};
+	history["TRIPLES"] = {1060, 1030, 1030, 1000, 970, 940, 940, 970, 1000};
+	history["POTHOLES"] = {940, 970, 1000, 1030, 1060, 1030, 1000, 1030, 1060, 1030, 1030, 1000, 970, 940};
+	return history;
+}
+
 auto api_profile(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std::string> &session_tokens) -> void {
 	app.get("/api/profile", [&app, &db, &session_tokens](auto *res, auto *req) {
 		auto suid = std::string(req->getQuery("uid")); 
@@ -205,6 +213,7 @@ auto api_profile(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std
 		json profile_json;
 		if (user != nullptr) {
 			profile_json = profile_to_json(user, stats, elos, friends);
+			profile_json["elo_history"] = hardcoded_elo_history();	// TODO: EPHISTORY
 		}
 		res->end(profile_json.dump());	
 	});	
@@ -257,7 +266,7 @@ auto api_leaderboards(uWS::App &app, DatabaseManager &db) -> void {
 		auto suid = std::string(req->getQuery("uid")); 
 		auto uid = atoi(suid.c_str());
 
-		// TODO: Generate the proper JSON
+		// TODO: Generate the proper JSON (EPLEADERBOARD)
 
 		// TODO: REMOVE THIS HARDCODED
 		json leaderboards = json::parse(R"(
@@ -266,6 +275,22 @@ auto api_leaderboards(uWS::App &app, DatabaseManager &db) -> void {
 		res->end(leaderboards.dump());	
 	});
 }
+
+auto api_social_feed(uWS::App &app, DatabaseManager &db) -> void {
+	app.get("/api/social/feed", [&app, &db](auto *res, auto *req) {
+		auto suid = std::string(req->getQuery("uid")); 
+		auto uid = atoi(suid.c_str());
+
+		// TODO: Generate the proper JSON (EPSOCIAL)
+
+		// TODO: REMOVE THIS HARDCODED
+		json leaderboards = json::parse(R"(
+			[{"message": "Watch MARY's play TRIPLES match!", "has-link": true, "link": "http://localhost:3000/replay/2"}, {"message": "David recently got 1000 elo!", "has-link": true, "link": "http://localhost:3000/profile/1"}, {"message": "You should try out the Potholes gamemode!", "has-link": false}, {"message": "Your friend is ranked 2nd on the leaderboards", "has-link": true, "link": "http://localhost:3000/leaderboards"}, {"message": "Watch your last match!", "has-link": true, "link": "http://localhost:3000/replay/2"}]
+		)");
+		res->end(leaderboards.dump());	
+	});
+}
+
 
 // Gets all replays
 auto api_search_all(uWS::App &app, DatabaseManager &db) -> void {
