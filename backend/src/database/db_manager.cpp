@@ -227,6 +227,9 @@ auto DatabaseManager::delete_friend(int from, int to) -> bool {
 }
 
 auto DatabaseManager::send_friend_req(int from, int to) -> bool {
+  if (from == to) {
+    return false;
+  }
   return execute0("send_friend_req", from, to);
 }
 
