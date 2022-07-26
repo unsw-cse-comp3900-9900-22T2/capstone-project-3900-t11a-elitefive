@@ -7,9 +7,12 @@ using json = nlohmann::json;
 
 auto generate_session_token(int id) -> std::string;
 
-auto generate_varification_code() -> std::string;
+auto generate_temporary_password() -> std::string;
 
-auto send_email_varification(std::string email, std::string username, std::string var_code) -> void;
+auto send_email_welcome(std::string email, std::string username) -> void;
+
+
+auto send_email_temp_password(std::string email, std::string username,std::string temp_pass) -> void;
 
 auto profile_to_json(User *user, PlayerStats *stats, std::map<std::string, int> elos,
   std::map<std::string, std::vector<int>> elohistory, std::vector<Match> matchhistory, std::vector<User*> friends) -> json;

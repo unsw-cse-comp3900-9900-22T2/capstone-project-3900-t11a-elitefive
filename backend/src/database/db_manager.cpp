@@ -249,6 +249,10 @@ auto DatabaseManager::insert_varification_code(int user, std::string var_code) -
   return execute0("insert_var_code", user, var_code);
 }
 
+auto DatabaseManager::change_password(int user, std::string new_password) -> bool {
+  return execute0("change_password", new_password, user);
+}
+
 // Prepare the statements on instantiation.
 auto DatabaseManager::prepare_statements() -> void {
   conn_.prepare("insert_user",
@@ -499,6 +503,8 @@ auto DatabaseManager::prepare_statements() -> void {
   "WHERE from_user = $1 AND to_user = $2;");
   conn_.prepare("insert_var_code",
   "INSERT INTO varification_codes VALUES ($1, $2);");
+  conn_.prepare("change_password",
+  "UPDATE users SET password_hash = $1 WHERE id = $2;");
 }
 
 template<typename... Args>

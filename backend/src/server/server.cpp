@@ -55,6 +55,7 @@ void BackendServer() {
 	api_friends(app, db, tokens);
 	api_leaderboards(app, db);
 	api_social_feed(app, db);
+	api_resetpass(app,db);
 
 	// Test functionality (REMOVE LATER)
 	api_david(app);
