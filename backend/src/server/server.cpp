@@ -67,6 +67,7 @@ void BackendServer() {
 	printf("DB Pointer: %p\n", &database_connection);
 
 	Pool pool = Pool(&app, &database_connection);
+	Invite invite = Invite(&app, &database_connection);
 	
 	// auto playersELO = std::map<int, int>{
 	// 	{1, 100},
