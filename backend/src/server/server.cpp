@@ -21,6 +21,7 @@
 #include "api.hpp"
 #include "server_util.hpp"
 #include "metadatagen.hpp"
+#include "invite.hpp"
 
 #include <stdio.h>
 
