@@ -206,11 +206,12 @@ auto api_profile(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std
 			{"TRIPLES", db.get_elo_progress(uid, "TRIPLES")},
 			{"POTHOLES", db.get_elo_progress(uid, "POTHOLES")}
 		};
+		auto matchhistory = db.get_matches(uid);
 		auto friends = db.get_friends(uid);
 		
 		json profile_json;
 		if (user != nullptr) {
-			profile_json = profile_to_json(user, stats, elos, elohistory, friends);
+			profile_json = profile_to_json(user, stats, elos, elohistory, matchhistory, friends);
 		}
 		res->end(profile_json.dump());	
 	});	
