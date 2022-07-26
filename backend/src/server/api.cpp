@@ -324,12 +324,20 @@ auto api_social_feed(uWS::App &app, DatabaseManager &db) -> void {
 auto api_search_all(uWS::App &app, DatabaseManager &db) -> void {
 	app.get("/api/search/all", [&app, &db](auto *res, auto *req) {
 		json payload;
-		std::string key = "all_matches";
-		payload[key] = {};
-		
+		payload["all_matches"] = {};
+		payload["classic"] = {};
+		payload["triples"] = {};
+		payload["potholes"] = {};
+		// All matches...
 		auto matches = db.get_matches();
 		for (auto const& match : matches) {
-			payload[key].push_back(match.to_json());
+			// Push to mode-specific list.
+			auto game = match.game;
+			std::transform(game.begin(), game.end(), game.begin(),
+				[](unsigned char c) { return std::tolower(c); });
+			payload[game].push_back(match.to_json());
+			// Push back to all matches.
+			payload["all_matches"].push_back(match.to_json());
 		}
 
 		res->end(payload.dump());
