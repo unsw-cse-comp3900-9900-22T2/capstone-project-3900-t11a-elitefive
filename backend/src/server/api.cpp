@@ -34,11 +34,8 @@ auto registerPage(uWS::App &app, DatabaseManager &db) -> void {
 				json payload;
 				if (db.insert_user(username, email, password)){
 				
-					// send varification email & stor code
-					auto var_code = generate_varification_code();
-					send_email_varification(email, username, var_code);
-					auto user = db.get_user(email);
-					db.insert_varification_code(user->id, var_code);
+					// send welcome email
+					send_email_welcome(email, username);
 					
 					// Register Success
 					payload["event"] = "register";
@@ -372,12 +369,40 @@ auto api_search_snapshot(uWS::App &app, DatabaseManager &db) -> void {
 	});
 }
 
+auto api_resetpass(uWS::App &app, DatabaseManager &db) -> void {
+	app.get("/api/resetpass", [&app, &db](auto *res, auto *req) {
+	
+		auto suid = std::string(req->getQuery("uid")); 
+		auto uid = atoi(suid.c_str());
+		auto temp_pass = generate_temporary_password();
+		auto temp_pass_hash = hash_password(temp_pass);
+		
+		json payload;
+		payload["event"] = "password";
+		payload["action"] = "reset";
+
+		
+		if (db.change_password(uid, temp_pass_hash)){
+			auto user = db.get_user(uid);
+			send_email_temp_password(user->email, user->username, temp_pass);
+			payload["payload"]["outcome"] = "success";
+		}else{
+			payload["payload"]["outcome"] = "failure";
+
+		}
+		
+		res->end(payload.dump());
+	});
+}
+
+
 // TESTING ENDPOINTS
 auto api_david(uWS::App &app) -> void {
 	app.get("/api/david", [&app](auto *res, auto *req) {
 		res->end("{\"name\": \"david\"}");
 	});
 }
+
 auto api_db(uWS::App &app, DatabaseManager &db) -> void {
   app.get("/db", [&db](auto *res, auto *req) {
 	// Testing Database Functionality.

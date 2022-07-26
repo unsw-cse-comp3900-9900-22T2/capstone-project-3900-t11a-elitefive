@@ -47,6 +47,7 @@ class DatabaseManager {
     auto revoke_friend_req(int revoker, int revoked) -> bool;
     // MAIL
     auto insert_varification_code(int user, std::string var_code) -> bool;
+    auto change_password(int user, std::string new_password) -> bool;
   private:
     auto prepare_statements() -> void;
     // Execute query with return result.

@@ -3,7 +3,7 @@
 
 #include <string.h>
 #include "basegame.hpp"
-#include "BitBoard.hpp"
+#include "bitboard.hpp"
 
 class Game : public BaseGame {
 	public:
