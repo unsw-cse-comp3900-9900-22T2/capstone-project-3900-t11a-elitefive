@@ -377,13 +377,21 @@ auto api_resetpass(uWS::App &app, DatabaseManager &db) -> void {
 		auto temp_pass = generate_temporary_password();
 		auto temp_pass_hash = hash_password(temp_pass);
 		
+		json payload;
+		payload["event"] = "password";
+		payload["action"] = "reset";
+
+		
 		if (db.change_password(uid, temp_pass_hash)){
-			std::cout << "change pass true\n";
 			auto user = db.get_user(uid);
-			send_email_temp_password(user->email, user->username, temp_pass);	
+			send_email_temp_password(user->email, user->username, temp_pass);
+			payload["payload"]["outcome"] = "success";
+		}else{
+			payload["payload"]["outcome"] = "failure";
+
 		}
 		
-		res->end("hi");
+		res->end(payload.dump());
 	});
 }
 
