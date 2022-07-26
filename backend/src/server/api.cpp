@@ -384,10 +384,11 @@ auto api_db(uWS::App &app, DatabaseManager &db) -> void {
 		auto winner = 1;
 		auto potholes = "";
 		auto move_seq = "12345";
+		auto svg_data = "";
 		auto snapshots = std::vector<uint64_t>{100, 200, 300, 400, 500};
-		auto matchID = db.save_match("POTHOLES", false, playersELO, winner, potholes, move_seq, snapshots);
-		db.save_match("CLASSIC", false, playersELO, winner, potholes, move_seq, snapshots);
-		db.save_match("TRIPLES", false, playersELO, winner, potholes, move_seq, snapshots);
+		auto matchID = db.save_match("POTHOLES", false, playersELO, winner, potholes, move_seq, svg_data, snapshots);
+		db.save_match("CLASSIC", false, playersELO, winner, potholes, move_seq, svg_data, snapshots);
+		db.save_match("TRIPLES", false, playersELO, winner, potholes, move_seq, svg_data, snapshots);
 		auto matches = db.get_matches(1);
 		for (auto const &match : matches) {
 			std::cout << match.id << " " << match.game << " " <<

@@ -285,8 +285,9 @@ auto Room::save_match(int winning_player) -> void {
 	// std::cout << "Room: Winning player - " << winning_player << " with uid: " << winning_uid << '\n';
 	
 	auto playersELO = calc_elos(winning_player);
+	auto svg_data = "svg_data";
 	auto const match_id = db_->save_match("CLASSIC", this->ranked_, playersELO, winning_uid,
-		game_->list_potholes_string() ,game_->move_sequence(), snapshots);
+		game_->list_potholes_string() ,game_->move_sequence(), svg_data, snapshots);
 	std::cout << "Match ID: " << match_id << '\n';
 }
 

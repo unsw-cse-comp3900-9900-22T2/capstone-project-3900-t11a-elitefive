@@ -40,9 +40,9 @@ auto DatabaseManager::get_user_username(std::string username) -> User* {
 }
 
 auto DatabaseManager::save_match(std::string gameType, bool is_ranked, std::map<int, int> playersELO, int winner,
-    std::string potholes, std::string move_seq, std::vector<uint64_t> snapshots) -> int {
+    std::string potholes, std::string move_seq, std::string svg_data, std::vector<uint64_t> snapshots) -> int {
   // Insert Match
-  auto res = execute("insert_match", gameType, is_ranked, potholes, move_seq);
+  auto res = execute("insert_match", gameType, is_ranked, potholes, move_seq, svg_data);
   auto matchID = atoi(res[0][0].c_str());
   // Insert Players & Outcomes
   auto outcome_columns = std::vector<std::string>{"player", "match", "end_elo", "outcome"};
@@ -76,14 +76,15 @@ auto DatabaseManager::get_match(int id) -> Match* {
   auto ranked = std::string(res[0][2].c_str()) == "t";
   auto potholes = res[0][3].c_str();
   auto replay = res[0][4].c_str();
-  auto curmatch = new Match(match, game, ranked, potholes, replay, std::vector<Player>{});
+  auto svg_data = res[0][5].c_str();
+  auto curmatch = new Match(match, game, ranked, potholes, replay, svg_data, std::vector<Player>{});
   for (auto const &row : res) {
     // Add player
-    auto p_id = atoi(row[5].c_str());
-    auto p_username = row[6].c_str();
-    auto p_startelo = atoi(row[7].c_str());
-    auto p_endelo = atoi(row[8].c_str());
-    auto p_outcome = row[9].c_str();
+    auto p_id = atoi(row[6].c_str());
+    auto p_username = row[7].c_str();
+    auto p_startelo = atoi(row[8].c_str());
+    auto p_endelo = atoi(row[9].c_str());
+    auto p_outcome = row[10].c_str();
     auto *player = new Player(p_id, p_username, p_startelo, p_endelo, p_outcome);
     curmatch->players.push_back(*player);
   }
@@ -269,7 +270,7 @@ auto DatabaseManager::prepare_statements() -> void {
   "RETURNING id;");
   // TODO: The COALESCE section for start_elo is a monstrosity...
   conn_.prepare("get_match",
-  "SELECT matches.id, game, ranked, potholes, replay, outcomes.player, "
+  "SELECT matches.id, game, ranked, potholes, replay, svg_data, outcomes.player, "
   "username, "
   "COALESCE("
   "(SELECT o.end_elo FROM matches m "
@@ -288,7 +289,7 @@ auto DatabaseManager::prepare_statements() -> void {
   "WHERE matches.id = $1;");
   // TODO: Refactor the two below - similar SQL.
   conn_.prepare("get_matches",
-  "SELECT matches.id, game, ranked, potholes, replay, outcomes.player, "
+  "SELECT matches.id, game, ranked, potholes, replay, svg_data, outcomes.player, "
   "username, "
   "COALESCE("
   "(SELECT o.end_elo FROM matches m "
@@ -305,7 +306,7 @@ auto DatabaseManager::prepare_statements() -> void {
   "JOIN outcomes ON matches.id = outcomes.match "
   "JOIN users ON outcomes.player = users.id;");
   conn_.prepare("get_matches_user",
-  "SELECT matches.id, game, ranked, potholes, replay, outcomes.player, "
+  "SELECT matches.id, game, ranked, potholes, replay, svg_data, outcomes.player, "
   "username, "
   "COALESCE("
   "(SELECT o.end_elo FROM matches m "
@@ -326,7 +327,7 @@ auto DatabaseManager::prepare_statements() -> void {
   "JOIN outcomes ON matches.id = outcomes.match "
   "WHERE outcomes.player = $1);");
   conn_.prepare("get_matches_snapshot1",
-  "SELECT matches.id, game, ranked, potholes, replay, outcomes.player, "
+  "SELECT matches.id, game, ranked, potholes, replay, svg_data, outcomes.player, "
   "username, "
   "COALESCE("
   "(SELECT o.end_elo FROM matches m "
@@ -353,7 +354,7 @@ auto DatabaseManager::prepare_statements() -> void {
   "s2 AS ("
   "SELECT * FROM snapshots "
   "WHERE move_num = $3 AND boardstate = $4) "
-  "SELECT matches.id, game, ranked, potholes, replay, outcomes.player, "
+  "SELECT matches.id, game, ranked, potholes, replay, svg_data, outcomes.player, "
   "username, "
   "COALESCE("
   "(SELECT o.end_elo FROM matches m "
@@ -576,15 +577,16 @@ auto DatabaseManager::parse_matches(pqxx::result res) -> std::vector<Match> {
       auto ranked = std::string(row[2].c_str()) == "t";
       auto potholes = row[3].c_str();
       auto replay = row[4].c_str();
-      curmatch = new Match(match, game, ranked, potholes, replay, std::vector<Player>{});
+      auto svg_data = row[5].c_str();
+      curmatch = new Match(match, game, ranked, potholes, replay, svg_data, std::vector<Player>{});
       curmatchID = match;
     }
     // Add player
-    auto p_id = atoi(row[5].c_str());
-    auto p_username = row[6].c_str();
-    auto p_startelo = atoi(row[7].c_str());
-    auto p_endelo = atoi(row[8].c_str());
-    auto p_outcome = row[9].c_str();
+    auto p_id = atoi(row[6].c_str());
+    auto p_username = row[7].c_str();
+    auto p_startelo = atoi(row[8].c_str());
+    auto p_endelo = atoi(row[9].c_str());
+    auto p_outcome = row[10].c_str();
     auto *player = new Player(p_id, p_username, p_startelo, p_endelo, p_outcome);
     curmatch->players.push_back(*player);
   }
