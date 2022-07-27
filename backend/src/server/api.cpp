@@ -56,6 +56,46 @@ auto registerPage(uWS::App &app, DatabaseManager &db) -> void {
 	});
 }
 
+auto changePW(uWS::App &app, DatabaseManager &db) -> void {
+	app.post("/api/changepw", [&app, &db](auto *res, auto *req) {
+		// Loop through header 
+		for (auto header : *req){
+			std::cout << header.first << ", " << header.second << "\n";
+		};
+		
+		// Get data from request
+		res->onData([&db, res](std::string_view data, bool last) {
+			auto buffer = std::string("");
+			auto message = std::string("");
+			
+			buffer.append(data.data(), data.length());
+			if (last) {
+				// Read message
+				auto user_json = json::parse(data);
+				std::string suid = user_json["uid"];
+				int uid = atoi(suid.c_str());
+				auto password = std::string(user_json["password"]);
+				
+				auto temp_pass_hash = hash_password(password);
+				
+				json payload;
+				payload["event"] = "password";
+				payload["action"] = "change";
+
+				if (db.change_password(uid, temp_pass_hash)){
+					auto user = db.get_user(uid);
+					send_email_temp_password(user->email, user->username, password);
+					payload["payload"]["outcome"] = "success";
+				}else{
+					payload["payload"]["outcome"] = "failure";
+				}
+				res->end(payload.dump());
+			}
+		});
+		res->onAborted([]() -> void {});
+	});
+}
+
 auto login(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std::string> &session_tokens) -> void {	
 	app.post("/login", [&app, &db, &session_tokens](auto *res, auto *req){
 		// Get data from request
