@@ -52,6 +52,8 @@ const Friend = styled.div`
 
 const Pending = styled.div`
   background: var(--background-color);
+  display: flex;
+  margin: 10px;
 `;
 
 export default function Invitepage({}: Props) {
@@ -126,7 +128,34 @@ export default function Invitepage({}: Props) {
       resolve(ws);
     })
   }
+
+  const emit = (key: string, data?: any) => {
+    inviteRoomWS?.send(JSON.stringify({
+      "event": key,
+      "data": data
+    }));
+  }
+
+  const handleInvite = (uid: number) => () => {
+    emit("send_invite", {
+      "friend": String(uid),
+      "uid": getUID()
+    })
+  }
+
+  const handleAccept = (uid: number) => () => {
+    emit("accept_invite", {
+      "friend": String(uid),
+      "uid": getUID()
+    })
+  }
   
+  const handleReject = (uid: number) => () => {
+    emit("decline_invite", {
+      "friend": String(uid),
+      "uid": getUID()
+    })
+  }
 
   return (
     <Container>
@@ -136,7 +165,9 @@ export default function Invitepage({}: Props) {
           {friends?.map((friend: FriendType) => {
             return(
               <Friend>
-                <Button background="var(--accent-purple)">invite</Button>
+                <Button background="var(--accent-purple)" onClick={handleInvite(friend.uid)}>
+                  invite
+                </Button>
                 <Typography variant="h5">{friend.username}</Typography>
               </Friend>
             )
@@ -149,8 +180,8 @@ export default function Invitepage({}: Props) {
           return (
             <Pending>
               <Typography variant="h5">{friend.username}</Typography>
-              <Button>accept</Button>
-              <Button>reject</Button>
+              <Button onClick={handleAccept(friend.uid)}>accept</Button>
+              <Button onClick={handleReject(friend.uid)}>reject</Button>
             </Pending>
           )
         })}
