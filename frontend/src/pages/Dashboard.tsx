@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Board from '../components/Board';
-import { Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import StyledInput from '../components/StyledInput';
 import {StyledButton} from '../components/ReusableButton-styled';
 import Button, {Button2, LargeButton} from '../components/ReusableButton';
@@ -52,15 +52,26 @@ export default function Dashboard({}: Props) {
     // 👇️ navigate to /contacts
     navigate('/leaderboard');
   };
+  const navigateToInviteFriends = () => {
+    navigate('/invite');
+  }
 
   return (
     <Container>
       <ProfileWidget/>
       <Container1>
-        <LargeButton onClick={navigateToGamepage}>
-          <Typography variant="h3">{"Play"}</Typography>
-        </LargeButton>
-        <LargeButton onClick={navigateToLeaderboard}>
+        <Box display="flex" flexDirection="column">
+          <LargeButton onClick={navigateToGamepage} background="var(--accent-purple)" height={350}>
+            <Typography variant="h3">{"Play"}</Typography>
+          </LargeButton>
+          <Button 
+            background="var(--accent-blue)" 
+            onClick={navigateToInviteFriends}
+            width={350}
+            height={50}
+          >Play with Friends</Button>
+        </Box>
+        <LargeButton>
           <Typography variant="h3">{"Leaderboard"}</Typography>
         </LargeButton>
         <LargeButton onClick={navigateToReplays}>

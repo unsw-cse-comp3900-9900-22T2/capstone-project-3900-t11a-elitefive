@@ -23,6 +23,7 @@ import FriendsPage from './pages/Friendspage';
 import Gamemode from './pages/Gamemode';
 import ReplayGamepage from './pages/ReplayGamepage/ReplayGamePage';
 import Leaderboard from './pages/Leaderboard';
+import Invitepage from './pages/InvitePage/Invitepage';
 
 
 function App() {
@@ -44,6 +45,7 @@ function App() {
                 <Route path="/replays" element={<ReplaySearchpage/>}/>
                 <Route path="/replay/:matchid" element={<ReplayGamepage/>}/>
                 <Route path="/leaderboard" element={<Leaderboard/>}/>      
+                <Route path="/invite" element={<Invitepage/>}/>           
               {/* </Route> */}
               <Route path="/" element={<Homepage/>}/>
             </Routes>
