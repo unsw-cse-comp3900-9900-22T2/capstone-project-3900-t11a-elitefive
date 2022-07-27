@@ -310,7 +310,7 @@ auto api_social_feed(uWS::App &app, DatabaseManager &db) -> void {
 
 		// TODO: REMOVE THIS HARDCODED
 		json leaderboards = json::parse(R"(
-			[{"message": "Watch MARY's play TRIPLES match!", "has-link": true, "link": "http://localhost:3000/replay/2"}, {"message": "David recently got 1000 elo!", "has-link": true, "link": "http://localhost:3000/profile/1"}, {"message": "You should try out the Potholes gamemode!", "has-link": false}, {"message": "Your friend is ranked 2nd on the leaderboards", "has-link": true, "link": "http://localhost:3000/leaderboards"}, {"message": "Watch your last match!", "has-link": true, "link": "http://localhost:3000/replay/2"}]
+			[{"message": "Watch MARY's play TRIPLES match!", "has-link": true, "link": "/replay/2"}, {"message": "David recently got 1000 elo!", "has-link": true, "link": "/profile/1"}, {"message": "You should try out the Potholes gamemode!", "has-link": false}, {"message": "Your friend is ranked 2nd on the leaderboards", "has-link": true, "link": "/leaderboards"}, {"message": "Watch your last match!", "has-link": true, "link": "/replay/2"}]
 		)");
 		res->end(leaderboards.dump());	
 	});
