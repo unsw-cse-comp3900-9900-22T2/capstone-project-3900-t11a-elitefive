@@ -337,6 +337,7 @@ auto api_leaderboards(uWS::App &app, DatabaseManager &db) -> void {
 		for (auto const &entry : f_pothole) {
 			leaderboards["friend_leaderboard"]["potholes"].push_back(entry.to_json());
 		}
+		leaderboards["rank"] = db.get_global_rank("CLASSIC", uid);
 		res->end(leaderboards.dump());
 	});
 }
@@ -355,7 +356,6 @@ auto api_social_feed(uWS::App &app, DatabaseManager &db) -> void {
 		res->end(leaderboards.dump());
 	});
 }
-
 
 // Gets all replays
 auto api_search_all(uWS::App &app, DatabaseManager &db) -> void {

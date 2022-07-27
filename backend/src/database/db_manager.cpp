@@ -143,6 +143,18 @@ auto DatabaseManager::get_elo_progress(int id, std::string mode) -> std::vector<
   return progress;
 }
 
+auto DatabaseManager::get_global_rank(std::string gameType, int id) -> int {
+  auto entries = get_global_leaderboard(gameType);
+  auto rank = 1;
+  for (auto const &e : entries) {
+    if (e.uid == id) {
+      return rank;
+    }
+    rank++;
+  }
+  return -1;
+}
+
 auto DatabaseManager::get_global_leaderboard(std::string gameType) -> std::vector<LeaderboardEntry> {
   auto res = execute("get_global_leaderboard", gameType);
   auto leaderboard = std::vector<LeaderboardEntry>{};

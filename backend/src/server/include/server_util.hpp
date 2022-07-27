@@ -11,7 +11,6 @@ auto generate_temporary_password() -> std::string;
 
 auto send_email_welcome(std::string email, std::string username) -> void;
 
-
 auto send_email_temp_password(std::string email, std::string username,std::string temp_pass) -> void;
 
 auto profile_to_json(User *user, PlayerStats *stats, std::map<std::string, int> elos,
