@@ -35,6 +35,7 @@ class DatabaseManager {
     // LEADERBOARD
     auto get_global_leaderboard(std::string gameType) -> std::vector<LeaderboardEntry>;
     auto get_friend_leaderboard(std::string gameType, int id) -> std::vector<LeaderboardEntry>;
+    auto get_global_rank(std::string gameType, int id) -> int;
     // FRIENDS
     auto get_friends(int id) -> std::vector<User*>;
     auto are_friends(int id1, int id2) -> bool;
