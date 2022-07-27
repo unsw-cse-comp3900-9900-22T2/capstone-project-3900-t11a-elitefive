@@ -46,6 +46,7 @@ void BackendServer() {
 	registerPage(app, db);
 	login(app, db, tokens);
 	friendaction(app, db, tokens);
+	changePW(app, db);
 
 	// Get Requests
 	api_search_snapshot(app, db);
