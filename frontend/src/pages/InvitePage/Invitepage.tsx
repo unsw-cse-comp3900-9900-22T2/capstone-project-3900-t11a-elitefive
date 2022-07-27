@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Button from '../../components/ReusableButton';
 import { useAuth } from '../../global/GlobalAuth';
+import { isEqual } from 'lodash';
 
 type Props = {}
 
@@ -84,6 +85,8 @@ export default function Invitepage({}: Props) {
       pending_uid: number[] | null;
       pending_username: string[] | null;
 
+      // invite
+      from_username: string;
       // decline
       from_uid: number;
 
@@ -104,7 +107,7 @@ export default function Invitepage({}: Props) {
       }
       ws.onmessage = (message) => {
         const payload: Payload = JSON.parse(message.data) as Payload;
-        console.log(payload);
+        // console.log(payload);
         switch(payload.event) {
           case "friends": {
             // initialise initial state
@@ -131,6 +134,31 @@ export default function Invitepage({}: Props) {
                 temp_pending.push(friend);
               })
               setPending(temp_pending);
+            }
+            break;
+          }
+
+          case "invite": {
+            const { from_uid, from_username } = payload;
+            if(from_uid) {
+              const new_player = { uid: from_uid, username: from_username }
+              // ignore duplicate
+              // checks if there is duplicate
+              // by deepEqual-ing the object
+              setPending(prev => {
+                let found = false;
+                for(const player of prev) {
+                  console.log(player)
+                  console.log(new_player)
+                  if(isEqual(player, new_player)) {
+                    found = true;
+                  }
+                }
+                if(!found) {
+                  return [...prev, new_player]
+                }
+                return prev;
+              });
             }
             break;
           }
