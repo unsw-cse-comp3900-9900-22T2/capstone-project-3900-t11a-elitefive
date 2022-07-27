@@ -1,5 +1,6 @@
 import { Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Button from '../../components/ReusableButton';
 import { useAuth } from '../../global/GlobalAuth';
@@ -63,6 +64,7 @@ export default function Invitepage({}: Props) {
   const [pending, setPending] = useState<FriendType[]>([]);
 
   const { getUID } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if(!inviteRoomWS) {
@@ -75,11 +77,19 @@ export default function Invitepage({}: Props) {
 
   const JoinSocketPromise = (): Promise<WebSocket> => {
     type Payload = {
+      // friends
       event: string;
       friends_uid: number[] | null;
       friends_username: string[] | null;
       pending_uid: number[] | null;
       pending_username: string[] | null;
+
+      // decline
+      from_uid: number;
+
+      // match_created
+      room_id: string;
+      uids: number[];
     }
     return new Promise((resolve, reject) => {
       const ws: WebSocket = new WebSocket('ws://localhost:8080/ws/inviteroom')
@@ -122,6 +132,27 @@ export default function Invitepage({}: Props) {
               })
               setPending(temp_pending);
             }
+            break;
+          }
+
+          case "declined": {
+            const { from_uid } = payload;
+            console.log(typeof from_uid)
+            if(from_uid) {
+              setPending(prev => prev.filter(f => f.uid != from_uid))
+            }
+            break;
+          }
+
+          case "match_created":{
+            const { room_id , uids } = payload;
+            const own_uid = getUID();
+            if(!own_uid) break;
+            if(uids.includes(parseInt(own_uid))) {
+              ws?.close();
+              navigate(`/game/${room_id}`);
+            }
+            break;
           }
         }
       }
