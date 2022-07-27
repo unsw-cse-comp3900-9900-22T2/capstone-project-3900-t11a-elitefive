@@ -81,6 +81,7 @@ class Match {
       payload["potholes"] = potholes;
       payload["moves"] = replay;
       payload["players"] = {};
+      payload["link"] = "/replay/" + std::to_string(id);
       for (auto const& player : players) {
           payload["players"].push_back(player.to_json());
       }

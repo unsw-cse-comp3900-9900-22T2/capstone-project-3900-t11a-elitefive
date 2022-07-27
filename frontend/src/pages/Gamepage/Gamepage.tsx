@@ -53,7 +53,9 @@ function ExtendedYavalathButton() {
   const { getUID } = useAuth();
   return (
     <div onClick={() => {
-      emit("retire", JSON.stringify(getUID()));
+      emit("retire", JSON.stringify({
+        'uid': getUID()
+      }));
     }}>
       <YavalathButton/>
     </div>

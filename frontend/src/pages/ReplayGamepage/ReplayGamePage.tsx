@@ -17,6 +17,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../global/GlobalAuth';
 import { NumberLiteralType, setConstantValue } from 'typescript';
 import { match } from 'assert';
+import { Box } from '@mui/material';
 
 type Props = {}
 
@@ -132,14 +133,26 @@ export default function ReplayGamepage({}: Props) {
          <Container>
            <YavalathButtonFixed/>
            <Container2>
-              <ReplayBoard replayStringArr={replayStringArr}/>
-              <Sidebar
-                matchData={matchData}
-                currIndex={currIndex}
-                replayStringArr={replayStringArr}
-                setCurrIndex={setCurrIndex}
-                setReplayStringArr={setReplayStringArr}
-              />
+            {
+            (matchData === DefaultMatchData) ? 
+            (
+              <Box display="flex" alignItems="center" height="100vh">
+                <Typography variant="h3">Replay is not found</Typography> 
+              </Box>
+            ):  
+            (
+              <>
+                <ReplayBoard replayStringArr={replayStringArr}/>
+                <Sidebar
+                  matchData={matchData}
+                  currIndex={currIndex}
+                  replayStringArr={replayStringArr}
+                  setCurrIndex={setCurrIndex}
+                  setReplayStringArr={setReplayStringArr}
+                />
+              </>
+            )
+            }
            </Container2>
          </Container>
   )

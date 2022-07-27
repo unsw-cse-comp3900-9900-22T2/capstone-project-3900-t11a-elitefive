@@ -43,7 +43,7 @@ function App() {
                 <Route path="/gamemode" element={<Gamemode/>}/>
                 <Route path="/replays" element={<ReplaySearchpage/>}/>
                 <Route path="/replay/:matchid" element={<ReplayGamepage/>}/>
-                <Route path="/leaderboard" element={<Leaderboard/>}/>
+                <Route path="/leaderboard" element={<Leaderboard/>}/>      
               {/* </Route> */}
               <Route path="/" element={<Homepage/>}/>
             </Routes>
