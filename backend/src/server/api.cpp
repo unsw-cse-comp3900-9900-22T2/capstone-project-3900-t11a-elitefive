@@ -245,6 +245,7 @@ auto api_profile(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std
 		};
 		auto matchhistory = db.get_matches(uid);
 		auto friends = db.get_friends(uid);
+		auto lastmatch = db.get_last_match(uid);
 		
 		json profile_json;
 		if (user != nullptr) {
@@ -337,7 +338,6 @@ auto api_leaderboards(uWS::App &app, DatabaseManager &db) -> void {
 		for (auto const &entry : f_pothole) {
 			leaderboards["friend_leaderboard"]["potholes"].push_back(entry.to_json());
 		}
-		leaderboards["rank"] = db.get_global_rank("CLASSIC", uid);
 		res->end(leaderboards.dump());
 	});
 }
@@ -369,12 +369,12 @@ auto api_search_all(uWS::App &app, DatabaseManager &db) -> void {
 		auto matches = db.get_matches();
 		for (auto const& match : matches) {
 			// Push to mode-specific list.
-			auto game = match.game;
+			auto game = match->game;
 			std::transform(game.begin(), game.end(), game.begin(),
 				[](unsigned char c) { return std::tolower(c); });
-			payload[game].push_back(match.to_json());
+			payload[game].push_back(match->to_json());
 			// Push back to all matches.
-			payload["all_matches"].push_back(match.to_json());
+			payload["all_matches"].push_back(match->to_json());
 		}
 
 		res->end(payload.dump());
@@ -402,7 +402,7 @@ auto api_search_snapshot(uWS::App &app, DatabaseManager &db) -> void {
 		std::string key = "snapshot_matches";
 		payload[key] = {};
 		for (auto const& match : matches) {
-			payload[key].push_back(match.to_json());
+			payload[key].push_back(match->to_json());
 		}
 
 		res->end(payload.dump());
@@ -464,9 +464,9 @@ auto api_db(uWS::App &app, DatabaseManager &db) -> void {
 		db.save_match("TRIPLES", false, playersELO, winner, potholes, move_seq, snapshots);
 		auto matches = db.get_matches(1);
 		for (auto const &match : matches) {
-			std::cout << match.id << " " << match.game << " " <<
-				match.replay << std::endl;
-			for (auto const &p : match.players) {
+			std::cout << match->id << " " << match->game << " " <<
+				match->replay << std::endl;
+			for (auto const &p : match->players) {
 				std::cout << p.username << " " << p.end_elo << " " <<
 					p.outcome << std::endl;
 			}
@@ -482,9 +482,9 @@ auto api_db(uWS::App &app, DatabaseManager &db) -> void {
 		// Snapshots
 		auto m = db.get_matches(4, 400, 5, 500);
 		for (auto const &match : m) {
-			std::cout << match.id << " " << match.game << " " <<
-				match.replay << std::endl;
-			for (auto const &p : match.players) {
+			std::cout << match->id << " " << match->game << " " <<
+				match->replay << std::endl;
+			for (auto const &p : match->players) {
 				std::cout << p.username << " " << p.end_elo << " " <<
 					p.outcome << std::endl;
 			}
