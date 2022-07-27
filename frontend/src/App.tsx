@@ -41,7 +41,7 @@ function App() {
                 <Route path="/game/:gameid" element={<Gamepage/>}/>
                 <Route path="/gamemode" element={<Gamemode/>}/>
                 <Route path="/replays" element={<ReplaySearchpage/>}/>
-                <Route path="/replay/:matchid" element={<ReplayGamepage/>}/>
+                <Route path="/replay/:matchid" element={<ReplayGamepage/>}/>           
               {/* </Route> */}
               <Route path="/" element={<Homepage/>}/>
             </Routes>

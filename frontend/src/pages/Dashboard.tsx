@@ -9,6 +9,7 @@ import {Routes, Route, useNavigate} from 'react-router-dom';
 import YavalathButton from '../components/YavalathButton';
 import ProfileWidget from '../components/ProfileWidget';
 import ScrollWidget from '../components/ScrollWidget';
+import Feedpage from './Feedpage';
 
 type Props = {}
 
@@ -62,6 +63,7 @@ export default function Dashboard({}: Props) {
         </LargeButton>
       </Container1>
       <ScrollWidget variant="bottom"/>
+      <Feedpage/>
     </Container>
   )
 }
