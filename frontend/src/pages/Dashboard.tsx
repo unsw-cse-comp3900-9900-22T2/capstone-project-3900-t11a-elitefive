@@ -71,7 +71,7 @@ export default function Dashboard({}: Props) {
             height={50}
           >Play with Friends</Button>
         </Box>
-        <LargeButton>
+        <LargeButton onClick={navigateToLeaderboard}>
           <Typography variant="h3">{"Leaderboard"}</Typography>
         </LargeButton>
         <LargeButton onClick={navigateToReplays}>
