@@ -9,6 +9,7 @@ export default createGlobalStyle`
     --accent-dark: #404348;
     --accent-purple: #824ACB;
     --accent-darker: #2E3034;
+    --accent-blue: #4A9CCB;
 
     // textbox colors
     --textbox-light: #4E5257;
