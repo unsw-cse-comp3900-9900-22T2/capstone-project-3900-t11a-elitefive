@@ -131,8 +131,7 @@ export default function Leaderboard({}: Props) {
               {buttonState ? "Toggle Friend" : "Toggle Global"}
             </Button>
           </Box>
-          {/* {dataType()} */}
-          <LeaderTab data={friendData}/>
+          {dataType()}
         </Box>
       </Container1>
     </Container>
