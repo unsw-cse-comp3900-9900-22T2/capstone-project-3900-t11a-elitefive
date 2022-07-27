@@ -48,6 +48,11 @@ export default function Dashboard({}: Props) {
     navigate('/replays');
   };
 
+  const navigateToLeaderboard = () => {
+    // 👇️ navigate to /contacts
+    navigate('/leaderboard');
+  };
+
   return (
     <Container>
       <ProfileWidget/>
@@ -55,7 +60,7 @@ export default function Dashboard({}: Props) {
         <LargeButton onClick={navigateToGamepage}>
           <Typography variant="h3">{"Play"}</Typography>
         </LargeButton>
-        <LargeButton>
+        <LargeButton onClick={navigateToLeaderboard}>
           <Typography variant="h3">{"Leaderboard"}</Typography>
         </LargeButton>
         <LargeButton onClick={navigateToReplays}>

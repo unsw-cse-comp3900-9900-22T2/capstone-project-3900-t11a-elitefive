@@ -7,6 +7,16 @@ import Box from '@mui/material/Box';
 import Button from './ReusableButton'
 
 import { profileDataType } from '../pages/Profilepage';
+import { leaderDataType } from '../pages/Leaderboard';
+
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
+import { styled } from '@mui/material/styles';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TablePagination from '@mui/material/TablePagination';
+import TableRow from '@mui/material/TableRow';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -91,6 +101,112 @@ export default function StatTab({ data }: { data: profileDataType}) {
       </TabPanel>
       <TabPanel value={value} index={2}>
         {renderTab("POTHOLES")}
+      </TabPanel>
+    </Box>
+  );
+}
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: "var(--accent-darker)",
+    color: theme.palette.common.white,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
+
+const StyledTableCell2 = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: "var(--accent-dark)",
+    color: theme.palette.common.white,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  '&:nth-of-type(odd)': {
+    backgroundColor: theme.palette.action.hover,
+  },
+  // hide last border
+  '&:last-child td, &:last-child th': {
+    border: 0,
+  },
+}));
+
+
+export function LeaderTab({ data }: { data: leaderDataType}) {
+  const [value, setValue] = React.useState(0);
+
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
+
+
+  const renderTab = (type: string) => {
+    console.log(data["triples"])
+    return(
+      <Box display="flex">
+        <Box width="400px" margin = "0 20px">
+          {/* <Typography variant="h4">Elo</Typography>
+          <Typography variant="h4">Wins</Typography>
+          <Typography variant="h4">Losses</Typography>
+          <Typography variant="h4">Draws</Typography>
+          <Button background="purple" width={400}>Elo History Chart</Button> */}
+          <TableContainer sx={{ maxHeight: 440 }}>
+            <Table stickyHeader aria-label="sticky table">
+              <TableHead>
+                <TableRow>
+                  <StyledTableCell align="right">Rank</StyledTableCell>
+                  <StyledTableCell align="right">Name</StyledTableCell>
+                  <StyledTableCell align="right">Elo</StyledTableCell>
+                  <StyledTableCell align="right">Win</StyledTableCell>
+                  <StyledTableCell align="right">Losses</StyledTableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody style={{verticalAlign:'top'}}>
+                
+                  {data[type]?.map((index) => (
+                    <StyledTableRow>
+                      <StyledTableCell2>{index.rank}</StyledTableCell2>
+                      <StyledTableCell2>{index.username}</StyledTableCell2>
+                      <StyledTableCell2>{index.elo}</StyledTableCell2>
+                      <StyledTableCell2>{index.wins}</StyledTableCell2>
+                      <StyledTableCell2>{index.losses}</StyledTableCell2>
+                    </StyledTableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+      </Box>
+    )
+  }
+
+  return (
+    <Box sx={{ width: '100%', background: 'var(--accent-dark)'}}>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs value={value} 
+        onChange={handleChange} 
+        textColor=" " 
+        indicatorColor="secondary"
+        aria-label="secondary tabs example"
+        >
+          <Tab label="Classic" {...a11yProps(0)} />
+          <Tab label="Triples" {...a11yProps(1)} />
+          <Tab label="Potholes" {...a11yProps(2)} />
+        </Tabs>
+      </Box>
+      <TabPanel value={value} index={0}>
+        {renderTab("classic")}
+      </TabPanel>
+      <TabPanel value={value} index={1}>
+        {renderTab("triples")}
+      </TabPanel>
+      <TabPanel value={value} index={2}>
+        {renderTab("potholes")}
       </TabPanel>
     </Box>
   );
