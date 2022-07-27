@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import Button from '../../components/ReusableButton';
 import { useAuth } from '../../global/GlobalAuth';
 import { isEqual } from 'lodash';
+import { PlayerType } from '../../global/GlobalGameState';
 
 type Props = {}
 
@@ -163,14 +164,18 @@ export default function Invitepage({}: Props) {
             break;
           }
 
-          case "declined": {
-            const { from_uid } = payload;
-            console.log(typeof from_uid)
-            if(from_uid) {
-              setPending(prev => prev.filter(f => f.uid != from_uid))
-            }
-            break;
-          }
+          // case "declined": {
+          //   const { from_uid } = payload;
+          //   console.log(typeof from_uid)
+          //   if(from_uid) {
+          //     setPending(prev => prev.filter((player) => {
+          //       console.log(prev);
+          //       console.log(from_uid)
+          //       return player.uid !== from_uid
+          //     }));
+          //   }
+          //   break;
+          // }
 
           case "match_created":{
             const { room_id , uids } = payload;
@@ -214,6 +219,8 @@ export default function Invitepage({}: Props) {
       "friend": String(uid),
       "uid": getUID()
     })
+
+    setPending(prev => prev.filter((player) => player.uid != uid));
   }
 
   return (
