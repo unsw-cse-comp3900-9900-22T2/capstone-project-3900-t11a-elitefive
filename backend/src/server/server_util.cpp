@@ -66,10 +66,8 @@ auto send_email_temp_password(std::string email, std::string username, std::stri
 	std::system(cmd.c_str());
 }
 
-
-
 auto profile_to_json(User *user, PlayerStats *stats, std::map<std::string, int> elos,
-    std::map<std::string, std::vector<int>> elohistory, std::vector<Match> matchhistory, std::vector<User*> friends) -> json {
+    std::map<std::string, std::vector<int>> elohistory, std::vector<Match*> matchhistory, std::vector<User*> friends) -> json {
     json result;
     result["event"] = "profile";
     result["action"] = "get";
@@ -107,10 +105,10 @@ auto elo_history_to_json(std::map<std::string, std::vector<int>> elohistory) -> 
     return result;
 }
 
-auto match_history_to_json(std::vector<Match> matchhistory) -> json {
+auto match_history_to_json(std::vector<Match*> matchhistory) -> json {
     json result = {};
     for (auto const& match : matchhistory) {
-        result.push_back(match.to_json());
+        result.push_back(match->to_json());
     }
     return result;
 }

@@ -90,22 +90,27 @@ auto DatabaseManager::get_match(int id) -> Match* {
   return curmatch;
 }
 
-auto DatabaseManager::get_matches() -> std::vector<Match> {
+auto DatabaseManager::get_matches() -> std::vector<Match*> {
   auto res = execute("get_matches");
   return parse_matches(res);
 }
 
-auto DatabaseManager::get_matches(int id) -> std::vector<Match> {
+auto DatabaseManager::get_matches(int id) -> std::vector<Match*> {
   auto res = execute("get_matches_user", id);
   return parse_matches(res);
 }
 
-auto DatabaseManager::get_matches(int move_n, int64_t bs) -> std::vector<Match> {
+auto DatabaseManager::get_last_match(int id) -> Match* {
+  auto matches = get_matches(id);
+  return (matches.size() == 0) ? nullptr : matches.back();
+}
+
+auto DatabaseManager::get_matches(int move_n, int64_t bs) -> std::vector<Match*> {
   auto res = execute("get_matches_snapshot1", move_n, bs);
   return parse_matches(res);
 }
 
-auto DatabaseManager::get_matches(int move_n1, int64_t bs1, int move_n2, int64_t bs2) -> std::vector<Match> {
+auto DatabaseManager::get_matches(int move_n1, int64_t bs1, int move_n2, int64_t bs2) -> std::vector<Match*> {
   auto res = execute("get_matches_snapshot2", move_n1, bs1, move_n2, bs2);
   return parse_matches(res);
 }
@@ -579,8 +584,8 @@ auto DatabaseManager::batch_insert(std::string table, std::vector<std::string> c
   return true;
 }
 
-auto DatabaseManager::parse_matches(pqxx::result res) -> std::vector<Match> {
-  auto matches = std::vector<Match>{};
+auto DatabaseManager::parse_matches(pqxx::result res) -> std::vector<Match*> {
+  auto matches = std::vector<Match*>{};
   auto curmatchID = -1;
   Match *curmatch = NULL;
   for (auto const &row : res) {
@@ -588,7 +593,7 @@ auto DatabaseManager::parse_matches(pqxx::result res) -> std::vector<Match> {
     // If different match, create a new match object.
     if (match != curmatchID) {
       if (curmatch != NULL) {
-        matches.push_back(*curmatch);
+        matches.push_back(curmatch);
       }
       auto game = row[1].c_str();
       auto ranked = std::string(row[2].c_str()) == "t";
@@ -608,7 +613,7 @@ auto DatabaseManager::parse_matches(pqxx::result res) -> std::vector<Match> {
   }
   // Push last.
   if (curmatch != NULL) {
-    matches.push_back(*curmatch);
+    matches.push_back(curmatch);
   }
   return matches;
 }
