@@ -31,6 +31,7 @@ const Container1  = styled.div`
   min-height: 50vh;
 
   display: flex;
+  flex-direction: column;
 
   margin-top: 100px
   justify-content: top;
@@ -103,13 +104,36 @@ export default function Leaderboard({}: Props) {
     })
   }, [])
 
+  const [buttonState, setButtonState] = useState(false);
+
+  function toggleStatus() {
+    setButtonState(!buttonState);
+  }
+
+  function dataType() {
+    if (!buttonState) {
+      return <LeaderTab data={friendData}/>
+    } else {
+      return <LeaderTab data={globalData}/>
+    }
+  }
+  
+
   return (
     
     <Container>
       <YavalathButtonFixed/>
       <ProfileWidget/>
       <Container1>
-        <LeaderTab data={friendData}/>
+        <Box margin="80px 50px">
+          <Box>
+            <Button onClick={() => toggleStatus()}>
+              {buttonState ? "Toggle Friend" : "Toggle Global"}
+            </Button>
+          </Box>
+          {/* {dataType()} */}
+          <LeaderTab data={friendData}/>
+        </Box>
       </Container1>
     </Container>
   )

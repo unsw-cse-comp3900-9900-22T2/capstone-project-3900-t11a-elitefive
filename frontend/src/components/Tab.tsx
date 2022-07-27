@@ -146,7 +146,7 @@ export function LeaderTab({ data }: { data: leaderDataType}) {
 
 
   const renderTab = (type: string) => {
-    console.log(data["classic"])
+    console.log(data["triples"])
     return(
       <Box display="flex">
         <Box width="400px" margin = "0 20px">
@@ -170,7 +170,7 @@ export function LeaderTab({ data }: { data: leaderDataType}) {
                 
                   {data[type]?.map((index) => (
                     <StyledTableRow>
-                      <StyledTableCell>{index.rank}</StyledTableCell>
+                      <StyledTableCell2>{index.rank}</StyledTableCell2>
                       <StyledTableCell2>{index.username}</StyledTableCell2>
                       <StyledTableCell2>{index.elo}</StyledTableCell2>
                       <StyledTableCell2>{index.wins}</StyledTableCell2>
