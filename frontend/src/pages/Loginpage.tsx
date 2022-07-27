@@ -6,6 +6,7 @@ import StyledInput from '../components/StyledInput';
 import Button from '../components/ReusableButton';
 import {Routes, Route, useNavigate} from 'react-router-dom';
 import { useAuth } from '../global/GlobalAuth';
+import YavalathButton from '../components/YavalathButton';
 
 
 type Props = {}
@@ -44,6 +45,7 @@ export default function Loginpage({}: Props) {
 
   return (
     <Container>
+      <YavalathButton/>
       <Typography variant="h3">Login</Typography>
       <StyledInput onChange={(e) => {setEmail(e.currentTarget.value)}} value={email} label="email"/>
       <StyledInput onChange={(e) => {setPassword(e.currentTarget.value)}} value={password} label="password" password/>

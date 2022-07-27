@@ -4,6 +4,7 @@ import { Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 import YavalathSvg from '../assets/YavalathSVG.svg';
+import { useAuth } from '../global/GlobalAuth';
 
 type Props = {}
 
@@ -28,8 +29,16 @@ const ContainerYavalath = styled.div`
 
 export default function YavalathButton({}: Props) {
   const navigate = useNavigate();
+  const { getToken, logout } = useAuth();
   return (
-    <Container onClick={() => navigate("/dashboard")}>
+    <Container onClick={() => {
+      if(getToken()) {
+        navigate("/dashboard");
+      }else {
+        logout();
+        navigate("/");
+      }
+    }}>
       <img src={YavalathSvg}/>
       <Typography variant="h4">Yavalath</Typography>
     </Container>

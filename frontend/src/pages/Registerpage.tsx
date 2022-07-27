@@ -6,6 +6,7 @@ import StyledInput from '../components/StyledInput';
 import Button from '../components/ReusableButton';
 import {Routes, Route, useNavigate} from 'react-router-dom';
 import {register} from '../api/rest'
+import YavalathButton from '../components/YavalathButton';
 
 type Props = {}
 
@@ -41,6 +42,7 @@ export default function Registerpage({}: Props) {
 
   return (
     <Container>
+      <YavalathButton/>
       <Typography variant="h3">Register</Typography>
       <StyledInput onChange={(e) => {setEmail(e.currentTarget.value)}} value={email} label="email"/>
       <StyledInput onChange={(e) => {setUsername(e.currentTarget.value)}} value={username} label="username"/>
