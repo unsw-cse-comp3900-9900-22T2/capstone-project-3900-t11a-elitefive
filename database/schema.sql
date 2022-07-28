@@ -24,6 +24,7 @@ create table matches (
 	end_time timestamptz default CURRENT_TIMESTAMP,
 	potholes text,
 	replay text,
+	svg_data text,
 	primary key (id)
 );
 
@@ -93,15 +94,15 @@ insert into users (username, email, password_hash) values
 insert into friends (friend1, friend2) values (9, 10);
 
 -- Insert Matches.
-insert into matches(game, ranked, potholes, replay) values 
-('CLASSIC', true, '', 'e5a1d8a4c4d4h5d1f3a2d7a3'),
-('CLASSIC', true, '', 'd5a1g2d4e7a4g6a2d6a3'),
-('CLASSIC', true, '', 'e5a1c3a4i4d1f2d3c4d4c6d2'),
-('CLASSIC', true, '', 'e4a1e7a4g7d1e5e6a2d4c3b1b2c1'),
-('CLASSIC', true, '', 'e4a1e7a4e5e6a3d1a2d4d6b1c5'),
-('CLASSIC', false, '', 'a1a2a5b2c2e5c3d5c5c4b3d2e3d3d4g6e6d8b6d6d7b4a4b5c6f7e8'),
-('CLASSIC', false, '', 'e5a1'),
-('CLASSIC', false, '', 'e4a1e7');
+insert into matches(game, ranked, potholes, replay, svg_data) values 
+('CLASSIC', true, '', 'e5a1d8a4c4d4h5d1f3a2d7a3', ''),
+('CLASSIC', true, '', 'd5a1g2d4e7a4g6a2d6a3', ''),
+('CLASSIC', true, '', 'e5a1c3a4i4d1f2d3c4d4c6d2', ''),
+('CLASSIC', true, '', 'e4a1e7a4g7d1e5e6a2d4c3b1b2c1', ''),
+('CLASSIC', true, '', 'e4a1e7a4e5e6a3d1a2d4d6b1c5', ''),
+('CLASSIC', false, '', 'a1a2a5b2c2e5c3d5c5c4b3d2e3d3d4g6e6d8b6d6d7b4a4b5c6f7e8', ''),
+('CLASSIC', false, '', 'e5a1', ''),
+('CLASSIC', false, '', 'e4a1e7', '');
 
 -- Insert Outcomes.
 insert into outcomes values 

@@ -62,15 +62,17 @@ class Match {
     bool ranked;
     std::string potholes;
     std::string replay;
+    std::string svg_data;
     std::vector<Player> players;
 
     Match(int id_, std::string game_, bool ranked_, std::string potholes_,
-     std::string replay_, std::vector<Player> players_)
+     std::string replay_, std::string svg_data_, std::vector<Player> players_)
     : id{id_}
     , game{game_}
     , ranked{ranked_}
     , potholes{potholes_}
     , replay{replay_}
+    , svg_data{svg_data_}
     , players{players_} {}
 
     auto to_json() const -> json {
@@ -80,6 +82,7 @@ class Match {
       payload["ranked"] = ranked;
       payload["potholes"] = potholes;
       payload["moves"] = replay;
+      payload["svg_data"] = svg_data;
       payload["players"] = {};
       payload["link"] = "/replay/" + std::to_string(id);
       for (auto const& player : players) {
