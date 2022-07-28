@@ -33,10 +33,34 @@ class Pool {
 		auto wait_for_potholes(int player_uid) -> void { potholes_.push_back(player_uid); }
 
 		// Check the queue
-		auto player_waiting(int uid) -> bool {
-			if (player_waiting_in_classic(uid)) return true;
-			if (player_waiting_in_triples(uid)) return true;
-			if (player_waiting_in_potholes(uid)) return true;
+		auto player_waiting(int uid, std::string const& gamemode) -> bool {
+			auto remove = [uid](std::deque<int> &queue) {
+				auto end_it = std::remove_if(
+					queue.begin(),
+					queue.end(),
+					[uid](int const& data) {
+						return (data == uid);
+					}
+				);
+				queue.erase(end_it, queue.end());
+			};
+			
+			if (player_waiting_in_classic(uid)) {
+				if (gamemode == "CLASSIC") return true;
+				remove(classic_);
+				return false;
+			}
+			if (player_waiting_in_triples(uid)) {
+				if (gamemode == "TRIPLES") return true;
+				remove(triples_);
+				return false;
+
+			}
+			if (player_waiting_in_potholes(uid)) {
+				if (gamemode == "POTHOLES") return true;
+				remove(potholes_);
+				return false;
+			}
 			return false;
 		}
 
@@ -55,9 +79,14 @@ class Pool {
 
 	private:
 		auto create_new_room(uint32_t room_id, bool ranked, bool ai, bool potholes, std::vector<int> const& uids) -> void {
+			std::cout << "\t\tDEBUG: REPLACE ROOM\n";
 			replace_room_id(room_id);
+			std::cout << "\t\tDEBUG: REPLACED\n";
 			uWS::App &applicaiton = *app;
+			std::cout << "\t\tDEBUG: MAKE NEW ROOM\n";
 			rooms.push_back(new Room(applicaiton, db, ranked, ai, potholes, std::to_string(room_id), uids));
+			std::cout << "\t\tDEBUG: MADE NEW ROOM\n";
+
 		}
 
 		auto replace_room_id(uint32_t roomid) -> void;	// Delete old rooms with the same `roomid`

@@ -73,6 +73,15 @@ Pool::Pool(uWS::App *app, DatabaseManager *db)
 // ==== Functions to manage the waiting room ====
 
 auto Pool::replace_room_id(uint32_t roomid) -> void {
+	int i = -1;
+	for (auto &room : rooms) {
+		++i;
+		if (room == nullptr) {
+			std::cout << "\t\t\t$$DEBUG: ROOM EMPTY - " << i << '\n';
+			continue;
+		}
+		std::cout << "\t\t\t$$DEBUG: ROOM EXISTS - " << room->room_id() << '\n';
+	}
 	for (auto &room : rooms) {
 		if (room == nullptr) continue;
 		if (room->room_id() == std::to_string(roomid)) {
@@ -80,6 +89,14 @@ auto Pool::replace_room_id(uint32_t roomid) -> void {
 			room = nullptr;  // TODO: Should properly erase from vector instead of setting to null
 			break;
 		}
+	}
+	for (auto &room : rooms) {
+		++i;
+		if (room == nullptr) {
+			std::cout << "\t\t\t^^DEBUG: ROOM EMPTY - " << i << '\n';
+			continue;
+		}
+		std::cout << "\t\t\t^^DEBUG: ROOM EXISTS - " << room->room_id() << '\n';
 	}
 }
 
@@ -128,7 +145,7 @@ auto Pool::start_player_vs_player_game(std::string const& gamemode, bool ranked_
 auto Pool::player_vs_player_waiting_lobby(std::string const& gamemode, bool ranked_flag, int uid) -> json {
 	// TODO: Do gamemode flags
 	// Ignore player if they are already in queue
-	if (player_waiting(uid)) {
+	if (player_waiting(uid, gamemode)) {
 		std::cout << "\tPool: Already waiting in queue for a match\n";
 		return {};	// Nothing to transmit to frontend
 	}

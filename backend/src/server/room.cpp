@@ -32,30 +32,31 @@ auto Room::publish(WebSocket ws, std::string const& message, uWS::OpCode opCode)
 // ======================================
 Room::Room(uWS::App &app, DatabaseManager *db, bool ranked, bool computer, bool potholes, std::string room_id, std::vector<int> uids)
 : room_id_{room_id}
+, gamemode_{0} // CLASSIC = 0, TRIPLES = 1, POTHOLES = 2
 , uids_{uids}
 , game_{nullptr}
 , aigame_{nullptr}
 , db_{db}
 , ranked_{ranked}
 , computer_{computer}
-, gamemode_{"CLASSIC"}
 {
 	// What is the gamemode?
-	if (potholes) 			gamemode_ = "POTHOLES";
-	if (uids.size() == 3) 	gamemode_ = "TRIPLES";
+	if (uids.size() == 3) 	gamemode_ = 1;  // Triples
+	if (potholes) 			gamemode_ = 2;	// Potholes	
 
 	generate_game(potholes);	// CLASSIC / POTHOLES / ETC
-	
+	 
 	if (computer_) {
 		create_socket_ai(app);
 	}
 	else { // Versing a human player
 		create_socket_player_verse_player(app);
 	}
-
+	std::cout << "\t\tGAME FULLY CREATED\n";
 }
 
 auto Room::generate_game(bool potholes) -> void {
+	std::cout << "\t\tDEBUG: Generating room\n";
 	int nplayers = uids_.size();
 	BitBoard missing_tiles = BitBoard(); // Assume none
 	if (potholes) {
@@ -63,6 +64,7 @@ auto Room::generate_game(bool potholes) -> void {
 	}
 	this->game_ = std::make_unique<Game>(nplayers, uids_, missing_tiles);
 	this->aigame_ = std::make_unique<AIGame>(nplayers, missing_tiles);
+	std::cout << "\t\tDEBUG: Generated room\n";
 }
 
 auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
@@ -207,7 +209,8 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 		},
 		.close = [this](WebSocket ws, int x , std::string_view str) {
 			ws->unsubscribe(this->room_id());
-			ws->close();
+			// ws->close();
+			// ws->end();
 			std::cout << "Left ai room\n";
 		}
 	});
