@@ -141,11 +141,11 @@ export function ReplayBoard({ width, height, replayStringArr}: ReplayBoardProps)
                 if(replayStringArr.includes(id)) {
                   if(replayStringArr.indexOf(id) % 2 == 0) {
                     return (
-                      <HexCell fill="red"/>
+                      <HexCell fill="#f33880"/>
                     )
                   } else {
                     return (
-                      <HexCell fill="blue"/>
+                      <HexCell fill="#1de254"/>
                     )
                   }
                 }

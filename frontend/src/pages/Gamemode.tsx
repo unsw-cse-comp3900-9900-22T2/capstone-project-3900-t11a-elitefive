@@ -50,8 +50,8 @@ export default function Gamemode({}: Props) {
     };
 
     const [waitingRoomSock, setWaitingRoomSock] = useState<WebSocket|undefined>();
-    const [vsAI, setVsAI] = useState(false);
-    const [isRanked, setIsRanked] = useState(false);
+    const [vsAI, setVsAI] = useState(true);
+    const [isRanked, setIsRanked] = useState(true);
     const [isWaiting, setIsWaiting] = useState(false);
 
     const { getUID } = useAuth();
