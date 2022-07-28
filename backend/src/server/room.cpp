@@ -38,7 +38,12 @@ Room::Room(uWS::App &app, DatabaseManager *db, bool ranked, bool computer, bool 
 , db_{db}
 , ranked_{ranked}
 , computer_{computer}
+, gamemode_{"CLASSIC"}
 {
+	// What is the gamemode?
+	if (potholes) 			gamemode_ = "POTHOLES";
+	if (uids.size() == 3) 	gamemode_ = "TRIPLES";
+
 	generate_game(potholes);	// CLASSIC / POTHOLES / ETC
 	
 	if (computer_) {
@@ -76,8 +81,8 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 				p1->username
 			};
 			payload["elos"] = {
-				db_->get_latest_elo(p0->id, "CLASSIC"),	// TODO: Do not hardcode
-				db_->get_latest_elo(p1->id, "CLASSIC")	// TODO: Do not hardcode
+				db_->get_latest_elo(p0->id, this->gamemode()),	// TODO: Do not hardcode
+				db_->get_latest_elo(p1->id, this->gamemode())	// TODO: Do not hardcode
 			};
 			payload["potholes"] = this->game_->list_potholes();
 
@@ -143,8 +148,8 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 				p1->username
 			};
 			payload["elos"] = {
-				db_->get_latest_elo(p0->id, "CLASSIC"),	// TODO: Do not hardcode
-				db_->get_latest_elo(p1->id, "CLASSIC")	// TODO: Do not hardcode
+				db_->get_latest_elo(p0->id, this->gamemode()),	// TODO: Do not hardcode
+				db_->get_latest_elo(p1->id, this->gamemode())	// TODO: Do not hardcode
 			};
 			payload["potholes"] = this->game_->list_potholes();
 
@@ -286,7 +291,7 @@ auto Room::save_match(int winning_player) -> void {
 	// std::cout << "Room: Winning player - " << winning_player << " with uid: " << winning_uid << '\n';
 	
 	auto playersELO = calc_elos(winning_player);
-	auto const match_id = db_->save_match("CLASSIC", this->ranked_, playersELO, winning_uid,
+	auto const match_id = db_->save_match(this->gamemode(), this->ranked_, playersELO, winning_uid,
 		game_->list_potholes_string() ,game_->move_sequence(), snapshots);
 	std::cout << "Match ID: " << match_id << '\n';
 }
@@ -294,7 +299,7 @@ auto Room::save_match(int winning_player) -> void {
 auto Room::calc_elos(int winning_player) -> std::map<int, int> {
 	auto playersELO = std::vector<std::pair<int, int>>{};	// Contains starting elo
 	for (auto const &uid : uids_) {
-		auto start_elo = db_->get_latest_elo(uid, "CLASSIC");
+		auto start_elo = db_->get_latest_elo(uid, this->gamemode());
 		playersELO.push_back({uid, start_elo});
 		std::cout << "\t\tELO: UID: " << uid << " Start elo: " << start_elo << " : " << db_->get_user(uid)->username << '\n';
 	}

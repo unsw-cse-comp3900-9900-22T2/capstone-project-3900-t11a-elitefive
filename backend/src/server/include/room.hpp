@@ -22,6 +22,7 @@ class Room {
         DatabaseManager *db_;
         bool ranked_;
         bool computer_;
+        std::string gamemode_;
 
     public:
         Room(uWS::App &app, DatabaseManager *db, bool ranked, bool computer, bool potholes, std::string room_id, std::vector<int> uids);
@@ -29,7 +30,8 @@ class Room {
         auto room_id() const -> std::string { return room_id_; }
         auto room_code() const -> std::string { return std::string{"/ws/game/" + this->room_id()}; }
         auto play_move(std::string const& move) -> bool { return this->game_->play(move); }
-
+        auto gamemode() const -> const std::string { return gamemode_; }
+        
         auto publish_move(std::string const& move) {
             if (game_ == nullptr) std::cout << "Lobby: WHAT IS HAPPENING\n";
             auto player = game_->whose_turn();

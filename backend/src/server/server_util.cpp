@@ -78,6 +78,7 @@ auto profile_to_json(User *user, PlayerStats *stats, std::map<std::string, int> 
     result["payload"]["unranked"] = stats_to_json(false, stats, elos);
     result["payload"]["elo_history"] = elo_history_to_json(elohistory);
     result["payload"]["match_history"] = match_history_to_json(matchhistory);
+    result["payload"]["match_history_filtered"] = match_history_filtered_to_json(matchhistory);
     result["payload"]["friends"] = friends_to_json(friends);
     return result;
 }
@@ -105,7 +106,23 @@ auto elo_history_to_json(std::map<std::string, std::vector<int>> elohistory) -> 
     return result;
 }
 
+auto match_history_filtered_to_json(std::vector<Match*> matchhistory) -> json { 
+    // FILTERED
+    json result;
+    result["CLASSIC"] = {};
+    result["TRIPLES"] = {};
+    result["POTHOLES"] = {};
+
+    for (auto const& match : matchhistory) {
+        json m = match->to_json();
+        std::string mode = m["gamemode"];
+        result[mode].push_back(m);
+    }
+    return result;
+}
+
 auto match_history_to_json(std::vector<Match*> matchhistory) -> json {
+    // TODO: DELETE BASIC
     json result = {};
     for (auto const& match : matchhistory) {
         result.push_back(match->to_json());
