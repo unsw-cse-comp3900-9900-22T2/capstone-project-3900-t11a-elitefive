@@ -9,3 +9,4 @@ backend/vcpkg
 .vscode/
 *.o
 board
+frontend/package-lock.json

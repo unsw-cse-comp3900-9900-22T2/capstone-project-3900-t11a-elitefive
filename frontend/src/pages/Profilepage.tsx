@@ -57,25 +57,26 @@ const StatContainer  = styled.div`
   grid-gap: 0px;
 `
 
-const MatchContainer  = styled.div`
-  min-height: 450px;
-
-  display: flex;
-  flex-direction: column;
-
- 
-  align-items: center;
-  grid-gap: 10px;
-`
 const TextContainer = styled.div `
-
   display: flex;
   flex-direction: column;
-
 
   align-items: center;
   grid-gap: 10px;
 `
+
+
+const Match = styled.div`
+  width: 80vw;
+  height: 150px;
+  background: var(--accent-dark);
+  cursor: pointer;
+
+  display:flex;
+  justify-content: center;
+  align-items: center;
+`
+
 
 export type profileDataType = {
   uid: number;
@@ -145,11 +146,21 @@ const DefaultProfileData = {
 }
 
 
+type replayType = {
+  link: string;
+  players: {
+    username: string;
+    elo_start: number;
+  }[]
+}
+
+
 
 
 
 export default function Profilepage({}: Props) {
   const [profileData, setProfileData] = useState<profileDataType>(DefaultProfileData);
+  const [replays, setReplays] = useState<replayType[]>([]);
   const navigate = useNavigate();
 
   const { uid } = useParams();
@@ -165,6 +176,7 @@ export default function Profilepage({}: Props) {
     .then(data => {
       const payload = data.payload;
       setProfileData(payload);
+      setReplays(payload["match_history"])
     })
   },[])
 
@@ -182,14 +194,22 @@ export default function Profilepage({}: Props) {
           <StatTab data={profileData}/>
         </StatContainer>
       </Container1>
-      {/*<TextContainer>
+      <TextContainer>
         <Typography variant="h3">{"Past Matches"}</Typography>
       </TextContainer>
-      <MatchContainer>
-        <MatchCard/>
-        <MatchCard/>
-        <MatchCard/>
-      </MatchContainer>*/}
+      {replays.map((replay: replayType) => {
+        return (
+          <Match onClick={() => {navigate(replay.link)}}>
+            <Box display="flex" flexDirection="column"> 
+              {replay.players.map((player) => (
+                <Typography variant="h4">
+                  {player.username} {player.elo_start}
+                </Typography>
+              ))}
+            </Box>
+          </Match> 
+        )
+      })}
     </Container>
   )
 }

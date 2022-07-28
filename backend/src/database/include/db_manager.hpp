@@ -23,11 +23,12 @@ class DatabaseManager {
     auto save_match(std::string gameType, bool is_ranked, std::map<int, int> playersELO, int winner,
       std::string potholes, std::string move_seq, std::string svg_data, std::vector<uint64_t> snapshots) -> int;
     auto get_match(int id) -> Match*;
-    auto get_matches() -> std::vector<Match>;
-    auto get_matches(int id) -> std::vector<Match>;
+    auto get_matches() -> std::vector<Match*>;
+    auto get_matches(int id) -> std::vector<Match*>;
+    auto get_last_match(int id) -> Match*;
     // SNAPSHOTS
-    auto get_matches(int move_n, int64_t bs) -> std::vector<Match>;
-    auto get_matches(int move_n1, int64_t bs1, int move_n2, int64_t bs2) -> std::vector<Match>;
+    auto get_matches(int move_n, int64_t bs) -> std::vector<Match*>;
+    auto get_matches(int move_n1, int64_t bs1, int move_n2, int64_t bs2) -> std::vector<Match*>;
     // PLAYER PROFILE
     auto get_latest_elo(int id, std::string gameType) -> int;
     auto get_stats(int id) -> PlayerStats*;
@@ -35,6 +36,7 @@ class DatabaseManager {
     // LEADERBOARD
     auto get_global_leaderboard(std::string gameType) -> std::vector<LeaderboardEntry>;
     auto get_friend_leaderboard(std::string gameType, int id) -> std::vector<LeaderboardEntry>;
+    auto get_global_rank(std::string gameType, int id) -> int;
     // FRIENDS
     auto get_friends(int id) -> std::vector<User*>;
     auto are_friends(int id1, int id2) -> bool;
@@ -47,6 +49,7 @@ class DatabaseManager {
     auto revoke_friend_req(int revoker, int revoked) -> bool;
     // MAIL
     auto insert_varification_code(int user, std::string var_code) -> bool;
+    auto change_password(int user, std::string new_password) -> bool;
   private:
     auto prepare_statements() -> void;
     // Execute query with return result.
@@ -63,7 +66,7 @@ class DatabaseManager {
     auto batch_insert(std::string table, std::vector<std::string> columns,
       std::vector<Args...> entries) -> bool;
     // Parse matches
-    auto parse_matches(pqxx::result res) -> std::vector<Match>;
+    auto parse_matches(pqxx::result res) -> std::vector<Match*>;
 };
 
 #endif

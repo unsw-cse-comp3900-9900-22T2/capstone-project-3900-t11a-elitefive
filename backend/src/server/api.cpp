@@ -34,11 +34,8 @@ auto registerPage(uWS::App &app, DatabaseManager &db) -> void {
 				json payload;
 				if (db.insert_user(username, email, password)){
 				
-					// send varification email & stor code
-					auto var_code = generate_varification_code();
-					send_email_varification(email, username, var_code);
-					auto user = db.get_user(email);
-					db.insert_varification_code(user->id, var_code);
+					// send welcome email
+					send_email_welcome(email, username);
 					
 					// Register Success
 					payload["event"] = "register";
@@ -52,6 +49,46 @@ auto registerPage(uWS::App &app, DatabaseManager &db) -> void {
 					payload["payload"]["outcome"] = "failure";
 				}
 				// Respond
+				res->end(payload.dump());
+			}
+		});
+		res->onAborted([]() -> void {});
+	});
+}
+
+auto changePW(uWS::App &app, DatabaseManager &db) -> void {
+	app.post("/api/changepw", [&app, &db](auto *res, auto *req) {
+		// Loop through header 
+		for (auto header : *req){
+			std::cout << header.first << ", " << header.second << "\n";
+		};
+		
+		// Get data from request
+		res->onData([&db, res](std::string_view data, bool last) {
+			auto buffer = std::string("");
+			auto message = std::string("");
+			
+			buffer.append(data.data(), data.length());
+			if (last) {
+				// Read message
+				auto user_json = json::parse(data);
+				std::string suid = user_json["uid"];
+				int uid = atoi(suid.c_str());
+				auto password = std::string(user_json["password"]);
+				
+				auto temp_pass_hash = hash_password(password);
+				
+				json payload;
+				payload["event"] = "password";
+				payload["action"] = "change";
+
+				if (db.change_password(uid, temp_pass_hash)){
+					auto user = db.get_user(uid);
+					send_email_temp_password(user->email, user->username, password);
+					payload["payload"]["outcome"] = "success";
+				}else{
+					payload["payload"]["outcome"] = "failure";
+				}
 				res->end(payload.dump());
 			}
 		});
@@ -206,11 +243,13 @@ auto api_profile(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std
 			{"TRIPLES", db.get_elo_progress(uid, "TRIPLES")},
 			{"POTHOLES", db.get_elo_progress(uid, "POTHOLES")}
 		};
+		auto matchhistory = db.get_matches(uid);
 		auto friends = db.get_friends(uid);
+		auto lastmatch = db.get_last_match(uid);
 		
 		json profile_json;
 		if (user != nullptr) {
-			profile_json = profile_to_json(user, stats, elos, elohistory, friends);
+			profile_json = profile_to_json(user, stats, elos, elohistory, matchhistory, friends);
 		}
 		res->end(profile_json.dump());	
 	});	
@@ -312,23 +351,30 @@ auto api_social_feed(uWS::App &app, DatabaseManager &db) -> void {
 
 		// TODO: REMOVE THIS HARDCODED
 		json leaderboards = json::parse(R"(
-			[{"message": "Watch MARY's play TRIPLES match!", "has-link": true, "link": "http://localhost:3000/replay/2"}, {"message": "David recently got 1000 elo!", "has-link": true, "link": "http://localhost:3000/profile/1"}, {"message": "You should try out the Potholes gamemode!", "has-link": false}, {"message": "Your friend is ranked 2nd on the leaderboards", "has-link": true, "link": "http://localhost:3000/leaderboards"}, {"message": "Watch your last match!", "has-link": true, "link": "http://localhost:3000/replay/2"}]
+			[{"message": "Watch MARY's play TRIPLES match!", "has-link": true, "link": "/replay/2"}, {"message": "David recently got 1000 elo!", "has-link": true, "link": "/profile/1"}, {"message": "You should try out the Potholes gamemode!", "has-link": false}, {"message": "Your friend is ranked 2nd on the leaderboards", "has-link": true, "link": "/leaderboards"}, {"message": "Watch your last match!", "has-link": true, "link": "/replay/2"}]
 		)");
-		res->end(leaderboards.dump());	
+		res->end(leaderboards.dump());
 	});
 }
-
 
 // Gets all replays
 auto api_search_all(uWS::App &app, DatabaseManager &db) -> void {
 	app.get("/api/search/all", [&app, &db](auto *res, auto *req) {
 		json payload;
-		std::string key = "all_matches";
-		payload[key] = {};
-		
+		payload["all_matches"] = {};
+		payload["classic"] = {};
+		payload["triples"] = {};
+		payload["potholes"] = {};
+		// All matches...
 		auto matches = db.get_matches();
 		for (auto const& match : matches) {
-			payload[key].push_back(match.to_json());
+			// Push to mode-specific list.
+			auto game = match->game;
+			std::transform(game.begin(), game.end(), game.begin(),
+				[](unsigned char c) { return std::tolower(c); });
+			payload[game].push_back(match->to_json());
+			// Push back to all matches.
+			payload["all_matches"].push_back(match->to_json());
 		}
 
 		res->end(payload.dump());
@@ -356,12 +402,39 @@ auto api_search_snapshot(uWS::App &app, DatabaseManager &db) -> void {
 		std::string key = "snapshot_matches";
 		payload[key] = {};
 		for (auto const& match : matches) {
-			payload[key].push_back(match.to_json());
+			payload[key].push_back(match->to_json());
 		}
 
 		res->end(payload.dump());
 	});
 }
+
+auto api_resetpass(uWS::App &app, DatabaseManager &db) -> void {
+	app.get("/api/resetpass", [&app, &db](auto *res, auto *req) {
+	
+		auto suid = std::string(req->getQuery("uid")); 
+		auto uid = atoi(suid.c_str());
+		auto temp_pass = generate_temporary_password();
+		auto temp_pass_hash = hash_password(temp_pass);
+		
+		json payload;
+		payload["event"] = "password";
+		payload["action"] = "reset";
+
+		
+		if (db.change_password(uid, temp_pass_hash)){
+			auto user = db.get_user(uid);
+			send_email_temp_password(user->email, user->username, temp_pass);
+			payload["payload"]["outcome"] = "success";
+		}else{
+			payload["payload"]["outcome"] = "failure";
+
+		}
+		
+		res->end(payload.dump());
+	});
+}
+
 
 // TESTING ENDPOINTS
 auto api_david(uWS::App &app) -> void {
@@ -369,6 +442,7 @@ auto api_david(uWS::App &app) -> void {
 		res->end("{\"name\": \"david\"}");
 	});
 }
+
 auto api_db(uWS::App &app, DatabaseManager &db) -> void {
   app.get("/db", [&db](auto *res, auto *req) {
 	// Testing Database Functionality.
@@ -391,9 +465,9 @@ auto api_db(uWS::App &app, DatabaseManager &db) -> void {
 		db.save_match("TRIPLES", false, playersELO, winner, potholes, move_seq, svg_data, snapshots);
 		auto matches = db.get_matches(1);
 		for (auto const &match : matches) {
-			std::cout << match.id << " " << match.game << " " <<
-				match.replay << std::endl;
-			for (auto const &p : match.players) {
+			std::cout << match->id << " " << match->game << " " <<
+				match->replay << std::endl;
+			for (auto const &p : match->players) {
 				std::cout << p.username << " " << p.end_elo << " " <<
 					p.outcome << std::endl;
 			}
@@ -409,9 +483,9 @@ auto api_db(uWS::App &app, DatabaseManager &db) -> void {
 		// Snapshots
 		auto m = db.get_matches(4, 400, 5, 500);
 		for (auto const &match : m) {
-			std::cout << match.id << " " << match.game << " " <<
-				match.replay << std::endl;
-			for (auto const &p : match.players) {
+			std::cout << match->id << " " << match->game << " " <<
+				match->replay << std::endl;
+			for (auto const &p : match->players) {
 				std::cout << p.username << " " << p.end_elo << " " <<
 					p.outcome << std::endl;
 			}

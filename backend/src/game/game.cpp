@@ -3,7 +3,7 @@
 
 #include "game.hpp"
 #include "axial.hpp"
-#include "BitBoard.hpp"
+#include "bitboard.hpp"
 
 Game::Game(int nplayers, BitBoard potholes) : Game(nplayers, std::vector<int>(nplayers, -1), potholes) {} // When you don't care about uids. Usually for metadata stuff
 

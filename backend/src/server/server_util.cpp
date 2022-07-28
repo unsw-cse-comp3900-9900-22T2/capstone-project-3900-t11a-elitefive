@@ -23,7 +23,7 @@ auto generate_session_token(int id) -> std::string {
 	return token;
 }
 
-auto generate_varification_code() -> std::string {
+auto generate_temporary_password() -> std::string {
 
     srand(time(NULL) + rand());
     auto token = std::string();
@@ -46,20 +46,28 @@ auto generate_varification_code() -> std::string {
 	return token;
 }
 
-auto send_email_varification(std::string email, std::string username, std::string var_code) -> void{
+auto send_email_welcome(std::string email, std::string username) -> void{
 	
 	auto message = std::string("Hello ") + username + std::string("!! \\n")
-	+ std::string("Welcome to Yavalath.\\nYour email verification code is: " + var_code);
+	+ std::string("Account creation successful.\\nWelcome to Yavalath!!");
 
 	auto cmd = "/app/mail/send_email.sh " + email + " \"Welcome to Yavalath!\" \"" + message + " \"";
 		
 	std::system(cmd.c_str());
 }
 
+auto send_email_temp_password(std::string email, std::string username, std::string temp_pass) -> void {
+	
+	auto message = std::string("Hi ") + username + std::string("!! \\n")
+	+ std::string("Your temporary Yavalath password is: ") + temp_pass;
 
+	auto cmd = "/app/mail/send_email.sh " + email + " \"Yavalath: Forgotten Password\" \"" + message + " \"";
+		
+	std::system(cmd.c_str());
+}
 
 auto profile_to_json(User *user, PlayerStats *stats, std::map<std::string, int> elos,
-    std::map<std::string, std::vector<int>> elohistory, std::vector<User*> friends) -> json {
+    std::map<std::string, std::vector<int>> elohistory, std::vector<Match*> matchhistory, std::vector<User*> friends) -> json {
     json result;
     result["event"] = "profile";
     result["action"] = "get";
@@ -69,6 +77,8 @@ auto profile_to_json(User *user, PlayerStats *stats, std::map<std::string, int> 
     result["payload"]["ranked"] = stats_to_json(true, stats, elos);
     result["payload"]["unranked"] = stats_to_json(false, stats, elos);
     result["payload"]["elo_history"] = elo_history_to_json(elohistory);
+    result["payload"]["match_history"] = match_history_to_json(matchhistory);
+    result["payload"]["match_history_filtered"] = match_history_filtered_to_json(matchhistory);
     result["payload"]["friends"] = friends_to_json(friends);
     return result;
 }
@@ -92,6 +102,30 @@ auto elo_history_to_json(std::map<std::string, std::vector<int>> elohistory) -> 
     std::vector<std::string> modes = { "CLASSIC", "TRIPLES", "POTHOLES" };
     for (auto const& mode : modes) {
         result[mode] = elohistory.at(mode);
+    }
+    return result;
+}
+
+auto match_history_filtered_to_json(std::vector<Match*> matchhistory) -> json { 
+    // FILTERED
+    json result;
+    result["CLASSIC"] = {};
+    result["TRIPLES"] = {};
+    result["POTHOLES"] = {};
+
+    for (auto const& match : matchhistory) {
+        json m = match->to_json();
+        std::string mode = m["gamemode"];
+        result[mode].push_back(m);
+    }
+    return result;
+}
+
+auto match_history_to_json(std::vector<Match*> matchhistory) -> json {
+    // TODO: DELETE BASIC
+    json result = {};
+    for (auto const& match : matchhistory) {
+        result.push_back(match->to_json());
     }
     return result;
 }

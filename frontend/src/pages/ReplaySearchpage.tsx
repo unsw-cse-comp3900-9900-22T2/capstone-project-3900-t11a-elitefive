@@ -73,9 +73,14 @@ const ReplaysContainer = styled.div`
 const SideBarContainer = styled.div`
   background: var(--accent-dark);
   width: 20vw;
+  height: 400px;
   margin: 120px 80px;
   display:flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
 `;
 
 // helper fnc
@@ -178,13 +183,13 @@ export default function ReplaySearchpage({}: Props) {
       </MainContainer>
       {sideBarData && (
         <SideBarContainer>
-          <Typography>{sideBarData.match_id}</Typography>
-          <Typography>{sideBarData.gamemode}</Typography>
-          <Typography>{sideBarData.mode}</Typography>
-          <Typography>{`${sideBarData.players[0].username} vs ${sideBarData.players[1].username}`}</Typography>
-          <Typography>{`${sideBarData.players[0].username} : ${sideBarData.players[0].outcome}`}</Typography>
-          <Typography>{`${sideBarData.players[1].username} : ${sideBarData.players[1].outcome}`}</Typography>
-          <Button onClick={() => { navigate(`/replay/${sideBarData.match_id}`)}}>
+          {/* <Typography variant="h5">{sideBarData.match_id}</Typography> */}
+          <Typography variant="h4">{sideBarData.gamemode}</Typography>
+          <Typography variant="h5">{sideBarData.mode}</Typography>
+          <Typography variant="h5">{`${sideBarData.players[0].username} vs ${sideBarData.players[1].username}`}</Typography>
+          <Typography variant="h5">{`${sideBarData.players[0].username} : ${sideBarData.players[0].outcome}`}</Typography>
+          <Typography variant="h5">{`${sideBarData.players[1].username} : ${sideBarData.players[1].outcome}`}</Typography>
+          <Button onClick={() => { navigate(`/replay/${sideBarData.match_id}`)}} background="var(--accent-purple)">
             Watch Replay
           </Button>
         </SideBarContainer>

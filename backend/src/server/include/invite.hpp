@@ -136,6 +136,7 @@ class Invite {
 						message_payload["from_username"] = this->db->get_user(uid)->username;
 
 						ws->publish(friend_suid, message_payload.dump(), opCode);   // Send message to friend about room creation
+						ws->send(message_payload.dump(), opCode);
 						
 						// Remove from invites
 						std::cout << "...Remove: " << friend_uid << " and " << uid << '\n';

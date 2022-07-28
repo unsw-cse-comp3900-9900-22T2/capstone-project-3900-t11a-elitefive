@@ -84,6 +84,7 @@ class Match {
       payload["moves"] = replay;
       payload["svg_data"] = svg_data;
       payload["players"] = {};
+      payload["link"] = "/replay/" + std::to_string(id);
       for (auto const& player : players) {
           payload["players"].push_back(player.to_json());
       }

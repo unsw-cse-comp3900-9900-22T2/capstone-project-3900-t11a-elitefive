@@ -91,22 +91,27 @@ auto DatabaseManager::get_match(int id) -> Match* {
   return curmatch;
 }
 
-auto DatabaseManager::get_matches() -> std::vector<Match> {
+auto DatabaseManager::get_matches() -> std::vector<Match*> {
   auto res = execute("get_matches");
   return parse_matches(res);
 }
 
-auto DatabaseManager::get_matches(int id) -> std::vector<Match> {
+auto DatabaseManager::get_matches(int id) -> std::vector<Match*> {
   auto res = execute("get_matches_user", id);
   return parse_matches(res);
 }
 
-auto DatabaseManager::get_matches(int move_n, int64_t bs) -> std::vector<Match> {
+auto DatabaseManager::get_last_match(int id) -> Match* {
+  auto matches = get_matches(id);
+  return (matches.size() == 0) ? nullptr : matches.back();
+}
+
+auto DatabaseManager::get_matches(int move_n, int64_t bs) -> std::vector<Match*> {
   auto res = execute("get_matches_snapshot1", move_n, bs);
   return parse_matches(res);
 }
 
-auto DatabaseManager::get_matches(int move_n1, int64_t bs1, int move_n2, int64_t bs2) -> std::vector<Match> {
+auto DatabaseManager::get_matches(int move_n1, int64_t bs1, int move_n2, int64_t bs2) -> std::vector<Match*> {
   auto res = execute("get_matches_snapshot2", move_n1, bs1, move_n2, bs2);
   return parse_matches(res);
 }
@@ -142,6 +147,18 @@ auto DatabaseManager::get_elo_progress(int id, std::string mode) -> std::vector<
     progress.push_back(elo);
   }
   return progress;
+}
+
+auto DatabaseManager::get_global_rank(std::string gameType, int id) -> int {
+  auto entries = get_global_leaderboard(gameType);
+  auto rank = 1;
+  for (auto const &e : entries) {
+    if (e.uid == id) {
+      return rank;
+    }
+    rank++;
+  }
+  return -1;
 }
 
 auto DatabaseManager::get_global_leaderboard(std::string gameType) -> std::vector<LeaderboardEntry> {
@@ -248,6 +265,10 @@ auto DatabaseManager::revoke_friend_req(int revoker, int revoked) -> bool {
 
 auto DatabaseManager::insert_varification_code(int user, std::string var_code) -> bool {
   return execute0("insert_var_code", user, var_code);
+}
+
+auto DatabaseManager::change_password(int user, std::string new_password) -> bool {
+  return execute0("change_password", new_password, user);
 }
 
 // Prepare the statements on instantiation.
@@ -500,6 +521,8 @@ auto DatabaseManager::prepare_statements() -> void {
   "WHERE from_user = $1 AND to_user = $2;");
   conn_.prepare("insert_var_code",
   "INSERT INTO varification_codes VALUES ($1, $2);");
+  conn_.prepare("change_password",
+  "UPDATE users SET password_hash = $1 WHERE id = $2;");
 }
 
 template<typename... Args>
@@ -562,8 +585,8 @@ auto DatabaseManager::batch_insert(std::string table, std::vector<std::string> c
   return true;
 }
 
-auto DatabaseManager::parse_matches(pqxx::result res) -> std::vector<Match> {
-  auto matches = std::vector<Match>{};
+auto DatabaseManager::parse_matches(pqxx::result res) -> std::vector<Match*> {
+  auto matches = std::vector<Match*>{};
   auto curmatchID = -1;
   Match *curmatch = NULL;
   for (auto const &row : res) {
@@ -571,7 +594,7 @@ auto DatabaseManager::parse_matches(pqxx::result res) -> std::vector<Match> {
     // If different match, create a new match object.
     if (match != curmatchID) {
       if (curmatch != NULL) {
-        matches.push_back(*curmatch);
+        matches.push_back(curmatch);
       }
       auto game = row[1].c_str();
       auto ranked = std::string(row[2].c_str()) == "t";
@@ -592,7 +615,7 @@ auto DatabaseManager::parse_matches(pqxx::result res) -> std::vector<Match> {
   }
   // Push last.
   if (curmatch != NULL) {
-    matches.push_back(*curmatch);
+    matches.push_back(curmatch);
   }
   return matches;
 }
