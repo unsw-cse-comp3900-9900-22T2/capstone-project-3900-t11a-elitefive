@@ -346,14 +346,50 @@ auto api_social_feed(uWS::App &app, DatabaseManager &db) -> void {
 	app.get("/api/social/feed", [&app, &db](auto *res, auto *req) {
 		auto suid = std::string(req->getQuery("uid")); 
 		auto uid = atoi(suid.c_str());
-
-		// TODO: Generate the proper JSON (EPSOCIAL)
-
-		// TODO: REMOVE THIS HARDCODED
-		json leaderboards = json::parse(R"(
-			[{"message": "Watch MARY's play TRIPLES match!", "has-link": true, "link": "/replay/2"}, {"message": "David recently got 1000 elo!", "has-link": true, "link": "/profile/1"}, {"message": "You should try out the Potholes gamemode!", "has-link": false}, {"message": "Your friend is ranked 2nd on the leaderboards", "has-link": true, "link": "/leaderboards"}, {"message": "Watch your last match!", "has-link": true, "link": "/replay/2"}]
-		)");
-		res->end(leaderboards.dump());
+		auto gamemodes = std::vector<std::string>{"CLASSIC", "TRIPLES", "POTHOLES"};
+		// Generate the social feed JSON.
+		json feed;
+		// Get the user's friends.
+		auto friends = db.get_friends(uid);
+		if (friends.empty()) {
+			// If no friends, suggest friends.
+			feed.push_back(social_json("", "Add friends to receive more social feed news!"));
+		} else {
+			// 1. Random friend's random match.
+			auto friend1 = friends.at(random_num(friends.size()));
+			auto matches = db.get_matches(friend1->id);
+			auto match = matches.at(random_num(matches.size()));
+			feed.push_back(social_json("/replay/" + std::to_string(match->id),
+				"Click here to watch " + friend1->username + " play a " + match->game + " match!"));
+			// 2. Random friend's latest elo.
+			auto friend2 = friends.at(random_num(friends.size()));
+			auto gamemode2 = gamemodes.at(random_num(gamemodes.size()));
+			auto recent_elo = db.get_latest_elo(friend2->id, gamemode2);
+			feed.push_back(social_json("/profile/" + std::to_string(friend2->id),
+				friend2->username + " recently reached " + std::to_string(recent_elo) + " in " + gamemode2 +
+				" mode! Click to view!"));
+			// 3. Random friend's leaderboard ranking.
+			auto gamemode3 = gamemodes.at(random_num(gamemodes.size()));
+			auto f_lb = db.get_friend_leaderboard(gamemode3, uid);
+			if (!f_lb.empty()) {
+				auto lb_entry = f_lb.at(random_num(f_lb.size()));
+				feed.push_back(social_json("/leaderboard",
+					lb_entry.username + " is ranked #" + std::to_string(lb_entry.rank) + " on the global " + gamemode3 +
+					" leaderboard! Click to view!"));	
+			}
+		}
+		// Recommend a gamemode.
+		feed.push_back(social_json("", "You should try out the "
+			+ gamemodes.at(random_num(gamemodes.size())) + " gamemode!"));
+		// Get player's last match.
+		auto lastmatch = db.get_last_match(uid);
+		if (lastmatch != nullptr) {
+			feed.push_back(social_json("/replay/" + std::to_string(lastmatch->id),
+				"Click here to replay your last match!"));
+		} else {
+			feed.push_back(social_json("", "Looks like you haven't played a match yet... You should play one!"));
+		}
+		res->end(feed.dump());
 	});
 }
 
