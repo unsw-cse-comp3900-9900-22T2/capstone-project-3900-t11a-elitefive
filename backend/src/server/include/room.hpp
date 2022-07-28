@@ -55,6 +55,7 @@ class Room {
         auto static ai_response(std::string move, AIGame *aigame, Game *game, void *ws) -> std::string;
         auto json_confirm_move(std::string const& move) -> std::string;
         auto json_player3(std::string const& move) -> std::string;
+        auto json_pothole(std::string const& move) -> std::string;
         auto json_board_move(std::string const& move) -> std::string;
         auto json_game_winner(std::string const& player) -> std::string;
 

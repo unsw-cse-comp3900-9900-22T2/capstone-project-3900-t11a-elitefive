@@ -5,7 +5,7 @@ import { useGameState, PlayerType } from './GlobalGameState';
 
 interface payload {
   // type: "init" | "terminating" | "acknowledged"
-  event: "move" | "moveconfirm" | "game_over" | "player_names" | "player3"
+  event: "move" | "moveconfirm" | "game_over" | "player_names" | "player3" | "pothole"
   contents?: string;
   tile?: string;
   winner?: string;
@@ -53,6 +53,7 @@ export const WSProvider = ({ children, gameId }: Props) => {
       playerJoin({uid: "abc", color: "#f33880"});
       playerJoin({uid: "BOT", color: "#1de254"});
       playerJoin({uid: "p3", color: "#00b9ca"});
+      playerJoin({uid: "pothole", color: "#12121"})
     }
     WS.onmessage = (message) => {
       const payload:payload = JSON.parse(message.data) as payload
@@ -87,6 +88,14 @@ export const WSProvider = ({ children, gameId }: Props) => {
           const hexKey = payload.tile;
           if (hexKey) {
             playMove("p3", hexKey);
+          }
+          break;
+        }
+        case "pothole" : {
+          const payload:payload = JSON.parse(message.data) as payload
+          const hexKey = payload.tile;
+          if (hexKey) {
+            playMove("pothole", hexKey);
           }
           break;
         }
