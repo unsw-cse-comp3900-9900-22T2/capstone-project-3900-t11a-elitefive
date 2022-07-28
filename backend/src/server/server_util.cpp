@@ -3,6 +3,7 @@
 #include "db_utils.hpp"
 #include "server_util.hpp"
 #include <nlohmann/json.hpp>
+#include <random>
 
 using json = nlohmann::json;
 
@@ -44,6 +45,14 @@ auto generate_temporary_password() -> std::string {
         token.push_back(char(r));
     }
 	return token;
+}
+
+auto random_num(int bound) -> int {
+    auto seed = std::chrono::steady_clock::now().time_since_epoch().count();
+    auto e = std::default_random_engine(seed);
+    auto distribution = std::uniform_int_distribution<int>(0, bound - 1);
+    auto random = distribution(e);
+    return random;
 }
 
 auto send_email_welcome(std::string email, std::string username) -> void{
@@ -149,5 +158,17 @@ auto friends_to_json(std::vector<User*> friends) -> json {
         r["username"] = fri->username;
         result.push_back(r);
     }
+    return result;
+}
+
+auto social_json(std::string link, std::string message) -> json {
+    json result = {};
+    if (link.empty()) {
+        result["has-link"] = false;
+    } else {
+        result["has-link"] = true;
+        result["link"] = link;
+    }
+    result["message"] = message;
     return result;
 }

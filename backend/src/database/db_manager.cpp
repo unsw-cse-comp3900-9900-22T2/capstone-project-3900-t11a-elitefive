@@ -114,7 +114,7 @@ auto DatabaseManager::get_matches(int id) -> std::vector<Match*> {
 
 auto DatabaseManager::get_last_match(int id) -> Match* {
   auto matches = get_matches(id);
-  return (matches.size() == 0) ? nullptr : matches.back();
+  return (matches.empty()) ? nullptr : matches.back();
 }
 
 auto DatabaseManager::get_matches(int move_n, int64_t bs) -> std::vector<Match*> {
@@ -439,21 +439,21 @@ auto DatabaseManager::prepare_statements() -> void {
   "FROM matches m "
   "JOIN outcomes o ON m.id = o.match "
   "WHERE o.player = users.id "
-  "AND outcome = 'WIN' "
+  "AND outcome = 'WIN' and m.ranked = true "
   "AND m.game = matches.game) "
   "as wins, "
   "(SELECT COUNT(outcome) "
   "FROM matches m "
   "JOIN outcomes o ON m.id = o.match "
   "WHERE o.player = users.id "
-  "AND outcome = 'LOSS' "
+  "AND outcome = 'LOSS' and m.ranked = true "
   "AND m.game = matches.game) "
   "as losses, "
   "(SELECT COUNT(outcome) "
   "FROM matches m "
   "JOIN outcomes o ON m.id = o.match "
   "WHERE o.player = users.id "
-  "AND outcome = 'DRAW' "
+  "AND outcome = 'DRAW' and m.ranked = true "
   "AND m.game = matches.game) "
   "as draws "
   "FROM users "
@@ -475,21 +475,21 @@ auto DatabaseManager::prepare_statements() -> void {
   "FROM matches m "
   "JOIN outcomes o ON m.id = o.match "
   "WHERE o.player = users.id "
-  "AND outcome = 'WIN' "
+  "AND outcome = 'WIN' and m.ranked = true "
   "AND m.game = matches.game) "
   "as wins, "
   "(SELECT COUNT(outcome) "
   "FROM matches m "
   "JOIN outcomes o ON m.id = o.match "
   "WHERE o.player = users.id "
-  "AND outcome = 'LOSS' "
+  "AND outcome = 'LOSS' and m.ranked = true "
   "AND m.game = matches.game) "
   "as losses, "
   "(SELECT COUNT(outcome) "
   "FROM matches m "
   "JOIN outcomes o ON m.id = o.match "
   "WHERE o.player = users.id "
-  "AND outcome = 'DRAW' "
+  "AND outcome = 'DRAW' and m.ranked = true "
   "AND m.game = matches.game) "
   "as draws "
   "FROM users "
