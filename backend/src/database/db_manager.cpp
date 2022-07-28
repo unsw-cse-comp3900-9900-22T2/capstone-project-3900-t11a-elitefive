@@ -287,7 +287,7 @@ auto DatabaseManager::prepare_statements() -> void {
   "WHERE username = $1;");
   conn_.prepare("insert_match",
   "INSERT INTO matches(game, ranked, potholes, replay, svg_data) "
-  "VALUES ($1, $2, $3, $4) "
+  "VALUES ($1, $2, $3, $4, $5) "
   "RETURNING id;");
   // TODO: The COALESCE section for start_elo is a monstrosity...
   conn_.prepare("get_match",
