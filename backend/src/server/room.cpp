@@ -302,15 +302,22 @@ auto Room::save_match(int winning_player) -> void {
 	auto i = 1;
 	for (auto const &board : game_->board().all_boards()) {
 		auto v = board.binary_to_vector();
-		auto j = 0;
-		for (auto const &e : v) {
-			std::cout << e << std::endl;
+		for (auto const &t : v) {
+			svg.at(t) = i;
 		}
 		i++;
 	}
 	// Update svg_data for potholes.
-
-	auto svg_data = "";
+	auto potholes_vec = game_->board().potholes().binary_to_vector();
+	for (auto const &t : potholes_vec) {
+		svg.at(t) = 4;
+	}
+	// Create the svg_data string.
+	auto svg_data = std::string();
+	for (auto const &t : svg) {
+		svg_data.append(std::to_string(t));
+	}
+	// Save Match to DB.
 	auto const match_id = db_->save_match("CLASSIC", this->ranked_, playersELO, winning_uid,
 		game_->list_potholes_string() ,game_->move_sequence(), svg_data, snapshots);
 	std::cout << "Match ID: " << match_id << '\n';
