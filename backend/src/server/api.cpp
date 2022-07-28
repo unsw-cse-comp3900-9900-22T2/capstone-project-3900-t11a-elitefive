@@ -367,15 +367,21 @@ auto api_social_feed(uWS::App &app, DatabaseManager &db) -> void {
 			auto recent_elo = db.get_latest_elo(friend2->id, gamemode2);
 			feed.push_back(social_json("/profile/" + std::to_string(friend2->id),
 				friend2->username + " recently reached " + std::to_string(recent_elo) + " in " + gamemode2 +
-				" mode! Click to view!"));
-			// 3. Random friend's leaderboard ranking.
+				" mode! (Click to view!"));
+			// 3. Random friend's friend leaderboard ranking OR global rank for gamemode.
+			auto friend3 = friends.at(random_num(friends.size()));
 			auto gamemode3 = gamemodes.at(random_num(gamemodes.size()));
 			auto f_lb = db.get_friend_leaderboard(gamemode3, uid);
-			if (!f_lb.empty()) {
+			auto rank = db.get_global_rank(gamemode3, friend3->id);
+			if (rank != -1) {
+				feed.push_back(social_json("/leaderboard",
+					friend3->username + " is ranked #" + std::to_string(rank) + " on the global " + gamemode3 +
+					" leaderboard! (Click to view!)"));	
+			} else if (!f_lb.empty()) {
 				auto lb_entry = f_lb.at(random_num(f_lb.size()));
 				feed.push_back(social_json("/leaderboard",
-					lb_entry.username + " is ranked #" + std::to_string(lb_entry.rank) + " on the global " + gamemode3 +
-					" leaderboard! Click to view!"));	
+					lb_entry.username + " is ranked #" + std::to_string(lb_entry.rank) + " on your friend " + gamemode3 +
+					" leaderboard! (Click to view!)"));	
 			}
 		}
 		// Recommend a gamemode.
