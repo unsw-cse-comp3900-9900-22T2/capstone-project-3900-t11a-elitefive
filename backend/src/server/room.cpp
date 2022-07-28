@@ -86,9 +86,13 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 				db_->get_latest_elo(p0->id, this->gamemode()),	// TODO: Do not hardcode
 				db_->get_latest_elo(p1->id, this->gamemode())	// TODO: Do not hardcode
 			};
-			payload["potholes"] = this->game_->list_potholes();
+			// payload["potholes"] = this->game_->list_potholes();
 
 			ws->send(payload.dump(), uWS::OpCode::TEXT);
+			// ws->send(payload.dump(), uWS::OpCode::TEXT);
+			for (auto const& pothole : this->game_->list_potholes()) {
+				ws->send(json_pothole(pothole), uWS::OpCode::TEXT);
+			}
 		},
 		.message = [this](WebSocket ws, std::string_view message, uWS::OpCode opCode) {
 			std::cout << "Lobby: Recieved message\n";
@@ -153,9 +157,11 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 				db_->get_latest_elo(p0->id, this->gamemode()),	// TODO: Do not hardcode
 				db_->get_latest_elo(p1->id, this->gamemode())	// TODO: Do not hardcode
 			};
-			payload["potholes"] = this->game_->list_potholes();
-
+			// payload["potholes"] = 
 			ws->send(payload.dump(), uWS::OpCode::TEXT);
+			for (auto const& pothole : this->game_->list_potholes()) {
+				ws->send(json_pothole(pothole), uWS::OpCode::TEXT);
+			}
 		},
 		.message = [this](WebSocket ws, std::string_view message, uWS::OpCode opCode) {
 			std::cout << "Recieved message\n";
@@ -267,6 +273,13 @@ auto Room::json_confirm_move(std::string const& move) -> std::string {
 auto Room::json_player3(std::string const& move) -> std::string {
 	json payload;
 	payload["event"] = "player3";
+	payload["tile"] = move;
+	return payload.dump();
+}
+
+auto Room::json_pothole(std::string const& move) -> std::string {
+	json payload;
+	payload["event"] = "pothole";
 	payload["tile"] = move;
 	return payload.dump();
 }
