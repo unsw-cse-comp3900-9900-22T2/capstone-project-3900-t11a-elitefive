@@ -104,7 +104,7 @@ export default function Leaderboard({}: Props) {
     })
   }, [])
 
-  const [buttonState, setButtonState] = useState(false);
+  const [buttonState, setButtonState] = useState(true);
 
   function toggleStatus() {
     setButtonState(!buttonState);

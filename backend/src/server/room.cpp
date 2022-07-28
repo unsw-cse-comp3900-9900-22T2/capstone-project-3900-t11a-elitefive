@@ -321,7 +321,7 @@ auto Room::save_match(int winning_player) -> void {
 		svg_data.append(std::to_string(t));
 	}
 	// Save Match to DB.
-	auto const match_id = db_->save_match("CLASSIC", this->ranked_, playersELO, winning_uid,
+	auto const match_id = db_->save_match(this->gamemode(), this->ranked_, playersELO, winning_uid,
 		game_->list_potholes_string() ,game_->move_sequence(), svg_data, snapshots);
 	std::cout << "Match ID: " << match_id << '\n';
 }

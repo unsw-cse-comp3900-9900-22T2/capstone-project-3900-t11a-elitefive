@@ -58,8 +58,8 @@ const ColumnContainer = styled.div`
   margin-top: -15px;
 `;
 
-const DEFAULT_COLOR_1 = "red";
-const DEFAULT_COLOR_2 = "blue";
+const DEFAULT_COLOR_1 = "#f33880";
+const DEFAULT_COLOR_2 = "#1de254";
 
 
 const DEFAULT_BOARD_WIDTH = 1200;

@@ -30,7 +30,7 @@ MetaDataGenerator::MetaDataGenerator(Game game)
 MetaDataGenerator::MetaDataGenerator(std::string moves, int players) : MetaDataGenerator(construct_game(moves, players)) {}
 
 auto construct_game(std::string moves, int players) -> Game {
-	auto game = Game(2);
+	auto game = Game(players);
 	for(int i = 0; i < moves.size(); i = i+2) {
 		std::string move = moves.substr(i, 2);
 		game.play(move);
