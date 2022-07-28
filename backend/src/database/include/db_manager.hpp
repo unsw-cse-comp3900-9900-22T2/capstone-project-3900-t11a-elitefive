@@ -22,6 +22,8 @@ class DatabaseManager {
     // MATCHES
     auto save_match(std::string gameType, bool is_ranked, std::map<int, int> playersELO, int winner,
       std::string potholes, std::string move_seq, std::string svg_data, std::vector<uint64_t> snapshots) -> int;
+    auto save_match(std::string gameType, bool is_ranked, std::map<int, int> playersELO, std::map<int, std::string> playerOutcomes,
+      std::string potholes, std::string move_seq, std::string svg_data, std::vector<uint64_t> snapshots) -> int;
     auto get_match(int id) -> Match*;
     auto get_matches() -> std::vector<Match*>;
     auto get_matches(int id) -> std::vector<Match*>;
