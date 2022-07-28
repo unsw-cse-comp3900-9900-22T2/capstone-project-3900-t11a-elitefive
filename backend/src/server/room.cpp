@@ -291,8 +291,35 @@ auto Room::save_match(int winning_player) -> void {
 	// std::cout << "Room: Winning player - " << winning_player << " with uid: " << winning_uid << '\n';
 	
 	auto playersELO = calc_elos(winning_player);
-	auto const match_id = db_->save_match(this->gamemode(), this->ranked_, playersELO, winning_uid,
-		game_->list_potholes_string() ,game_->move_sequence(), snapshots);
+	// 0 -> Background
+	// 1 -> Player 0
+	// 2 -> Player 1
+	// 3 -> Player 2
+	// 4 -> Potholes
+	// Initialize all tiles as background initially.
+	auto svg = std::vector<int>(61, 0);
+	// Update svg_data for players.
+	auto i = 1;
+	for (auto const &board : game_->board().all_boards()) {
+		auto v = board.binary_to_vector();
+		for (auto const &t : v) {
+			svg.at(t) = i;
+		}
+		i++;
+	}
+	// Update svg_data for potholes.
+	auto potholes_vec = game_->board().potholes().binary_to_vector();
+	for (auto const &t : potholes_vec) {
+		svg.at(t) = 4;
+	}
+	// Create the svg_data string.
+	auto svg_data = std::string();
+	for (auto const &t : svg) {
+		svg_data.append(std::to_string(t));
+	}
+	// Save Match to DB.
+	auto const match_id = db_->save_match("CLASSIC", this->ranked_, playersELO, winning_uid,
+		game_->list_potholes_string() ,game_->move_sequence(), svg_data, snapshots);
 	std::cout << "Match ID: " << match_id << '\n';
 }
 
