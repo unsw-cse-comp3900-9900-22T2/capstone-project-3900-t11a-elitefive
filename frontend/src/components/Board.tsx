@@ -123,9 +123,10 @@ type ReplayBoardProps = {
   width?: number;
   height?: number;
   replayStringArr: string[];
+  numPlayers : number;
 }
 
-export function ReplayBoard({ width, height, replayStringArr}: ReplayBoardProps) {
+export function ReplayBoard({ width, height, replayStringArr, numPlayers}: ReplayBoardProps) {
 
   const renderBoard = () => {
     const w = width ? width : DEFAULT_BOARD_WIDTH;
@@ -139,14 +140,11 @@ export function ReplayBoard({ width, height, replayStringArr}: ReplayBoardProps)
             <RowContainer x_offset={x_offset}>
               {row.map((id:string) => {
                 if(replayStringArr.includes(id)) {
-                  if(replayStringArr.indexOf(id) % 2 == 0) {
-                    return (
-                      <HexCell fill="#f33880"/>
-                    )
-                  } else {
-                    return (
-                      <HexCell fill="#1de254"/>
-                    )
+                  console.log(numPlayers);
+                  switch(replayStringArr.indexOf(id) % numPlayers) {
+                    case 0 : return (<HexCell fill="#f33880"/>)
+                    case 1 : return (<HexCell fill="#1de254"/>)
+                    case 2 : return (<HexCell fill="#00b9ca"/>)
                   }
                 }
                 return (<HexCell />)

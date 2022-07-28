@@ -107,11 +107,11 @@ export type gamemodeDataType = {
   gamemode: string;
 }
 
-
 export default function ReplayGamepage({}: Props) {
 
   const [matchData, setMatchData] = useState<matchDataType>(DefaultMatchData);
   const [gamemode, setGamemode] = useState<gamemodeDataType>(DefaultGamemode);
+  const [nplayers, setPlayerCount] = useState<number>(2);
   const{ matchid } = useParams();
   const { setWinner } = useGameState();
 
@@ -126,6 +126,13 @@ export default function ReplayGamepage({}: Props) {
     .then(data => {
       setGamemode(data.gamemode);
       setMatchData(data);
+      // console.log(data);
+      // console.log(data.nplayers);
+      const nplayers = data.nplayers;
+      setPlayerCount(nplayers);
+      console.log("Is set to:")
+      console.log(nplayers);
+
     })
   },[])
 
@@ -142,7 +149,10 @@ export default function ReplayGamepage({}: Props) {
             ):  
             (
               <>
-                <ReplayBoard replayStringArr={replayStringArr}/>
+                <ReplayBoard 
+                  replayStringArr={replayStringArr}
+                  numPlayers={nplayers}
+                />
                 <Sidebar
                   matchData={matchData}
                   currIndex={currIndex}
