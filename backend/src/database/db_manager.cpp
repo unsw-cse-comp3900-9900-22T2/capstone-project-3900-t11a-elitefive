@@ -41,6 +41,17 @@ auto DatabaseManager::get_user_username(std::string username) -> User* {
 
 auto DatabaseManager::save_match(std::string gameType, bool is_ranked, std::map<int, int> playersELO, int winner,
     std::string potholes, std::string move_seq, std::string svg_data, std::vector<uint64_t> snapshots) -> int {
+  auto playerOutcomes = std::map<int, std::string>{};
+  for (auto const& entry : playersELO) {
+    auto player = entry.first;
+    auto outcome = (playersELO.count(winner) == 0) ? "DRAW" : (winner == player) ? "WIN" : "LOSS";
+    playerOutcomes.insert({player, outcome});
+  }
+  return save_match(gameType, is_ranked, playersELO, playerOutcomes, potholes, move_seq, svg_data, snapshots);
+}
+
+auto DatabaseManager::save_match(std::string gameType, bool is_ranked, std::map<int, int> playersELO, std::map<int, std::string> playerOutcomes,
+    std::string potholes, std::string move_seq, std::string svg_data, std::vector<uint64_t> snapshots) -> int {
   // Insert Match
   auto res = execute("insert_match", gameType, is_ranked, potholes, move_seq, svg_data);
   auto matchID = atoi(res[0][0].c_str());
@@ -48,9 +59,9 @@ auto DatabaseManager::save_match(std::string gameType, bool is_ranked, std::map<
   auto outcome_columns = std::vector<std::string>{"player", "match", "end_elo", "outcome"};
   auto outcome_entries = std::vector<std::tuple<int, int, int, std::string>>{};
   for (auto const& entry : playersELO) {
-      auto player = entry.first;
-      auto end_elo = entry.second;
-      auto outcome = (playersELO.count(winner) == 0) ? "DRAW" : (winner == player) ? "WIN" : "LOSS";
+    auto player = entry.first;
+    auto end_elo = entry.second;
+    auto outcome = playerOutcomes[player];
     outcome_entries.push_back(std::make_tuple(player, matchID, end_elo, outcome));
   }
   batch_insert("outcomes", outcome_columns, outcome_entries);
