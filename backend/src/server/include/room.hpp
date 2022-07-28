@@ -16,21 +16,24 @@ class Room {
     typedef uWS::WebSocket<false, true, SocketData> *WebSocket;
     private:
         std::string room_id_;
+        int gamemode_;
         std::vector<int> uids_; 
         std::unique_ptr<Game> game_;
         std::unique_ptr<AIGame> aigame_;
         DatabaseManager *db_;
         bool ranked_;
         bool computer_;
-        std::string gamemode_;
 
     public:
         Room(uWS::App &app, DatabaseManager *db, bool ranked, bool computer, bool potholes, std::string room_id, std::vector<int> uids);
-
         auto room_id() const -> std::string { return room_id_; }
         auto room_code() const -> std::string { return std::string{"/ws/game/" + this->room_id()}; }
         auto play_move(std::string const& move) -> bool { return this->game_->play(move); }
-        auto gamemode() const -> const std::string { return gamemode_; }
+        auto gamemode() const -> std::string { 
+            if (gamemode_ == 0) return "CLASSIC"; 
+            if (gamemode_ == 1) return "TRIPLES"; 
+            if (gamemode_ == 2) return "POTHOLES";
+        }
         
         auto publish_move(std::string const& move) {
             if (game_ == nullptr) std::cout << "Lobby: WHAT IS HAPPENING\n";
