@@ -20,6 +20,7 @@ auto stats_to_json(bool ranked, PlayerStats *stats, std::map<std::string, int> e
 
 auto elo_history_to_json(std::map<std::string, std::vector<int>> elohistory) -> json;
 
+auto match_history_filtered_to_json(std::vector<Match*> matchhistory) -> json;
 auto match_history_to_json(std::vector<Match*> matchhistory) -> json;
 
 auto all_friends_to_json(int id, std::vector<User*> friends, std::vector<User*> incoming, std::vector<User*> outgoing) -> json;
