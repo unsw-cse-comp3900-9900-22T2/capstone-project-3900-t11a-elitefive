@@ -92,6 +92,7 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 			if (player_resigned(message)) {
 				int player = this->game_->give_player_with_uid(uid);
 				int winning_player = this->game_->player_after(player);
+				std::cout << "\tRoom: Player resigned - winning player: " << winning_player << '\n';
 
 				save_match(winning_player);
 
@@ -291,22 +292,36 @@ auto Room::save_match(int winning_player) -> void {
 }
 
 auto Room::calc_elos(int winning_player) -> std::map<int, int> {
-	auto playersELO = std::map<int, int>{};	// Contains starting elo
+	auto playersELO = std::vector<std::pair<int, int>>{};	// Contains starting elo
 	for (auto const &uid : uids_) {
 		auto start_elo = db_->get_latest_elo(uid, "CLASSIC");
-		playersELO.insert({uid, start_elo});
+		playersELO.push_back({uid, start_elo});
+		std::cout << "\t\tELO: UID: " << uid << " Start elo: " << start_elo << " : " << db_->get_user(uid)->username << '\n';
 	}
 	// Don't do calculation if there is a draw
 	if (this->ranked_ && winning_player != -1) {
 		std::cout << "\tRoom: Do elo calculation\n";
 		int player = 0;
 		for (auto &elo : playersELO) {
-			if (player == winning_player) elo.second += 30;
-			else elo.second -= 30;
+			if (player == winning_player) {
+				elo.second += 30;
+				std::cout << "\t\tELO: UID: " << elo.first << " End elo: " << elo.second << " : " << db_->get_user(elo.first)->username << '\n';
+			}
+			else {
+				elo.second -= 30;
+				std::cout << "\t\tELO: UID: " << elo.first << " End elo: " << elo.second << " : " << db_->get_user(elo.first)->username << '\n';
+			}
 			++player;
 		}
 	}
-	return playersELO;
+
+	// Put in format for database
+	std::map<int, int> final_elos{};
+	for (auto const& result : playersELO) {
+		final_elos.insert({result.first, result.second});
+	}
+
+	return final_elos;
 }
 
 // TODO: Make this a game function instead
