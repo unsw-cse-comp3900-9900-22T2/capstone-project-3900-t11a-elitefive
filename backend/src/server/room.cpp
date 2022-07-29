@@ -2,6 +2,7 @@
 #include <string>
 #include <stdio.h>
 #include <future>
+#include <random>
 
 #include "App.h"
 #include "room.hpp"
@@ -60,7 +61,25 @@ auto Room::generate_game(bool potholes) -> void {
 	int nplayers = uids_.size();
 	BitBoard missing_tiles = BitBoard(); // Assume none
 	if (potholes) {
-		missing_tiles = BitBoard(743284239);
+		auto now = std::chrono::steady_clock::now().time_since_epoch().count();
+    auto e1 = std::default_random_engine(now);
+    auto d1 = std::uniform_int_distribution<int>(5, 10);
+    auto r1 = d1(e1);
+		std::cout << r1 << std::endl;
+		auto potholes = std::vector<int>(61, 0);
+		for (int i = 1; i <= r1; i++) {
+			auto e2 = std::default_random_engine(now * i);
+    	auto d2 = std::uniform_int_distribution<int>(0, 60);
+    	auto r2 = d2(e2);
+			potholes.at(r2) = 1;
+			std::cout << r2 << std::endl;
+		}
+		auto pots = std::string();
+		for (auto const &p : potholes) {
+			pots.append(std::to_string(p));
+		}
+		std::bitset<64> b(pots);       // [0,0,1,1,0,0,1,0]
+		missing_tiles = BitBoard(b);
 	}
 	this->game_ = std::make_unique<Game>(nplayers, uids_, missing_tiles);
 	this->aigame_ = std::make_unique<AIGame>(nplayers, missing_tiles);
