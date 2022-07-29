@@ -30,9 +30,15 @@ auto registerPage(uWS::App &app, DatabaseManager &db) -> void {
 				auto email = std::string(user_json["email"]);
 				auto password = std::string(user_json["password"]);
 				
-				// Manage json
 				json payload;
-				if (db.insert_user(username, email, password)){
+				if (password.length() < 8 ){
+					// Register Failure
+					payload["event"] = "register";
+					payload["action"] = "register";
+					payload["payload"]["outcome"] = "failure";
+					payload["payload"]["message"] = "password must be at least 8 characters";
+				}
+				else if (db.insert_user(username, email, password)){
 				
 					// send welcome email
 					send_email_welcome(email, username);
@@ -47,6 +53,8 @@ auto registerPage(uWS::App &app, DatabaseManager &db) -> void {
 					payload["event"] = "register";
 					payload["action"] = "register";
 					payload["payload"]["outcome"] = "failure";
+					payload["payload"]["message"] = "email already exists";
+
 				}
 				// Respond
 				res->end(payload.dump());
