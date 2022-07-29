@@ -10,6 +10,7 @@ class Game : public BaseGame {
 		enum class state { ONGOING, WIN, LOSS, DRAW };
 	private:
 		std::vector<int> uids_; 
+		std::vector<bool> out_;
 		Game::state gamestate_;
 		std::vector<std::string> move_sequence_;
 	public:
@@ -21,9 +22,18 @@ class Game : public BaseGame {
 
 		auto ongoing() const -> bool;
 		auto status() const -> Game::state const;		// Tells you whether the game is over or not
-
 		auto move_sequence() const -> std::string;
 		auto all_moves() const -> const std::vector<std::string>;
+
+		auto num_players_in() -> int {
+			int count = 0;
+			for (auto const value : out_) {
+				if (value == false) ++count;
+			}
+			return count;
+		}
+		auto set_player_out(int player) -> void {out_[player] = true; }
+		auto continue_game() -> void {gamestate_ = Game::state::ONGOING;}
 
 		auto which_player_won() const -> int {
 			auto const state = this->status();
@@ -42,16 +52,19 @@ class Game : public BaseGame {
 			}
 			else {
 				if (this->whose_turn() == 0) {
-					if (state == Game::state::WIN) return 0;	// Player 0 won
-					if (state == Game::state::LOSS) return 1;	// Player 1 won
+					if (state == Game::state::WIN) 						return 0;	// Player 0 won
+					if (state == Game::state::LOSS && out_[2] == true) 	return 1;	// Player 1 won - Player 2 out
+					if (state == Game::state::LOSS && out_[1] == true) 	return 2;	// Player 2 won - Player 1 out
 				}
 				if (this->whose_turn() == 1) {
-					if (state == Game::state::WIN) return 1;	// Player 1 won
-					if (state == Game::state::LOSS) return 2;	// Player 2 won
+					if (state == Game::state::WIN) 						return 1;	// Player 1 won
+					if (state == Game::state::LOSS && out_[2] == true) 	return 0; 	// Player 0 won - Player 2 out
+					if (state == Game::state::LOSS && out_[0] == true) 	return 2;	// Player 2 won - Player 0 out
 				}
 				if (this->whose_turn() == 2) {
-					if (state == Game::state::WIN) return 2;	// Player 2 won
-					if (state == Game::state::LOSS) return 0;	// Player 0 won
+					if (state == Game::state::WIN) 						return 2;	// Player 2 won
+					if (state == Game::state::LOSS && out_[1] == true) 	return 0; 	// Player 0 won - Player 1 out
+					if (state == Game::state::LOSS && out_[0] == true) 	return 1;	// Player 1 won - Player 0 out
 				}
 			}
 			
