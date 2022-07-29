@@ -85,7 +85,7 @@ export default function StickyHeadTable() {
         <TableRow hover >
           <TableCell
           key={j}
-          style={{ minWidth: 100 }}
+          style={{ minWidth: 100 , background: 'var(--accent-dark)'}}
           align={'center'}
           >
             {element}
@@ -96,7 +96,7 @@ export default function StickyHeadTable() {
     return (
       <TableCell 
       key={i} 
-      style={{width: 100}} 
+      style={{width: 100, background: 'var(--accent-dark)'}} 
       padding={'none'}
       > 
       {cell} 
@@ -114,8 +114,9 @@ export default function StickyHeadTable() {
                 {matchData.players.map((x, index) => (
                   <TableCell
                   key={index}
-                  style={{ minWidth: 100}}
+                  style={{ minWidth: 100, background: 'var(--accent-dark)'}}
                   align={'center'}
+                  
                   >
                     {x.username}
                   </TableCell>

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import Board from '../components/Board';
-import { Box, Modal, Typography } from '@mui/material';
+import { Box, Modal, Slider, Typography } from '@mui/material';
 import StyledInput from '../components/StyledInput';
 import {StyledButton} from '../components/ReusableButton-styled';
 import Button, {Button2, LargeButton} from '../components/ReusableButton';
@@ -40,6 +40,11 @@ const Container1  = styled.div`
   grid-gap: 30px;
 `
 
+const SliderContainer = styled.div`
+  width: 300px;
+  color: white;
+`;
+
 export default function Gamemode({}: Props) {
 
     const navigate = useNavigate();
@@ -53,16 +58,25 @@ export default function Gamemode({}: Props) {
     const [vsAI, setVsAI] = useState(true);
     const [isRanked, setIsRanked] = useState(true);
     const [isWaiting, setIsWaiting] = useState(false);
+    const [aiDifficulty, setAIDifficulty] = useState<number|number[]>(0);
 
     const { getUID } = useAuth();
     
     const handleJoinWaitingRoom = (gamemode:string) => async () => {
       if(!waitingRoomSock) {
         const uid = getUID();
-        console.log(uid);
+        // console.log(uid);
         if(!uid) return;
         const ws = await JoinSocket(parseInt(uid));
         setIsWaiting(true);
+
+
+        const aiDiff = (aiDifficulty > 50) ? 2 :
+                        (
+                          (aiDifficulty < 50) ? 0 : 1
+                        )
+                        
+        console.log(`aidiff = ${aiDiff}`);
 
         setTimeout(() => {
           ws.send(JSON.stringify({
@@ -71,6 +85,7 @@ export default function Gamemode({}: Props) {
               "ranked": isRanked,
               "ai": vsAI,
               "gamemode": gamemode,
+              "ai-difficulty": aiDiff
             })
           }));
         },1000)
@@ -79,10 +94,49 @@ export default function Gamemode({}: Props) {
       }
     }
 
+    const renderStepTwo = () => {
+      if(vsAI) {
+        const handleSlider = (event: Event, value:number|number[]) => {
+          setAIDifficulty(value);
+        }
+
+        return (
+          <SliderContainer>
+            <Typography variant="h4">AI Difficulty</Typography>
+            <Slider
+              value={aiDifficulty}
+              step={50}
+              sx={{
+                color: "white",
+              }}
+              onChange={handleSlider}
+             />
+          </SliderContainer>
+        )
+      }
+      // else
+      return (
+        <Box display="flex">
+          <Button
+            onClick={() => {setIsRanked(true)}}
+            background={isRanked ? "var(--accent-darker)" : "var(--accent-dark)"}
+          >
+            Ranked
+          </Button>
+          <Button 
+            onClick={() => {setIsRanked(false)}}
+            background={!isRanked ? "var(--accent-darker)" : "var(--accent-dark)"}
+          >
+            casual
+          </Button>
+        </Box>
+      )
+
+    }
+
     useEffect(() => {
-      console.log(`ai = ${vsAI}`)
-      console.log(`isranked = ${isRanked}`)
-    },[vsAI, isRanked])
+      console.log(aiDifficulty)
+    },[aiDifficulty])
 
     const JoinSocket = (uid: number): Promise<WebSocket> => {
       return new Promise((resolve, reject) => {
@@ -151,20 +205,7 @@ export default function Gamemode({}: Props) {
               Vs Human
             </Button>
           </Box>
-          <Box display="flex">
-            <Button
-              onClick={() => {setIsRanked(true)}}
-              background={isRanked ? "var(--accent-darker)" : "var(--accent-dark)"}
-            >
-              Ranked
-            </Button>
-            <Button 
-              onClick={() => {setIsRanked(false)}}
-              background={!isRanked ? "var(--accent-darker)" : "var(--accent-dark)"}
-            >
-              casual
-            </Button>
-          </Box>
+          {renderStepTwo()}
           <Container1>
             <LargeButton onClick={handleJoinWaitingRoom("CLASSIC")}>
               <Typography variant="h3">{"Classic"}</Typography>
