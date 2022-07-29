@@ -41,8 +41,13 @@ export async function register(username: string, password: string, email: string
   
   // register succes or register failure 
   const response_json = await response.json()
-  const { outcome } = response_json.payload
+  //const { outcome } = response_json.payload
+  const { outcome, message } = response_json.payload
+
   if(outcome == "success") return true;
+  
+  alert(message)
+  
   return false;
 }
 
