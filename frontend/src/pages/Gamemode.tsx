@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import Board from '../components/Board';
-import { Box, Modal, Typography } from '@mui/material';
+import { Box, Modal, Slider, Typography } from '@mui/material';
 import StyledInput from '../components/StyledInput';
 import {StyledButton} from '../components/ReusableButton-styled';
 import Button, {Button2, LargeButton} from '../components/ReusableButton';
@@ -40,6 +40,11 @@ const Container1  = styled.div`
   grid-gap: 30px;
 `
 
+const SliderContainer = styled.div`
+  width: 300px;
+  color: white;
+`;
+
 export default function Gamemode({}: Props) {
 
     const navigate = useNavigate();
@@ -53,6 +58,7 @@ export default function Gamemode({}: Props) {
     const [vsAI, setVsAI] = useState(true);
     const [isRanked, setIsRanked] = useState(true);
     const [isWaiting, setIsWaiting] = useState(false);
+    const [aiDifficulty, setAIDifficulty] = useState('easy');
 
     const { getUID } = useAuth();
     
@@ -77,6 +83,58 @@ export default function Gamemode({}: Props) {
 
         setWaitingRoomSock(ws);
       }
+    }
+
+    const renderStepTwo = () => {
+      if(vsAI) {
+        const marks = [
+          {
+            value: 0,
+            // label: 'easy'
+          },
+          {
+            value: 1,
+            // label: 'medium'
+          },
+          {
+            value: 2,
+            // label: 'hard'
+          }
+        ]
+
+        return (
+          <SliderContainer>
+            <Typography variant="h4">AI Difficulty</Typography>
+            <Slider
+             marks={marks} 
+             step={50}
+             sx={{
+              color: "white",
+             }}
+             valueLabelDisplay="off"
+             orientation="horizontal"
+             />
+          </SliderContainer>
+        )
+      }
+      // else
+      return (
+        <Box display="flex">
+          <Button
+            onClick={() => {setIsRanked(true)}}
+            background={isRanked ? "var(--accent-darker)" : "var(--accent-dark)"}
+          >
+            Ranked
+          </Button>
+          <Button 
+            onClick={() => {setIsRanked(false)}}
+            background={!isRanked ? "var(--accent-darker)" : "var(--accent-dark)"}
+          >
+            casual
+          </Button>
+        </Box>
+      )
+
     }
 
     useEffect(() => {
@@ -151,20 +209,7 @@ export default function Gamemode({}: Props) {
               Vs Human
             </Button>
           </Box>
-          <Box display="flex">
-            <Button
-              onClick={() => {setIsRanked(true)}}
-              background={isRanked ? "var(--accent-darker)" : "var(--accent-dark)"}
-            >
-              Ranked
-            </Button>
-            <Button 
-              onClick={() => {setIsRanked(false)}}
-              background={!isRanked ? "var(--accent-darker)" : "var(--accent-dark)"}
-            >
-              casual
-            </Button>
-          </Box>
+          {renderStepTwo()}
           <Container1>
             <LargeButton onClick={handleJoinWaitingRoom("CLASSIC")}>
               <Typography variant="h3">{"Classic"}</Typography>
