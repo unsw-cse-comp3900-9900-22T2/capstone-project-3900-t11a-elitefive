@@ -9,22 +9,30 @@ MetaDataGenerator::MetaDataGenerator(Game game)
 , moves_by_player_(game.num_players())
 , positions_{}
 {
-	// Generate moves per player
-	auto player = 0;
-	for (auto const& move : move_sequence_) {
-		moves_by_player_[player].push_back(move);
-		player = (player + 1) % nplayers_;
-	}
+	// // Generate moves per player
+	// auto player = 0;
+	// for (auto const& move : move_sequence_) {
+	// 	moves_by_player_[player].push_back(move);
+	// 	player = (player + 1) % nplayers_;
+	// }
 
 	// Generate all unique position
 	auto simgame = Game(nplayers_);
+	auto const nplayers = simgame.num_players();
 	for (auto const& move: move_sequence_) {
 		auto player = simgame.whose_turn();
-		simgame.play(move);
+		moves_by_player_[player].push_back(move); // Generating moves by player
+		
+		auto result = simgame.play(move);
 		auto board = simgame.board().player_tiles(player);
 		positions_.push_back(board);
-	}
 
+		if (nplayers == 3 && simgame.num_players_in() == 3 && simgame.status() == Game::state::LOSS) {
+			simgame.set_player_out(simgame.whose_turn());	
+			simgame.continue_game();
+			simgame.pass_turn();
+		}
+	}
 }
 
 MetaDataGenerator::MetaDataGenerator(std::string moves, int players) : MetaDataGenerator(construct_game(moves, players)) {}
@@ -34,6 +42,11 @@ auto construct_game(std::string moves, int players) -> Game {
 	for(int i = 0; i < moves.size(); i = i+2) {
 		std::string move = moves.substr(i, 2);
 		game.play(move);
+		if (players == 3 && game.num_players_in() == 3 && game.status() == Game::state::LOSS) {
+			game.set_player_out(game.whose_turn());	
+			game.continue_game();
+			game.pass_turn();
+		}
 	}
 	return game;
 }
