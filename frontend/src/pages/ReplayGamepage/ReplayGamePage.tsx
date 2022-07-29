@@ -38,6 +38,7 @@ const Container2 = styled.div`
   justify-content: center;
   align-items: center;
   grid-gap: 30px;
+  margin-top: 120px;
 `;
 
 const ContainerArrow = styled.div`
@@ -57,6 +58,7 @@ export type matchDataType = {
   moves: string;
   nplayers: number;
   players: Array<playersDataType>;
+  potholes: string;
 }
 
 type playersDataType = {
@@ -97,6 +99,7 @@ const DefaultMatchData = {
             "username": ""
         }
     ],
+    "potholes": ""
 }
 
 const DefaultGamemode = {
@@ -118,7 +121,11 @@ export default function ReplayGamepage({}: Props) {
   const [replayStringArr, setReplayStringArr] = useState<string[]>([])
   const [currIndex, setCurrIndex] = useState(0);
 
-
+  const getPotholesStringArr = () => {
+    const potholesSplit = matchData.potholes.match(/.{2}/g);
+    if(!potholesSplit) return [];
+    return potholesSplit;
+  }
 
   useEffect(() => {
     fetch(`/api/replay?matchid=${matchid}`)
@@ -150,6 +157,7 @@ export default function ReplayGamepage({}: Props) {
             (
               <>
                 <ReplayBoard 
+                  potholesStringArr={getPotholesStringArr()}
                   replayStringArr={replayStringArr}
                   numPlayers={nplayers}
                 />

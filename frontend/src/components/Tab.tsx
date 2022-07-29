@@ -67,17 +67,19 @@ export default function StatTab({ data, value, setValue }: {
     return(
       <Box display="flex">
         <Box width="400px" margin = "0 20px">
-          <Typography variant="h4">Elo</Typography>
-          <Typography variant="h4">Wins</Typography>
-          <Typography variant="h4">Losses</Typography>
-          <Typography variant="h4">Draws</Typography>
-          <Button background="purple" width={400}>Elo History Chart</Button>
+          <Typography variant="h5">Elo</Typography>
+          <Typography variant="h5">Wins</Typography>
+          <Typography variant="h5">Losses</Typography>
+          <Typography variant="h5">Draws</Typography>
+          <Box margin="40px 30px">
+            <Button background="var(--accent-purple)" width={400}>Elo History Chart</Button>
+          </Box>
         </Box>
         <Box>
-          <Typography variant="h4">{data.ranked[type].elo}</Typography>
-          <Typography variant="h4">{data.ranked[type].wins}</Typography>
-          <Typography variant="h4">{data.ranked[type].losses}</Typography>
-          <Typography variant="h4">{data.ranked[type].draws}</Typography>
+          <Typography variant="h5">{data.ranked[type].elo}</Typography>
+          <Typography variant="h5">{data.ranked[type].wins}</Typography>
+          <Typography variant="h5">{data.ranked[type].losses}</Typography>
+          <Typography variant="h5">{data.ranked[type].draws}</Typography>
         </Box>
       </Box>
     )
@@ -153,22 +155,21 @@ export function LeaderTab({ data }: { data: leaderDataType}) {
   const renderTab = (type: string) => {
     console.log(data["triples"])
     return(
-      <Box display="flex">
-        <Box width="400px" margin = "0 20px">
+        <Box width="400px" margin = "0 20px" id="abc">
           {/* <Typography variant="h4">Elo</Typography>
           <Typography variant="h4">Wins</Typography>
           <Typography variant="h4">Losses</Typography>
           <Typography variant="h4">Draws</Typography>
           <Button background="purple" width={400}>Elo History Chart</Button> */}
-          <TableContainer sx={{ maxHeight: 440 }}>
+          <TableContainer sx={{ maxHeight: 440, background: 'var(--accent-dark)' }}>
             <Table stickyHeader aria-label="sticky table">
               <TableHead>
                 <TableRow>
-                  <StyledTableCell align="right">Rank</StyledTableCell>
-                  <StyledTableCell align="right">Name</StyledTableCell>
-                  <StyledTableCell align="right">Elo</StyledTableCell>
-                  <StyledTableCell align="right">Win</StyledTableCell>
-                  <StyledTableCell align="right">Losses</StyledTableCell>
+                  <StyledTableCell align="right" style={{background: 'var(--accent-darker)'}}>Rank</StyledTableCell>
+                  <StyledTableCell align="right" style={{background: 'var(--accent-darker)'}}>Name</StyledTableCell>
+                  <StyledTableCell align="right" style={{background: 'var(--accent-darker)'}}>Elo</StyledTableCell>
+                  <StyledTableCell align="right" style={{background: 'var(--accent-darker)'}}>Win</StyledTableCell>
+                  <StyledTableCell align="right" style={{background: 'var(--accent-darker)'}}>Losses</StyledTableCell>
                 </TableRow>
               </TableHead>
               <TableBody style={{verticalAlign:'top'}}>
@@ -190,12 +191,11 @@ export function LeaderTab({ data }: { data: leaderDataType}) {
             </Table>
           </TableContainer>
         </Box>
-      </Box>
     )
   }
 
   return (
-    <Box sx={{ width: '100%', background: 'var(--accent-dark)'}}>
+    <Box sx={{ background: 'var(--accent-dark)'}} id="aslkjdlk">
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={value} 
         onChange={handleChange} 

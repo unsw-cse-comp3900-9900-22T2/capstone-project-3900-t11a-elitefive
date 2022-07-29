@@ -52,11 +52,16 @@ function ExtendedYavalathButton() {
   const { emit } = useSocket();
   const { getUID } = useAuth();
   return (
-    <div onClick={() => {
-      emit("retire", JSON.stringify({
-        'uid': getUID()
-      }));
-    }}>
+    <div 
+      onClick={() => {
+        emit("retire", JSON.stringify({
+          'uid': getUID()
+        }));
+      }}
+      style={{
+        width: '300px'
+      }}
+    >
       <YavalathButton/>
     </div>
   )
