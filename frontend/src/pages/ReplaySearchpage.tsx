@@ -69,18 +69,22 @@ const MainContainer = styled.div`
 const ReplaysContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
+  overflow-y: scroll;
 `;
 
 const SideBarContainer = styled.div`
   background: var(--accent-dark);
   width: 20vw;
-  height: 400px;
-  margin: 200px 100px;
+  height: 500px;
+  margin: 0 100px;
   display:flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 10px;
+
+  position: sticky;
+  top: 300px;
 `;
 
 const Highlight = styled.div<{isSelected: boolean}>`
