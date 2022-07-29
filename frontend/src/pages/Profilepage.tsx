@@ -197,7 +197,7 @@ export default function Profilepage({}: Props) {
       <TextContainer>
         <Typography variant="h3">{"Past Matches"}</Typography>
       </TextContainer>
-      {replays.map((replay: replayType) => {
+      {replays?.map((replay: replayType) => {
         return (
           <Match onClick={() => {navigate(replay.link)}}>
             <Box display="flex" flexDirection="column"> 
