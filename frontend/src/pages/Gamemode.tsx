@@ -58,17 +58,25 @@ export default function Gamemode({}: Props) {
     const [vsAI, setVsAI] = useState(true);
     const [isRanked, setIsRanked] = useState(true);
     const [isWaiting, setIsWaiting] = useState(false);
-    const [aiDifficulty, setAIDifficulty] = useState('easy');
+    const [aiDifficulty, setAIDifficulty] = useState<number|number[]>(0);
 
     const { getUID } = useAuth();
     
     const handleJoinWaitingRoom = (gamemode:string) => async () => {
       if(!waitingRoomSock) {
         const uid = getUID();
-        console.log(uid);
+        // console.log(uid);
         if(!uid) return;
         const ws = await JoinSocket(parseInt(uid));
         setIsWaiting(true);
+
+
+        const aiDiff = (aiDifficulty > 50) ? 2 :
+                        (
+                          (aiDifficulty < 50) ? 0 : 1
+                        )
+                        
+        console.log(`aidiff = ${aiDiff}`);
 
         setTimeout(() => {
           ws.send(JSON.stringify({
@@ -77,6 +85,7 @@ export default function Gamemode({}: Props) {
               "ranked": isRanked,
               "ai": vsAI,
               "gamemode": gamemode,
+              "ai-difficulty": aiDiff
             })
           }));
         },1000)
@@ -87,32 +96,20 @@ export default function Gamemode({}: Props) {
 
     const renderStepTwo = () => {
       if(vsAI) {
-        const marks = [
-          {
-            value: 0,
-            // label: 'easy'
-          },
-          {
-            value: 1,
-            // label: 'medium'
-          },
-          {
-            value: 2,
-            // label: 'hard'
-          }
-        ]
+        const handleSlider = (event: Event, value:number|number[]) => {
+          setAIDifficulty(value);
+        }
 
         return (
           <SliderContainer>
             <Typography variant="h4">AI Difficulty</Typography>
             <Slider
-             marks={marks} 
-             step={50}
-             sx={{
-              color: "white",
-             }}
-             valueLabelDisplay="off"
-             orientation="horizontal"
+              value={aiDifficulty}
+              step={50}
+              sx={{
+                color: "white",
+              }}
+              onChange={handleSlider}
              />
           </SliderContainer>
         )
@@ -138,9 +135,8 @@ export default function Gamemode({}: Props) {
     }
 
     useEffect(() => {
-      console.log(`ai = ${vsAI}`)
-      console.log(`isranked = ${isRanked}`)
-    },[vsAI, isRanked])
+      console.log(aiDifficulty)
+    },[aiDifficulty])
 
     const JoinSocket = (uid: number): Promise<WebSocket> => {
       return new Promise((resolve, reject) => {
