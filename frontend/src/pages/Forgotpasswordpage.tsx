@@ -25,10 +25,7 @@ const Container = styled.div`
 
 export default function Forgotpasswordpage({}: Props) {
   const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const { login } = useAuth();
   const { setError, setInfo } = useAlert();
-  const navigate = useNavigate();
   
   const handleClick = async () => {
     try {
