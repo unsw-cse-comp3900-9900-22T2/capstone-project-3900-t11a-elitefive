@@ -83,8 +83,10 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 				p1->username
 			};
 			payload["elos"] = {
-				db_->get_latest_elo(p0->id, this->gamemode()),	// TODO: Do not hardcode
-				db_->get_latest_elo(p1->id, this->gamemode())	// TODO: Do not hardcode
+				// std::to_string(db_->get_latest_elo(p0->id, this->gamemode())),	// TODO: Do not hardcode
+				// std::to_string(db_->get_latest_elo(p1->id, this->gamemode()))	// TODO: Do not hardcode
+				std::string("Lol this isn't elo\n"),
+				std::string()
 			};
 			// payload["potholes"] = this->game_->list_potholes();
 
@@ -168,7 +170,9 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 			};
 			payload["elos"] = {
 				db_->get_latest_elo(p0->id, this->gamemode()),	// TODO: Do not hardcode
-				db_->get_latest_elo(p1->id, this->gamemode())	// TODO: Do not hardcode
+				// db_->get_latest_elo(p1->id, this->gamemode())	// TODO: Do not hardcode
+				// std::string("Lol this isn't elo\n"),
+				std::string()
 			};
 			// payload["potholes"] = 
 			ws->send(payload.dump(), uWS::OpCode::TEXT);
