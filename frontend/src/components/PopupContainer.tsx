@@ -11,12 +11,13 @@ const Container = styled.div`
   background: var(--accent-darker);
   border-radius: 10px;
   border: 1px solid white;
-
+  
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   color: white;
+  opacity: 92%
 `;
 
 export default function PopupContainer({ children }: Props) {

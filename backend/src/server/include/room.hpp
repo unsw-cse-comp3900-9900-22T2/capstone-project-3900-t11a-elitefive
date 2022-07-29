@@ -46,6 +46,8 @@ class Room {
 
         auto game_result() -> std::string;
 		auto game_result(int const uid) -> std::string;
+        
+        auto on_connect_match_info(uWS::WebSocket<false, true, SocketData> *ws) -> void;
 
     private:
         auto generate_game(bool potholes) -> void;       // Init game

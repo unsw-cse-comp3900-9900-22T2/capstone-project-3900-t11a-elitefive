@@ -55,16 +55,19 @@ class Game : public BaseGame {
 					if (state == Game::state::WIN) 						return 0;	// Player 0 won
 					if (state == Game::state::LOSS && out_[2] == true) 	return 1;	// Player 1 won - Player 2 out
 					if (state == Game::state::LOSS && out_[1] == true) 	return 2;	// Player 2 won - Player 1 out
+					return -2;
 				}
 				if (this->whose_turn() == 1) {
 					if (state == Game::state::WIN) 						return 1;	// Player 1 won
 					if (state == Game::state::LOSS && out_[2] == true) 	return 0; 	// Player 0 won - Player 2 out
 					if (state == Game::state::LOSS && out_[0] == true) 	return 2;	// Player 2 won - Player 0 out
+					return -2;
 				}
 				if (this->whose_turn() == 2) {
 					if (state == Game::state::WIN) 						return 2;	// Player 2 won
 					if (state == Game::state::LOSS && out_[1] == true) 	return 0; 	// Player 0 won - Player 1 out
 					if (state == Game::state::LOSS && out_[0] == true) 	return 1;	// Player 1 won - Player 0 out
+					return -2;
 				}
 			}
 			
