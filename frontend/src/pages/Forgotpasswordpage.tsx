@@ -38,7 +38,7 @@ export default function Forgotpasswordpage({}: Props) {
             setError(message)
         } 
         else{
-            setInfo("Check email for your new password", 50)
+            setInfo("Check email for your new password", 5000)
         } 
       } catch (err) {
         console.log('an error occured');
