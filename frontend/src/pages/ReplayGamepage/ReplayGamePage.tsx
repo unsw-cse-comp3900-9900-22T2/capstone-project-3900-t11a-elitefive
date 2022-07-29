@@ -208,7 +208,13 @@ export function Sidebar({ matchData, currIndex, replayStringArr, setCurrIndex, s
       <Typography sx={{ fontSize: 80 }} color="white" gutterBottom>
           Replay
         </Typography>
-      <ReplayPlayerCard name1={matchData.players[0].username} name2={matchData.players[1].username}/>
+      <ReplayPlayerCard>
+        {matchData?.players?.map((player) => (
+          <Typography sx={{ fontSize: 30 }} color="white" gutterBottom>
+            {player?.username}
+          </Typography>
+        ))}
+      </ReplayPlayerCard>
       {/* for loop to go through names also add elo*/}
       <Card2>
         <StickyHeadTable/>

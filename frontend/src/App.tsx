@@ -24,6 +24,7 @@ import Gamemode from './pages/Gamemode';
 import ReplayGamepage from './pages/ReplayGamepage/ReplayGamePage';
 import Leaderboard from './pages/Leaderboard';
 import Invitepage from './pages/InvitePage/Invitepage';
+import { AlertProvider } from './global/GlobalAlert';
 
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
       <AuthProvider>
         <GlobalStyles />
         <PageContainer>
+        <AlertProvider>
           <Router>
             <Routes>
               <Route path="/register" element={<Registerpage/>}/>
@@ -50,6 +52,7 @@ function App() {
               <Route path="/" element={<Homepage/>}/>
             </Routes>
           </Router>
+        </AlertProvider>
         </PageContainer>
       </AuthProvider>
     </>

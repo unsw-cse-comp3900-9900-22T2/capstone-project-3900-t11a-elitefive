@@ -7,6 +7,7 @@ import Button from '../components/ReusableButton';
 import {Routes, Route, useNavigate} from 'react-router-dom';
 import { useAuth } from '../global/GlobalAuth';
 import YavalathButton from '../components/YavalathButton';
+import { useAlert } from '../global/GlobalAlert';
 
 
 type Props = {}
@@ -24,6 +25,7 @@ export default function Loginpage({}: Props) {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const { login } = useAuth();
+  const { setError } = useAlert();
   const navigate = useNavigate();
 
   const navigateToDashboard = () => {
@@ -39,6 +41,7 @@ export default function Loginpage({}: Props) {
       }
     } catch (err) {
       console.log('invalid credentials');
+      setError('invalid credentials');
       return;
     }
   }

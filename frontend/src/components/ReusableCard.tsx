@@ -161,13 +161,12 @@ const bull = (
   }
 
   type ReplayPlayerProps = {
-    name1: string;
-    name2: string;
+    children: any[]|any;
     // maybe add another name for 3 player
   } & cardProps;
 
   // For player card
-  export function ReplayPlayerCard({name1,name2, ...styleProps}: ReplayPlayerProps) {
+  export function ReplayPlayerCard({ children, ...styleProps}: ReplayPlayerProps) {
     return (
       <StyledCard
         {...styleProps}
@@ -175,12 +174,7 @@ const bull = (
         <CardContent>
           <Container2>
             <Container>
-              <Typography sx={{ fontSize: 30 }} color="white" gutterBottom>
-                {name1}
-              </Typography>
-              <Typography sx={{ fontSize: 30 }} color="white" gutterBottom>
-                {name2}
-              </Typography>
+              {children}
             </Container>
           </Container2>
         </CardContent>

@@ -55,6 +55,7 @@ export default function SnapshotPopup({open, handleClose, setReplayData}: Props)
       setReplayData(results.snapshot_matches);
     }
     handleClose();
+    setReplayString([]);
   }
 
   return (

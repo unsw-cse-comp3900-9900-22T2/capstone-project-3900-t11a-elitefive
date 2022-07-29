@@ -92,6 +92,11 @@ export type profileDataType = {
     POTHOLES: statsDataType;
     TRIPLES: statsDataType;
   }
+  "match_history_filtered": {
+    "CLASSIC": replayType[]|null;
+    "POTHOLES": replayType[]|null;
+    "TRIPLES": replayType[]|null;
+  }
 }
 
 
@@ -142,6 +147,11 @@ const DefaultProfileData = {
       "losses": 0,
       "wins": 0,
     }
+  },
+  "match_history_filtered": {
+    "CLASSIC": null,
+    "POTHOLES": null,
+    "TRIPLES": null
   }
 }
 
@@ -155,12 +165,17 @@ type replayType = {
 }
 
 
-
-
+const tabMap = [
+  'CLASSIC',
+  'TRIPLES',
+  'POTHOLES'
+]
 
 export default function Profilepage({}: Props) {
   const [profileData, setProfileData] = useState<profileDataType>(DefaultProfileData);
-  const [replays, setReplays] = useState<replayType[]>([]);
+  // const [replays, setReplays] = useState<replayType[]>([]);
+  const [tabValue, setTabValue] = React.useState(0);
+
   const navigate = useNavigate();
 
   const { uid } = useParams();
@@ -176,9 +191,28 @@ export default function Profilepage({}: Props) {
     .then(data => {
       const payload = data.payload;
       setProfileData(payload);
-      setReplays(payload["match_history"])
     })
   },[])
+
+  useEffect(() => {
+    // console.log(tabValue)
+    console.log(profileData);
+    // setReplays();
+  }, [tabValue])
+
+  const renderFilteredReplay = () => {
+    switch (tabMap[tabValue]) {
+      case "CLASSIC": {
+        return profileData["match_history_filtered"].CLASSIC
+      }
+      case "TRIPLES": {
+        return profileData["match_history_filtered"].TRIPLES
+      }
+      case "POTHOLES": {
+        return profileData["match_history_filtered"].POTHOLES
+      }
+    }
+  }
 
 
   return (
@@ -187,17 +221,17 @@ export default function Profilepage({}: Props) {
       <Container1>
         <Container>
           <ProfileCard name={profileData.username}/>
-          <CustomizedInputBase/>
+          {/* <CustomizedInputBase/> */}
           <Button align-items="right" onClick={navigateToFriends}>Friends</Button>
         </Container>
         <StatContainer>
-          <StatTab data={profileData}/>
+          <StatTab value={tabValue} setValue={setTabValue} data={profileData}/>
         </StatContainer>
       </Container1>
       <TextContainer>
         <Typography variant="h3">{"Past Matches"}</Typography>
       </TextContainer>
-      {replays.map((replay: replayType) => {
+      {renderFilteredReplay()?.map((replay: replayType) => {
         return (
           <Match onClick={() => {navigate(replay.link)}}>
             <Box display="flex" flexDirection="column"> 

@@ -11,6 +11,7 @@ export type buttonProps = {
 export const StyledButton = styled.div<buttonProps>`
   width: ${props=>props.width?props.width:"120"}px;
   height: ${props=>props.height?props.height+"px":"auto"};
+  padding: 10px 0;
   background: ${props=>props.background?props.background:"var(--textbox-dark)"};
   color: ${props=>props.color?props.color:"white"};
   display: flex;
