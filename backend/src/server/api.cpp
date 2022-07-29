@@ -104,6 +104,51 @@ auto tempPass(uWS::App &app, DatabaseManager &db) -> void {
 	});
 }
 
+auto resetPass(uWS::App &app, DatabaseManager &db) -> void {
+	app.post("/api/resetpassword", [&app, &db](auto *res, auto *req) {
+
+		// Get data from request
+		res->onData([&db, res](std::string_view data, bool last) {
+			auto buffer = std::string("");
+			auto message = std::string("");
+			
+			buffer.append(data.data(), data.length());
+			if (last) {
+			
+				json payload;
+				payload["event"] = "password";
+				payload["action"] = "reset";
+				
+				// Read message
+				auto res_json = json::parse(data);
+				std::string suid = res_json["uid"];
+				auto uid = atoi(suid.c_str());
+				std::string oldpass = res_json["oldpass"];
+				std::string newpass = res_json["newpass"];
+				
+				// Check if old password is correct 
+				auto user = db.get_user(uid);
+				if (hash_password(oldpass) != user->password_hash){
+					payload["payload"]["outcome"] = "failure";
+					payload["payload"]["message"] = "incorrect password";
+				}else if(newpass.length() < 8 ){
+					payload["payload"]["outcome"] = "failure";
+					payload["payload"]["message"] = "new password must be at least 8 characters";
+				}else if (db.change_password(user->id, hash_password(newpass))){
+					payload["payload"]["outcome"] = "success";
+					payload["payload"]["message"] = "success";
+				}else{
+					payload["payload"]["outcome"] = "failure";
+					payload["payload"]["message"] = "database error";
+				}
+				
+				res->end(payload.dump());
+			}
+		});
+		res->onAborted([]() -> void {});
+	});
+}
+
 auto changePW(uWS::App &app, DatabaseManager &db) -> void {
 	app.post("/api/changepw", [&app, &db](auto *res, auto *req) {
 		// Loop through header 
@@ -502,21 +547,23 @@ auto api_search_snapshot(uWS::App &app, DatabaseManager &db) -> void {
 
 /*
 auto api_resetpass(uWS::App &app, DatabaseManager &db) -> void {
-	app.get("/api/resetpass", [&app, &db](auto *res, auto *req) {
+	app.get("/api/resetpassword", [&app, &db](auto *res, auto *req) {
+	
+		std::cout << "reset pass\n\n";
 	
 		auto suid = std::string(req->getQuery("uid")); 
 		auto uid = atoi(suid.c_str());
-		auto temp_pass = generate_temporary_password();
-		auto temp_pass_hash = hash_password(temp_pass);
+		auto oldpass = std::string(req->getQuery("oldpass")); 
+		auto newpass = std::string(req->getQuery("newpass")); 
+		
+		auto new_pass_hash = hash_password(newpass);
 		
 		json payload;
 		payload["event"] = "password";
 		payload["action"] = "reset";
 
 		
-		if (db.change_password(uid, temp_pass_hash)){
-			auto user = db.get_user(uid);
-			send_email_temp_password(user->email, user->username, temp_pass);
+		if (db.change_password(uid, new_pass_hash)){
 			payload["payload"]["outcome"] = "success";
 		}else{
 			payload["payload"]["outcome"] = "failure";
@@ -527,6 +574,7 @@ auto api_resetpass(uWS::App &app, DatabaseManager &db) -> void {
 	});
 }
 */
+
 
 
 // TESTING ENDPOINTS

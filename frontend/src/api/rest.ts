@@ -41,12 +41,27 @@ export async function register(username: string, password: string, email: string
     body: JSON.stringify(data),
   })
   
-  // register succes or register failure 
   const response_json = await response.json()
-  //const { outcome } = response_json.payload
-  //const { outcome, message } = response_json.payload
+    
+  return response_json;
+}
 
-  //if(outcome == "success") return true;
+// Post to server with values from register field
+export async function resetPassword(uid: string, oldpass: string, newpass: string){
+   
+  const data = { uid: uid, oldpass: oldpass, newpass: newpass};
+   
+  const response = await fetch('/api/resetpassword', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+    body: JSON.stringify(data),
+  })
+  
+  const response_json = await response.json()
+    
+  console.log(response_json)
     
   return response_json;
 }
@@ -71,7 +86,6 @@ export async function querySnapShot(snapshotstring: string) {
 
 // Post to server with values from register field
 export async function forgotPassword(email: string){
-  console.log(email)
    
   const data = { email: email };
    
@@ -85,7 +99,6 @@ export async function forgotPassword(email: string){
   
   // register succes or register failure 
   const response_json = await response.json()
-  console.log(response_json);
   const { outcome, message } = response_json.payload
 
   return response_json;

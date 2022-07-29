@@ -48,6 +48,7 @@ void BackendServer() {
 	friendaction(app, db, tokens);
 	changePW(app, db);
 	tempPass(app, db);
+	resetPass(app,db);
 
 	// Get Requests
 	api_search_snapshot(app, db);

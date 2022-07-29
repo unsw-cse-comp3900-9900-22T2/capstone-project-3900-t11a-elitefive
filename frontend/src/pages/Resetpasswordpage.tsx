@@ -5,10 +5,10 @@ import { Typography } from '@mui/material';
 import StyledInput from '../components/StyledInput';
 import Button from '../components/ReusableButton';
 import {Routes, Route, useNavigate, useParams} from 'react-router-dom';
-import { useAuth } from '../global/GlobalAuth';
+import { getStoredUID, useAuth } from '../global/GlobalAuth';
 import YavalathButton from '../components/YavalathButton';
 import { useAlert } from '../global/GlobalAlert';
-import { forgotPassword } from '../api/rest';
+import { resetPassword } from '../api/rest';
 import { sortedLastIndexOf } from 'lodash';
 import { convertCompilerOptionsFromJson, createImportSpecifier } from 'typescript';
 
@@ -25,19 +25,25 @@ const Container = styled.div`
 `;
 
 export default function Resetpasswordpage({}: Props) {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const { login } = useAuth();
+  const [oldpass, setOldPass] = useState<string>("");
+  const [newpass, setNewPass] = useState<string>("");
   const { setError, setInfo } = useAlert();
-  const navigate = useNavigate();
-  
-  
+
   // Get iser info 
   const { getUID } = useAuth();
   const uid = window.localStorage.getItem("username")
   
   const handleClick = async () => {
-    console.log(window.localStorage)
+    //setInfo('Registering user, please wait', 5000);
+    const uid = String(getStoredUID())
+    const response = await resetPassword(uid, oldpass, newpass)
+    const { outcome, message } = response.payload
+    if(outcome == 'success') {
+      setInfo("Your password has been changed!", 5000);
+    } else {
+      console.log('register error');
+      setError(message)
+    }
   }
   
   return (      
@@ -46,8 +52,8 @@ export default function Resetpasswordpage({}: Props) {
       <Typography variant="h3">Reset Password</Typography>
       <Typography variant="h4">hi {uid} </Typography>
 
-      <StyledInput onChange={(e) => {setEmail(e.currentTarget.value)}} value={email} label="old password"/>
-      <StyledInput onChange={(e) => {setEmail(e.currentTarget.value)}} value={email} label="new password"/>
+      <StyledInput onChange={(e) => {setOldPass(e.currentTarget.value)}} value={oldpass} label="old password"/>
+      <StyledInput onChange={(e) => {setNewPass(e.currentTarget.value)}} value={newpass} label="new password"/>
       <Button onClick={handleClick}> Submit </Button>
     </Container>
   )
