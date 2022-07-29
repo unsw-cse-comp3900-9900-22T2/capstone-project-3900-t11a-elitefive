@@ -44,18 +44,6 @@ auto Room::InitRoom(bool ranked, bool computer, bool potholes) -> void {
 	generate_game(potholes);	// CLASSIC / POTHOLES / ETC	
 }
 
-// auto Room::generate_game(bool potholes) -> void {
-// 	std::cout << "\t\tDEBUG: Generating room\n";
-// 	int nplayers = uids_.size();
-// 	BitBoard missing_tiles = BitBoard(); // Assume none
-// 	if (potholes) {
-// 		missing_tiles = BitBoard(743284239);
-// 	}
-// 	this->game_ = std::make_unique<Game>(nplayers, uids_, missing_tiles);
-// 	this->aigame_ = std::make_unique<AIGame>(nplayers, missing_tiles);
-// 	std::cout << "\t\tDEBUG: Generated room\n";
-// }
-
 Room::Room(uWS::App &app, DatabaseManager *db, bool ranked, bool computer, bool potholes, std::string room_id, std::vector<int> uids)
 : room_id_{room_id}
 , gamemode_{0} // CLASSIC = 0, TRIPLES = 1, POTHOLES = 2
