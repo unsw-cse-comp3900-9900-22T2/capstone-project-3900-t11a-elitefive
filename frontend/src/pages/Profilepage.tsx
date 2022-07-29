@@ -26,7 +26,7 @@ type BoxContainerProps = {
 }
 
 const Container  = styled.div`
-  min-height: 100px;
+  min-height: 70vh;
 
   display: flex;
   flex-direction: Column;
@@ -43,8 +43,9 @@ const Container1  = styled.div`
   flex-direction: row;
 
   justify-content: center;
+  align-items: center;
 
-  grid-gap: 30px;
+  grid-gap: 80px;
 `
 const StatContainer  = styled.div`
   min-height: 450px;
