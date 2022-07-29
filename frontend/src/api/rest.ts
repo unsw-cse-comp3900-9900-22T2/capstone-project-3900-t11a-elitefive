@@ -1,5 +1,6 @@
 import { text } from "stream/consumers";
 
+
 type loginResp = {
   uid: string,
   token: string
@@ -42,13 +43,11 @@ export async function register(username: string, password: string, email: string
   // register succes or register failure 
   const response_json = await response.json()
   //const { outcome } = response_json.payload
-  const { outcome, message } = response_json.payload
+  //const { outcome, message } = response_json.payload
 
-  if(outcome == "success") return true;
-  
-  alert(message)
-  
-  return false;
+  //if(outcome == "success") return true;
+    
+  return response_json;
 }
 
 export async function getAllReplays() {
@@ -67,4 +66,26 @@ export async function querySnapShot(snapshotstring: string) {
   if(!data) return null;
 
   return data
+}
+
+// Post to server with values from register field
+export async function forgotPassword(email: string){
+  console.log(email)
+   
+  const data = { email: email };
+   
+  const response = await fetch('/api/temppass', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+    body: JSON.stringify(data),
+  })
+  
+  // register succes or register failure 
+  const response_json = await response.json()
+  console.log(response_json);
+  const { outcome, message } = response_json.payload
+
+  return response_json;
 }

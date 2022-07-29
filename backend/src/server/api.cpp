@@ -64,6 +64,46 @@ auto registerPage(uWS::App &app, DatabaseManager &db) -> void {
 	});
 }
 
+auto tempPass(uWS::App &app, DatabaseManager &db) -> void {
+	app.post("/api/temppass", [&app, &db](auto *res, auto *req) {
+
+		// Get data from request
+		res->onData([&db, res](std::string_view data, bool last) {
+			auto buffer = std::string("");
+			auto message = std::string("");
+			
+			buffer.append(data.data(), data.length());
+			if (last) {
+			
+				json payload;
+				payload["event"] = "password";
+				payload["action"] = "temporary";
+				
+				auto password = generate_temporary_password();
+				auto temp_pass_hash = hash_password(password);
+			
+				// Read message
+				auto email_json = json::parse(data);
+				std::string email = email_json["email"];
+				
+				auto user = db.get_user(email);
+				if (user == NULL){
+					payload["payload"]["outcome"] = "failure";
+					payload["payload"]["message"] = "email not on database";
+				}
+				else if (db.change_password(user->id, temp_pass_hash)){
+					send_email_temp_password(user->email, user->username, password);
+					payload["payload"]["outcome"] = "success";
+				}else{
+					payload["payload"]["outcome"] = "failure";
+				}
+				res->end(payload.dump());
+			}
+		});
+		res->onAborted([]() -> void {});
+	});
+}
+
 auto changePW(uWS::App &app, DatabaseManager &db) -> void {
 	app.post("/api/changepw", [&app, &db](auto *res, auto *req) {
 		// Loop through header 
@@ -459,6 +499,7 @@ auto api_search_snapshot(uWS::App &app, DatabaseManager &db) -> void {
 	});
 }
 
+/*
 auto api_resetpass(uWS::App &app, DatabaseManager &db) -> void {
 	app.get("/api/resetpass", [&app, &db](auto *res, auto *req) {
 	
@@ -484,6 +525,7 @@ auto api_resetpass(uWS::App &app, DatabaseManager &db) -> void {
 		res->end(payload.dump());
 	});
 }
+*/
 
 
 // TESTING ENDPOINTS

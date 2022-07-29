@@ -8,6 +8,8 @@ import {Routes, Route, useNavigate} from 'react-router-dom';
 import { useAuth } from '../global/GlobalAuth';
 import YavalathButton from '../components/YavalathButton';
 import { useAlert } from '../global/GlobalAlert';
+import { forgotPassword } from '../api/rest';
+import { sortedLastIndexOf } from 'lodash';
 
 
 type Props = {}
@@ -21,44 +23,38 @@ const Container = styled.div`
   grid-gap: 30px;
 `;
 
-export default function Loginpage({}: Props) {
+export default function Forgotpasswordpage({}: Props) {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const { login } = useAuth();
-  const { setError } = useAlert();
+  const { setError, setInfo } = useAlert();
   const navigate = useNavigate();
-
-  const navigateToDashboard = () => {
-      // 👇️ navigate to /contacts
-      navigate('/dashboard');
-  };
   
   const handleClick = async () => {
     try {
-      const result = await login(email,password)
-      if(result) {
-        navigateToDashboard();
+        const result = await forgotPassword(email)
+        const { outcome, message } = result.payload
+        if (outcome =="failure"){
+            setError(message)
+        } 
+        else{
+            setInfo("Check email for your new password", 50)
+        } 
+      } catch (err) {
+        console.log('an error occured');
+        setError('an error occured');
+        return;
       }
-    } catch (err) {
-      console.log('invalid credentials');
-      setError('invalid credentials');
-      return;
-    }
   }
   
-  const handleForgotPw = async () => {
-    console.log("forgot password")
-    navigate("forgotpassword")
-  }
-
-  return (
+  return (      
     <Container>
       <YavalathButton/>
-      <Typography variant="h3">Login</Typography>
+      <Typography variant="h3">Forgot Password</Typography>
+      <Typography variant="h4">Enter your email and a temporary password will be sent</Typography>
+
       <StyledInput onChange={(e) => {setEmail(e.currentTarget.value)}} value={email} label="email"/>
-      <StyledInput onChange={(e) => {setPassword(e.currentTarget.value)}} value={password} label="password" password/>
       <Button onClick={handleClick}> Submit </Button>
-      <Button onClick={handleForgotPw}> Forgot Password </Button>
     </Container>
   )
 }
