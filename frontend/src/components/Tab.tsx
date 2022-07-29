@@ -5,6 +5,7 @@ import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Button from './ReusableButton'
+import { useNavigate } from 'react-router-dom';
 
 import { profileDataType } from '../pages/Profilepage';
 import { leaderDataType } from '../pages/Leaderboard';
@@ -142,6 +143,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 export function LeaderTab({ data }: { data: leaderDataType}) {
   const [value, setValue] = React.useState(0);
+  const navigate = useNavigate();
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -170,11 +172,15 @@ export function LeaderTab({ data }: { data: leaderDataType}) {
                 </TableRow>
               </TableHead>
               <TableBody style={{verticalAlign:'top'}}>
-                
                   {data[type]?.map((index) => (
                     <StyledTableRow>
                       <StyledTableCell2>{index.rank}</StyledTableCell2>
-                      <StyledTableCell2>{index.username}</StyledTableCell2>
+                      <StyledTableCell2 
+                        style={{cursor: 'pointer'}}
+                        onClick={() => {
+                          navigate(`/profile/${index.uid}`)
+                        }}
+                      >{index.username}</StyledTableCell2>
                       <StyledTableCell2>{index.elo}</StyledTableCell2>
                       <StyledTableCell2>{index.wins}</StyledTableCell2>
                       <StyledTableCell2>{index.losses}</StyledTableCell2>
