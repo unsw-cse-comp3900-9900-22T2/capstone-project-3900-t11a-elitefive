@@ -3,7 +3,8 @@ import { text } from "stream/consumers";
 
 type loginResp = {
   uid: string,
-  token: string
+  token: string,
+  username:string
 } 
 export async function login(email: string, password: string): Promise<loginResp| null> {
   
@@ -19,11 +20,11 @@ export async function login(email: string, password: string): Promise<loginResp|
   // register succes or register failure 
   const response_text = await response.text()
   const response_json = JSON.parse(response_text);
-  const { outcome, uid, session } = response_json.payload
+  const { outcome, uid, session, username } = response_json.payload
 
   if(outcome == "failure") return null;
 
-  return { uid, token: session }
+  return { uid, token: session, username }
 }
 
 // Post to server with values from register field

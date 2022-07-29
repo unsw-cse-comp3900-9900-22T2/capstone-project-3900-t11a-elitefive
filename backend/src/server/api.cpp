@@ -179,6 +179,7 @@ auto login(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std::stri
 						payload["action"] = "login";
 						payload["payload"]["outcome"] = "success";
 						payload["payload"]["uid"] = std::to_string(user->id);
+						payload["payload"]["username"] = user->username;
 						payload["payload"]["email"] = user->email;
 						payload["payload"]["session"] = session_tokens[user->id];
 					}
