@@ -25,7 +25,8 @@ import ReplayGamepage from './pages/ReplayGamepage/ReplayGamePage';
 import Leaderboard from './pages/Leaderboard';
 import Invitepage from './pages/InvitePage/Invitepage';
 import { AlertProvider } from './global/GlobalAlert';
-
+import { ThemeProvider as MUIThemeProvider } from '@mui/material';
+import MUITheme from './global/GlobalMui';
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
       <AuthProvider>
         <GlobalStyles />
         <PageContainer>
+        <MUIThemeProvider theme={MUITheme}>
         <AlertProvider>
           <Router>
             <Routes>
@@ -53,6 +55,7 @@ function App() {
             </Routes>
           </Router>
         </AlertProvider>
+        </MUIThemeProvider>
         </PageContainer>
       </AuthProvider>
     </>
