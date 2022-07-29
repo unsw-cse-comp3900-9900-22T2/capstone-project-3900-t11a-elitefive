@@ -51,6 +51,8 @@ class Board {
 				auto player = board.which_player_at(position);
 				if (player == 0) return 'o';
 				if (player == 1) return 'x';
+				if (player == 2) return '&';
+
 				return '-';
 			};
 
