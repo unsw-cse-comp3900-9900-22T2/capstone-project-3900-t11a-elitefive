@@ -2,6 +2,7 @@
 #include <string>
 #include <stdio.h>
 #include <future>
+#include <random>
 
 #include "App.h"
 #include "room.hpp"
@@ -43,17 +44,17 @@ auto Room::InitRoom(bool ranked, bool computer, bool potholes) -> void {
 	generate_game(potholes);	// CLASSIC / POTHOLES / ETC	
 }
 
-auto Room::generate_game(bool potholes) -> void {
-	std::cout << "\t\tDEBUG: Generating room\n";
-	int nplayers = uids_.size();
-	BitBoard missing_tiles = BitBoard(); // Assume none
-	if (potholes) {
-		missing_tiles = BitBoard(743284239);
-	}
-	this->game_ = std::make_unique<Game>(nplayers, uids_, missing_tiles);
-	this->aigame_ = std::make_unique<AIGame>(nplayers, missing_tiles);
-	std::cout << "\t\tDEBUG: Generated room\n";
-}
+// auto Room::generate_game(bool potholes) -> void {
+// 	std::cout << "\t\tDEBUG: Generating room\n";
+// 	int nplayers = uids_.size();
+// 	BitBoard missing_tiles = BitBoard(); // Assume none
+// 	if (potholes) {
+// 		missing_tiles = BitBoard(743284239);
+// 	}
+// 	this->game_ = std::make_unique<Game>(nplayers, uids_, missing_tiles);
+// 	this->aigame_ = std::make_unique<AIGame>(nplayers, missing_tiles);
+// 	std::cout << "\t\tDEBUG: Generated room\n";
+// }
 
 Room::Room(uWS::App &app, DatabaseManager *db, bool ranked, bool computer, bool potholes, std::string room_id, std::vector<int> uids)
 : room_id_{room_id}
@@ -73,6 +74,40 @@ Room::Room(uWS::App &app, DatabaseManager *db, bool ranked, bool computer, bool 
 		create_socket_player_verse_player(app);
 	}
 	std::cout << "\t\tGAME FULLY CREATED\n";
+}
+
+auto Room::generate_game(bool potholes) -> void {
+	std::cout << "\t\tDEBUG: Generating room\n";
+	int nplayers = uids_.size();
+	BitBoard missing_tiles = BitBoard(); // Assume none
+	if (potholes) {
+		
+		// Random seed
+		auto now = std::chrono::steady_clock::now().time_since_epoch().count();
+		auto e1 = std::default_random_engine(now);
+		auto d1 = std::uniform_int_distribution<int>(6, 13);
+		auto r1 = d1(e1);
+		std::cout << r1 << std::endl;
+
+		auto potholes = std::vector<int>(61, 0);
+		for (int i = 1; i <= r1; i++) {
+			auto e2 = std::default_random_engine(now * i);
+			auto d2 = std::uniform_int_distribution<int>(0, 60);
+			auto r2 = d2(e2);
+			potholes.at(r2) = 1;
+			std::cout << r2 << std::endl;
+		}
+
+		auto pots = std::string();
+		for (auto const &p : potholes) {
+			pots.append(std::to_string(p));
+		}
+		auto generated_potholes = std::bitset<64>(pots);
+		missing_tiles = BitBoard(generated_potholes);
+	}
+	this->game_ = std::make_unique<Game>(nplayers, uids_, missing_tiles);
+	this->aigame_ = std::make_unique<AIGame>(nplayers, missing_tiles);
+	std::cout << "\t\tDEBUG: Generated room\n";
 }
 
 auto Room::on_connect_match_info(uWS::WebSocket<false, true, SocketData> *ws) -> void {
