@@ -6,6 +6,7 @@ type Props = {
   height?: number;
   stroke?: string;
   fill?: string;
+  opacity?: number;
   transform?: string;
   onClick?: (args?: any) =>void;
 }
@@ -15,6 +16,7 @@ type StyledProps = {
   height?: number;
   stroke?: string;
   fill?: string;
+  opacity?: number;
 }
 
 // const DEFAULT_WIDTH = 110;
@@ -28,11 +30,13 @@ const DEFAULT_FILL = "#2b3135"
 const DEFAULT_TRANSFORM = ""
 const DEFAULT_STROKE_WIDTH = 3;
 const DEFAULT_HOVER_FILL = "#575757"; // Hover colour
+const DEFAULT_OPACITY = "100";
 
 
 const SVGContainer = styled.svg<StyledProps>`
   width: ${props => props.width? props.width : DEFAULT_WIDTH}px;
   height: ${props => props.height? props.height: DEFAULT_HEIGHT}px;
+  opacity: ${props => props.opacity? props.opacity : DEFAULT_OPACITY}px;
 
   & > polygon {
     stroke: ${props => props.stroke? props.stroke : DEFAULT_STROKE};
@@ -51,6 +55,7 @@ export default function HexCell(props: Props) {
     height,
     stroke,
     fill,
+    opacity,
     transform,
     onClick,
   } = props;
@@ -81,6 +86,7 @@ export default function HexCell(props: Props) {
     <SVGContainer
       width={width} 
       height={height}
+      opacity={opacity}
       onClick={onClick}
       fill={fill}
       stroke={stroke}

@@ -497,12 +497,12 @@ auto DatabaseManager::prepare_statements() -> void {
   "JOIN matches ON outcomes.match = matches.id "
   "WHERE game = $1 "
   "AND users.id NOT IN (6, 7, 8) "
-  "AND (users.id IN "
+  "AND ((users.id IN "
   "(SELECT friend1 FROM friends "
   "WHERE friend2 = $2)) "
   "OR (users.id IN "
   "(SELECT friend2 FROM friends "
-  "WHERE friend1 = $2)) "
+  "WHERE friend1 = $2))) "
   "GROUP BY game, users.id "
   "ORDER BY elo DESC, username;");
   conn_.prepare("are_friends",

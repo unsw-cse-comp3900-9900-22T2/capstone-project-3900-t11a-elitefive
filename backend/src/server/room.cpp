@@ -2,6 +2,7 @@
 #include <string>
 #include <stdio.h>
 #include <future>
+#include <random>
 
 #include "App.h"
 #include "room.hpp"
@@ -30,6 +31,19 @@ auto Room::publish(WebSocket ws, std::string const& message, uWS::OpCode opCode)
 // ======================================
 // 			Class implementation
 // ======================================
+
+auto Room::InitRoom(bool ranked, bool computer, bool potholes) -> void {
+	// What is the gamemode?
+	if (uids_.size() == 3) 	gamemode_ = 1;  // Triples
+	if (potholes) 			gamemode_ = 2;	// Potholes	
+
+	// Simple flags
+	ranked_ = ranked;
+	computer_ = computer;
+	
+	generate_game(potholes);	// CLASSIC / POTHOLES / ETC	
+}
+
 Room::Room(uWS::App &app, DatabaseManager *db, bool ranked, bool computer, bool potholes, std::string room_id, std::vector<int> uids)
 : room_id_{room_id}
 , gamemode_{0} // CLASSIC = 0, TRIPLES = 1, POTHOLES = 2
@@ -40,12 +54,7 @@ Room::Room(uWS::App &app, DatabaseManager *db, bool ranked, bool computer, bool 
 , ranked_{ranked}
 , computer_{computer}
 {
-	// What is the gamemode?
-	if (uids.size() == 3) 	gamemode_ = 1;  // Triples
-	if (potholes) 			gamemode_ = 2;	// Potholes	
-
-	generate_game(potholes);	// CLASSIC / POTHOLES / ETC
-	 
+	InitRoom(ranked, computer, potholes);
 	if (computer_) {
 		create_socket_ai(app);
 	}
@@ -60,11 +69,53 @@ auto Room::generate_game(bool potholes) -> void {
 	int nplayers = uids_.size();
 	BitBoard missing_tiles = BitBoard(); // Assume none
 	if (potholes) {
-		missing_tiles = BitBoard(743284239);
+		
+		// Random seed
+		auto now = std::chrono::steady_clock::now().time_since_epoch().count();
+		auto e1 = std::default_random_engine(now);
+		auto d1 = std::uniform_int_distribution<int>(6, 13);
+		auto r1 = d1(e1);
+
+		auto potholes = std::vector<int>(61, 0);
+		for (int i = 1; i <= r1; i++) {
+			auto e2 = std::default_random_engine(now * i);
+			auto d2 = std::uniform_int_distribution<int>(0, 60);
+			auto r2 = d2(e2);
+			potholes.at(r2) = 1;
+		}
+
+		auto pots = std::string();
+		for (auto const &p : potholes) {
+			pots.append(std::to_string(p));
+		}
+		auto generated_potholes = std::bitset<64>(pots);
+		missing_tiles = BitBoard(generated_potholes);
 	}
 	this->game_ = std::make_unique<Game>(nplayers, uids_, missing_tiles);
 	this->aigame_ = std::make_unique<AIGame>(nplayers, missing_tiles);
 	std::cout << "\t\tDEBUG: Generated room\n";
+}
+
+auto Room::on_connect_match_info(uWS::WebSocket<false, true, SocketData> *ws) -> void {
+	json payload;
+	payload["event"] = "player_names";
+	payload["player_name"] = {}; // Populate based on current game settings
+	payload["elos"] = {};		// Populate based on current game settings
+
+	for (int i = 0; i < this->game_->num_players(); ++i) {
+		User *player = this->db_->get_user(this->game_->give_uid(i));
+		std::string elo = ((this->ranked_) ? std::to_string(db_->get_latest_elo(player->id, this->gamemode())) : std::string());
+		
+		payload["player_name"].push_back(player->username);
+		payload["elos"].push_back(elo);
+	}
+
+	ws->send(payload.dump(), uWS::OpCode::TEXT);
+
+	// Send potholes information if any
+	for (auto const& pothole : this->game_->list_potholes()) {
+		ws->send(json_pothole(pothole), uWS::OpCode::TEXT);
+	}
 }
 
 auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
@@ -73,26 +124,7 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 		.open = [this](WebSocket ws) {
 			ws->subscribe(this->room_id());
 			std::cout << "\tLobby: Joined multiplayer lobby\n";
-			// TODO: Hack to display names
-			User *p0 = this->db_->get_user(this->game_->give_uid(0));
-			User *p1 = this->db_->get_user(this->game_->give_uid(1));
-			json payload;
-			payload["event"] = "player_names";
-			payload["player_name"] = {
-				p0->username,
-				p1->username
-			};
-			payload["elos"] = {
-				((this->ranked_) ? std::to_string(db_->get_latest_elo(p0->id, this->gamemode())) : std::string()),	// TODO: Do not hardcode
-				((this->ranked_) ? std::to_string(db_->get_latest_elo(p1->id, this->gamemode())) : std::string()),	// TODO: Do not hardcode
-			};
-			// payload["potholes"] = this->game_->list_potholes();
-
-			ws->send(payload.dump(), uWS::OpCode::TEXT);
-			// ws->send(payload.dump(), uWS::OpCode::TEXT);
-			for (auto const& pothole : this->game_->list_potholes()) {
-				ws->send(json_pothole(pothole), uWS::OpCode::TEXT);
-			}
+			on_connect_match_info(ws);
 		},
 		.message = [this](WebSocket ws, std::string_view message, uWS::OpCode opCode) {
 			std::cout << "Lobby: Recieved message\n";
@@ -157,24 +189,7 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 		.open = [this](uWS::WebSocket<false, true, SocketData> *ws) {
 			ws->subscribe(this->room_id());
 			std::cout << "Joined room\n";
-			// TODO: Hack to display names
-			User *p0 = this->db_->get_user(this->game_->give_uid(0));
-			User *p1 = this->db_->get_user(this->game_->give_uid(1));
-			json payload;
-			payload["event"] = "player_names";
-			payload["player_name"] = {
-				p0->username,
-				p1->username
-			};
-			payload["elos"] = {
-				((this->ranked_) ? std::to_string(db_->get_latest_elo(p0->id, this->gamemode())) : std::string()),	// TODO: Do not hardcode
-				((this->ranked_) ? std::to_string(db_->get_latest_elo(p1->id, this->gamemode())) : std::string()),	// TODO: Do not hardcode
-			};
-			// payload["potholes"] = 
-			ws->send(payload.dump(), uWS::OpCode::TEXT);
-			for (auto const& pothole : this->game_->list_potholes()) {
-				ws->send(json_pothole(pothole), uWS::OpCode::TEXT);
-			}
+			on_connect_match_info(ws);
 		},
 		.message = [this](WebSocket ws, std::string_view message, uWS::OpCode opCode) {
 			std::cout << "Recieved message\n";
@@ -347,6 +362,7 @@ auto Room::save_match(int winning_player) -> void {
 		svg_data.append(std::to_string(t));
 	}
 	// Save Match to DB.
+	// TODO: WIN LOSS DRAW MAP in the event of a draw
 	auto const match_id = db_->save_match(this->gamemode(), this->ranked_, playersELO, winning_uid,
 		game_->list_potholes_string() ,game_->move_sequence(), svg_data, snapshots);
 	std::cout << "Match ID: " << match_id << '\n';

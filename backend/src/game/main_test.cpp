@@ -46,20 +46,20 @@ auto computer_verse_computer() -> void;
 // 	// }
 
 auto main(void) -> int {
-	Game game = Game(2);
-	game.play("a1");
-	game.play("b1");
-	game.play("a2");
-	game.play("b2");
-	game.play("a4");
-	game.play("c3");
-	game.play("a3");
-	std::cout << game << '\n';
+	// Game game = Game(2);
+	// game.play("a1");
+	// game.play("b1");
+	// game.play("a2");
+	// game.play("b2");
+	// game.play("a4");
+	// game.play("c3");
+	// game.play("a3");
+	// std::cout << game << '\n';
 
-	auto meta = MetaDataGenerator(game);
-	for (auto pos : meta.db_snapshot()) {
-		std::cout << pos << '\n';
-	}
+	// auto meta = MetaDataGenerator(game);
+	// for (auto pos : meta.db_snapshot()) {
+	// 	std::cout << pos << '\n';
+	// }
 	
 
 
@@ -75,8 +75,8 @@ auto main(void) -> int {
 	// // std::cout << memo.contains(boards) << '\n';
 	// // std::cout << memo.find(boards) << '\n';
 
-	// auto game = generate_test_game();
-	// ai_play_game(game);
+	auto game = generate_test_game();
+	ai_play_game(game);
 	
 	return 0;
 }
@@ -105,7 +105,7 @@ auto generate_test_game() -> AIGame {
 	// // game.play(48); game.pass_turn();
 	// return game;
 	
-	auto game = AIGame(2);
+	auto game = AIGame(3);
 	// game.pass_turn();
 	game.play(30);
 	game.play(38);

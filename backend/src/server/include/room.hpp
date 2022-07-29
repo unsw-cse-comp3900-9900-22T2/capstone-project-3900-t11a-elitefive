@@ -26,6 +26,8 @@ class Room {
 
     public:
         Room(uWS::App &app, DatabaseManager *db, bool ranked, bool computer, bool potholes, std::string room_id, std::vector<int> uids);
+        auto InitRoom(bool ranked, bool computer, bool potholes) -> void;
+        
         auto room_id() const -> std::string { return room_id_; }
         auto room_code() const -> std::string { return std::string{"/ws/game/" + this->room_id()}; }
         auto play_move(std::string const& move) -> bool { return this->game_->play(move); }
@@ -46,6 +48,8 @@ class Room {
 
         auto game_result() -> std::string;
 		auto game_result(int const uid) -> std::string;
+        
+        auto on_connect_match_info(uWS::WebSocket<false, true, SocketData> *ws) -> void;
 
     private:
         auto generate_game(bool potholes) -> void;       // Init game

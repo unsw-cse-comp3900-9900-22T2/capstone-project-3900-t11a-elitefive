@@ -72,32 +72,32 @@ Pool::Pool(uWS::App *app, DatabaseManager *db)
 
 // ==== Functions to manage the waiting room ====
 
-auto Pool::replace_room_id(uint32_t roomid) -> void {
-	int i = -1;
-	for (auto &room : rooms) {
-		++i;
-		if (room == nullptr) {
-			std::cout << "\t\t\t$$DEBUG: ROOM EMPTY - " << i << '\n';
-			continue;
-		}
-		std::cout << "\t\t\t$$DEBUG: ROOM EXISTS - " << room->room_id() << '\n';
-	}
+auto Pool::replace_room_id(uint32_t roomid) -> Room * {
+	// int i = -1;
+	// for (auto &room : rooms) {
+	// 	++i;
+	// 	if (room == nullptr) {
+	// 		std::cout << "\t\t\t$$DEBUG: ROOM EMPTY - " << i << '\n';
+	// 		continue;
+	// 	}
+	// 	std::cout << "\t\t\t$$DEBUG: ROOM EXISTS - " << room->room_id() << '\n';
+	// }
 	for (auto &room : rooms) {
 		if (room == nullptr) continue;
 		if (room->room_id() == std::to_string(roomid)) {
-			delete room;
-			room = nullptr;  // TODO: Should properly erase from vector instead of setting to null
-			break;
+			return room;
 		}
 	}
-	for (auto &room : rooms) {
-		++i;
-		if (room == nullptr) {
-			std::cout << "\t\t\t^^DEBUG: ROOM EMPTY - " << i << '\n';
-			continue;
-		}
-		std::cout << "\t\t\t^^DEBUG: ROOM EXISTS - " << room->room_id() << '\n';
-	}
+	return nullptr;
+	// }
+	// for (auto &room : rooms) {
+	// 	++i;
+	// 	if (room == nullptr) {
+	// 		std::cout << "\t\t\t^^DEBUG: ROOM EMPTY - " << i << '\n';
+	// 		continue;
+	// 	}
+	// 	std::cout << "\t\t\t^^DEBUG: ROOM EXISTS - " << room->room_id() << '\n';
+	// }
 }
 
 auto Pool::start_player_vs_player_game(std::string const& gamemode, bool ranked_flag, int uid) -> json {

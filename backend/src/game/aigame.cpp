@@ -66,6 +66,9 @@ auto AIGame::unplay(int index) -> void {
 }
 
 auto AIGame::isTerminal() const -> bool {
+	if (this->num_moves() == this->board().num_spaces()) { 
+		return true; // Terminal - Draw position
+	}	
 	return (reason_ != AIGame::terminal::NONE);
 }
 
@@ -237,7 +240,7 @@ auto AIGame::run_minmax(int depth, int player, Memo &memo, int alpha, int beta) 
 			AIGame *s2 = memo.find(b);
 			return s1->score() < s2->score();
 		});
-
+		
 		this->score_ = worst->score();
 		return this->score_;
 	}

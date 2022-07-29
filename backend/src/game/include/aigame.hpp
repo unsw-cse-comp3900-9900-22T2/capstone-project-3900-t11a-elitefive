@@ -28,7 +28,7 @@ class AIGame : public BaseGame {
 		int score_;			// The heuristic score
 		std::vector<std::vector<BitBoard>> states_;
 	public:
-		AIGame(): BaseGame{2}, move_{-1}, reason_{terminal::NONE}, eval_depth_{-1}, score_{0}, states_{}{}	// For the memo class
+		AIGame(): BaseGame{3}, move_{-1}, reason_{terminal::NONE}, eval_depth_{-1}, score_{0}, states_{}{}	// For the memo class
 		AIGame(int nplayers, BitBoard potholes = BitBoard());
 		AIGame(AIGame const& position, int move);
 
