@@ -367,7 +367,7 @@ auto api_social_feed(uWS::App &app, DatabaseManager &db) -> void {
 			auto recent_elo = db.get_latest_elo(friend2->id, gamemode2);
 			feed.push_back(social_json("/profile/" + std::to_string(friend2->id),
 				friend2->username + " recently reached " + std::to_string(recent_elo) + " in " + gamemode2 +
-				" mode! (Click to view!"));
+				" mode! (Click to view!)"));
 			// 3. Random friend's friend leaderboard ranking OR global rank for gamemode.
 			auto friend3 = friends.at(random_num(friends.size()));
 			auto gamemode3 = gamemodes.at(random_num(gamemodes.size()));
