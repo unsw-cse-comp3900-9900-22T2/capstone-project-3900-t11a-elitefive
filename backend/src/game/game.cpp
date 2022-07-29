@@ -10,6 +10,7 @@ Game::Game(int nplayers, BitBoard potholes) : Game(nplayers, std::vector<int>(np
 Game::Game(int nplayers, std::vector<int> const uids, BitBoard potholes)
 : BaseGame{nplayers, potholes}
 , uids_{uids}
+, out_(nplayers, false)
 , gamestate_{Game::state::ONGOING}
 , move_sequence_{}
 {
@@ -79,7 +80,9 @@ auto Game::end_turn(int index) -> void {
 		return;
 	}
 	// Game still in play - Update game stats
-	pass_turn();
+	do {
+		pass_turn();	// Go to next non-out player
+	} while(out_[whose_turn()] == true);
 }
 
 auto Game::append_move(std::string move) -> void {

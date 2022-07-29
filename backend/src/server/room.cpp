@@ -120,11 +120,24 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 
 			// Postgame Checks
 			if (game_->status() != Game::state::ONGOING) {
-				std::string winner = game_result();
-				publish(ws, json_game_winner(winner), opCode);
-				
-				int const winning_player = this->game_->which_player_won();
-				save_match(winning_player);
+				if (game_->num_players_in() == 3 && game_->status() == Game::state::LOSS) {
+					game_->set_player_out(game_->whose_turn());
+					
+					json payload;
+					payload["event"] = "game_over";
+					payload["winner"] = "To be decided - You are out!";
+					ws->send(payload.dump(), opCode);
+					
+					game_->continue_game();
+					game_->pass_turn();
+				}
+				else {
+					std::string winner = game_result();
+					publish(ws, json_game_winner(winner), opCode);
+					
+					int const winning_player = this->game_->which_player_won();
+					save_match(winning_player);
+				}
 			}
 		},
 		.close = [this](WebSocket ws, int x , std::string_view str) {
