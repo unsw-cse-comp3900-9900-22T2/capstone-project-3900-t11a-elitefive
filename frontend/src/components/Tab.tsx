@@ -51,8 +51,11 @@ function a11yProps(index: number) {
   };
 }
 
-export default function StatTab({ data }: { data: profileDataType}) {
-  const [value, setValue] = React.useState(0);
+export default function StatTab({ data, value, setValue }: { 
+  data: profileDataType
+  value: number,
+  setValue: React.Dispatch<React.SetStateAction<number>>
+}) {
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
