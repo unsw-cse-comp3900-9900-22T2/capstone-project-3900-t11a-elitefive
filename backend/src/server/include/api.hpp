@@ -9,6 +9,7 @@ auto registerPage(uWS::App &app, DatabaseManager &db) -> void;
 auto login(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std::string> &session_tokens) -> void;
 auto friendaction(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std::string> &session_tokens) -> void;
 auto changePW(uWS::App &app, DatabaseManager &db) -> void;
+auto tempPass(uWS::App &app, DatabaseManager &db) -> void;
 
 // GET REQUESTS
 auto api_profile(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std::string> &session_tokens) -> void;
