@@ -75,13 +75,20 @@ const SideBarContainer = styled.div`
   background: var(--accent-dark);
   width: 20vw;
   height: 400px;
-  margin: 120px 80px;
+  margin: 200px 100px;
   display:flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 10px;
+`;
 
+const Highlight = styled.div<{isSelected: boolean}>`
+  border: ${props => props.isSelected ? 
+    '5px solid var(--accent-blue)' :
+    '5px solid var(--accent-dark)'
+  };
+  margin: 50px; /* margin has to be placed in this level otherwise it wont work */
 `;
 
 // helper fnc
@@ -125,6 +132,7 @@ export default function ReplaySearchpage({}: Props) {
   const [secondaryFilter, setSecondaryFilter] = useState<string|undefined>();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [sideBarData, setSideBarData] = useState<replayDataType|undefined>();
+  const [clickedRef, setClickedRef] = useState<number>(-1);
 
   const navigate = useNavigate();
 
@@ -174,27 +182,32 @@ export default function ReplaySearchpage({}: Props) {
         </Box>
         <ReplaysContainer>
           {replays && filterData(replays as replayDataType[], filter, secondaryFilter)?.map((data: replayDataType) => (
-              <ReplayPreview {...data} setSideBarData={() => {
-                setSideBarData({...data})
-                console.log(data)
-              }}/>
+              <Highlight isSelected={clickedRef == data.match_id}>
+                <ReplayPreview {...data} setSideBarData={() => {
+                  setSideBarData({...data})
+                  setClickedRef(data.match_id);
+                  console.log(data)
+                }}/>
+              </Highlight>
             ))
           }
         </ReplaysContainer>
       </MainContainer>
-      {sideBarData && (
         <SideBarContainer>
-          {/* <Typography variant="h5">{sideBarData.match_id}</Typography> */}
-          <Typography variant="h4">{sideBarData.gamemode}</Typography>
-          <Typography variant="h5">{sideBarData.mode}</Typography>
-          <Typography variant="h5">{`${sideBarData.players[0].username} vs ${sideBarData.players[1].username}`}</Typography>
-          <Typography variant="h5">{`${sideBarData.players[0].username} : ${sideBarData.players[0].outcome}`}</Typography>
-          <Typography variant="h5">{`${sideBarData.players[1].username} : ${sideBarData.players[1].outcome}`}</Typography>
-          <Button onClick={() => { navigate(`/replay/${sideBarData.match_id}`)}} background="var(--accent-purple)">
-            Watch Replay
-          </Button>
+          {sideBarData && (
+            <>
+            {/* <Typography variant="h5">{sideBarData.match_id}</Typography> */}
+            <Typography variant="h4">{sideBarData.gamemode}</Typography>
+            <Typography variant="h5">{sideBarData.mode}</Typography>
+            <Typography variant="h5">{`${sideBarData.players[0].username} vs ${sideBarData.players[1].username}`}</Typography>
+            <Typography variant="h5">{`${sideBarData.players[0].username} : ${sideBarData.players[0].outcome}`}</Typography>
+            <Typography variant="h5">{`${sideBarData.players[1].username} : ${sideBarData.players[1].outcome}`}</Typography>
+            <Button onClick={() => { navigate(`/replay/${sideBarData.match_id}`)}} background="var(--accent-purple)">
+              Watch Replay
+            </Button>
+            </>
+          )}
         </SideBarContainer>
-      )}
     </Box>
     </>
   )
