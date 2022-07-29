@@ -59,22 +59,21 @@ export default function Board({ width, height, isStatic }: Props) {
     return (
       <RowContainer x_offset={x_offset}>
         {row.map(({ hexKey, hexState }: GameStateType) => {
-          return (
-            <HexCell
-              fill={hexState?.color ? hexState?.color : "var(--accent-darker)"}
-              onClick={() => {
-                // if isStatic does not do any of this Websocket stuff
-                if(!isStatic) {
-                  // playMove("abc", hexKey);
-                  // then sends WS emit method which will cause change
-                  emit("move", JSON.stringify({
-                    'uid': getUID(),
-                    'move': hexKey,
-                  }));
-                }
-              }}
-            />
-          )
+          return (hexState?.user == "pothole") ? <HexCell opacity={0}/> : 
+          <HexCell
+            fill={hexState?.color ? hexState?.color : "var(--accent-darker)"}
+            onClick={() => {
+              // if isStatic does not do any of this Websocket stuff
+              if(!isStatic) {
+                // playMove("abc", hexKey);
+                // then sends WS emit method which will cause change
+                emit("move", JSON.stringify({
+                  'uid': getUID(),
+                  'move': hexKey,
+                }));
+              }
+            }}
+          />
         })}
       </RowContainer>
     )

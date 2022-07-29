@@ -95,7 +95,10 @@ export const WSProvider = ({ children, gameId }: Props) => {
           const payload:payload = JSON.parse(message.data) as payload
           const hexKey = payload.tile;
           if (hexKey) {
-            playMove("pothole", hexKey);
+            setHexTileState(hexKey, {
+              user: "pothole",
+              color: ""
+            });
           }
           break;
         }
