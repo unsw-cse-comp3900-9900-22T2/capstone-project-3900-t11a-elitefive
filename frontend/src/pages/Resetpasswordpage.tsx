@@ -38,11 +38,8 @@ export default function Resetpasswordpage({}: Props) {
     const uid = String(getStoredUID())
     const response = await resetPassword(uid, oldpass, newpass)
     const { outcome, message } = response.payload
-    console.log("XXX")
-    console.log(response)
-    console.log("XXX")
     if(outcome == 'success') {
-      console.log("succ")
+      setInfo("Your password has been changed!", 5000);
     } else {
       console.log('register error');
       setError(message)

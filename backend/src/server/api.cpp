@@ -135,8 +135,8 @@ auto resetPass(uWS::App &app, DatabaseManager &db) -> void {
 					payload["payload"]["outcome"] = "failure";
 					payload["payload"]["message"] = "new password must be at least 8 characters";
 				}else if (db.change_password(user->id, hash_password(newpass))){
-					payload["payload"]["outcome"] = "sucess";
-					payload["payload"]["message"] = "sucess";
+					payload["payload"]["outcome"] = "success";
+					payload["payload"]["message"] = "success";
 				}else{
 					payload["payload"]["outcome"] = "failure";
 					payload["payload"]["message"] = "database error";
