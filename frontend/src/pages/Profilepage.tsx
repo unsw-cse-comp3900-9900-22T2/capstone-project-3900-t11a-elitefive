@@ -187,7 +187,7 @@ export default function Profilepage({}: Props) {
       <Container1>
         <Container>
           <ProfileCard name={profileData.username}/>
-          <CustomizedInputBase/>
+          {/* <CustomizedInputBase/> */}
           <Button align-items="right" onClick={navigateToFriends}>Friends</Button>
         </Container>
         <StatContainer>
