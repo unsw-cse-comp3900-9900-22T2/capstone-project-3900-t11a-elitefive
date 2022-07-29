@@ -76,7 +76,8 @@ const SideBarContainer = styled.div`
   background: var(--accent-dark);
   width: 20vw;
   height: 500px;
-  margin: 0 100px;
+  margin: 0 50px;
+  padding: 50px;
   display:flex;
   flex-direction: column;
   align-items: center;
@@ -84,7 +85,7 @@ const SideBarContainer = styled.div`
   gap: 10px;
 
   position: sticky;
-  top: 300px;
+  top: 200px;
 `;
 
 const Highlight = styled.div<{isSelected: boolean}>`
