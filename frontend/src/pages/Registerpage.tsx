@@ -7,6 +7,7 @@ import Button from '../components/ReusableButton';
 import {Routes, Route, useNavigate} from 'react-router-dom';
 import {register} from '../api/rest'
 import YavalathButton from '../components/YavalathButton';
+import { useAlert } from '../global/GlobalAlert';
 
 type Props = {}
 
@@ -23,6 +24,7 @@ export default function Registerpage({}: Props) {
   const [email, setEmail] = useState<string>("");
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const { setError, setInfo } = useAlert();
 
   const navigate = useNavigate();
   
@@ -32,11 +34,13 @@ export default function Registerpage({}: Props) {
   };
   
   const handleClick = async () => {
+    setInfo('Registering user, please wait', 5000);
     const success = await register(username, password, email)
     if(success) {
       navigate("/login");
     } else {
       console.log('register error');
+      setError('error registering user')
     }
   }
 

@@ -12,6 +12,7 @@ import * as API from '../api/rest';
 // types
 export interface IError {
   setError: (msg: string) => void;
+  setInfo: (msg: string, timeout: number) => void;
 }
 
 type Props = {
@@ -20,6 +21,8 @@ type Props = {
 
 export const AlertContext = React.createContext<IError>({
   setError: (msg: string) => {},
+  setInfo: (msg: string, timeout: number) => {},
+
 });
 
 export const AlertProvider = ({ children }: Props) => {
@@ -38,6 +41,16 @@ export const AlertProvider = ({ children }: Props) => {
     }, 2000)
   }
 
+  const setInfo = (msg: string, timeout: number) => {
+    setIsAlert(true);
+    setSeverity("info");
+    setAlertMsg(msg);
+
+    setTimeout(() => {
+      clearAlert();
+    }, timeout)
+  }
+
   const clearAlert = () => {
     setIsAlert(false);
     setAlertMsg('');
@@ -47,6 +60,7 @@ export const AlertProvider = ({ children }: Props) => {
     <AlertContext.Provider
       value={{
         setError,
+        setInfo
       }}
     >
       {isAlert && (

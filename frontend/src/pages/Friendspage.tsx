@@ -8,6 +8,7 @@ import FriendRequest from '../components/FriendRequest';
 import Button from '../components/ReusableButton';
 import StyledInput from '../components/StyledInput';
 import YavalathButton from '../components/YavalathButton';
+import { useAlert } from '../global/GlobalAlert';
 import { useAuth } from '../global/GlobalAuth';
 
 type Props = {}
@@ -80,8 +81,9 @@ export default function FriendsPage({}: Props) {
   const [interaction, setInteraction] = useState(0);
 
   const [quickAddInput, setQuickAddInput] = useState('');
-  
 
+  const { setError } = useAlert();
+  
   useEffect(() => {
     fetch(`/api/friends?uid=${getUID()}`)
     .then(resp => resp.json())
@@ -106,7 +108,13 @@ export default function FriendsPage({}: Props) {
     })
     .then(resp => resp.json())
     .then(data => {
-      console.log(data);
+      if(!data || !data.payload) {
+        setError('response doesn\'t have payload');
+        return;
+      }
+      if (data.payload.outcome == "failure") {
+        setError(data.payload.message);
+      }
       //forces a refresh
       setInteraction(prev => prev+1);
     })
