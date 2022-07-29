@@ -80,16 +80,21 @@ class Pool {
 	private:
 		auto create_new_room(uint32_t room_id, bool ranked, bool ai, bool potholes, std::vector<int> const& uids) -> void {
 			std::cout << "\t\tDEBUG: REPLACE ROOM\n";
-			replace_room_id(room_id);
-			std::cout << "\t\tDEBUG: REPLACED\n";
-			uWS::App &applicaiton = *app;
-			std::cout << "\t\tDEBUG: MAKE NEW ROOM\n";
-			rooms.push_back(new Room(applicaiton, db, ranked, ai, potholes, std::to_string(room_id), uids));
-			std::cout << "\t\tDEBUG: MADE NEW ROOM\n";
+			Room *lobby = replace_room_id(room_id);
+			if (lobby == nullptr) {
+				std::cout << "\t\tDEBUG: MAKE NEW ROOM\n";
+				uWS::App &applicaiton = *app;
+				rooms.push_back(new Room(applicaiton, db, ranked, ai, potholes, std::to_string(room_id), uids));
+				std::cout << "\t\tDEBUG: MADE NEW ROOM\n";
+			}
+			else {
+				std::cout << "\t\tDEBUG: REPLACE GAMEMODE IN EXISTING ROOM\n";
+				lobby->InitRoom(ranked, ai, potholes);
+			}
 
 		}
 
-		auto replace_room_id(uint32_t roomid) -> void;	// Delete old rooms with the same `roomid`
+		auto replace_room_id(uint32_t roomid) -> Room *;	// Delete old rooms with the same `roomid`
 
 		auto player_vs_player_waiting_lobby(std::string const& gamemode, bool ranked_flag, int uid) -> json;
 
