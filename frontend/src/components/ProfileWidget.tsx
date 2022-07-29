@@ -4,6 +4,10 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../global/GlobalAuth';
 
+import Profile1 from '../assets/profile1.png';
+import Profile2 from '../assets/profile2.png';
+import Profile3 from '../assets/profile3.png';
+
 const Container = styled.div`
   position: absolute;
   top: 5%;
@@ -61,6 +65,15 @@ type ProfileWidgetProps = {
 
 }
 
+const imageRenderer = (uid: string|null) => {
+  if(!uid) return '';
+  const u_id = parseInt(uid) % 3;
+  if(u_id == 0) {return Profile1}
+  else if(u_id == 1) {return Profile2}
+  else {return Profile3}
+}
+
+
 export default function ProfileWidget({}: ProfileWidgetProps) {
   const [isHovered, setIsHovered ] = useState(false);
   const [name, setName] = useState('Name');
@@ -94,7 +107,7 @@ export default function ProfileWidget({}: ProfileWidgetProps) {
       <ProfileWidgetContainer onClick={() => {
         navigate(`/profile/${getUID()}`);
       }}>
-        <ImageContainer />
+        <ImageContainer src={imageRenderer(getUID())}/>
         <Box display="flex" flexDirection="column" marginTop="30px">
           <Typography variant="h4">{name}</Typography>
           <Typography variant="body1">profile</Typography>
@@ -112,9 +125,10 @@ type ProfileCardProps = {
 }
 
 export function ProfileCard({ name }: ProfileCardProps) {
+  const { getUID } = useAuth();
   return (
     <ProfileWidgetContainer>
-      <ImageContainer />
+      <ImageContainer src={imageRenderer(getUID())}/>
       <Box display="flex" flexDirection="column" marginTop="30px">
         <Typography variant="h4">{name}</Typography>
         {/* <Typography variant="body1">Elo {elo}</Typography> */}
