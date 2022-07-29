@@ -66,7 +66,7 @@ auto AIGame::unplay(int index) -> void {
 }
 
 auto AIGame::isTerminal() const -> bool {
-	if (this->num_moves() == 61) { 
+	if (this->num_moves() == this->board().num_spaces()) { 
 		return true; // Terminal - Draw position
 	}	
 	return (reason_ != AIGame::terminal::NONE);
