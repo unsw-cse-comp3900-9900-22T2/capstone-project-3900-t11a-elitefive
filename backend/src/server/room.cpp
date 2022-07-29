@@ -30,29 +30,17 @@ auto Room::publish(WebSocket ws, std::string const& message, uWS::OpCode opCode)
 // ======================================
 // 			Class implementation
 // ======================================
-Room::Room(uWS::App &app, DatabaseManager *db, bool ranked, bool computer, bool potholes, std::string room_id, std::vector<int> uids)
-: room_id_{room_id}
-, gamemode_{0} // CLASSIC = 0, TRIPLES = 1, POTHOLES = 2
-, uids_{uids}
-, game_{nullptr}
-, aigame_{nullptr}
-, db_{db}
-, ranked_{ranked}
-, computer_{computer}
-{
+
+auto Room::InitRoom(bool ranked, bool computer, bool potholes) -> void {
 	// What is the gamemode?
-	if (uids.size() == 3) 	gamemode_ = 1;  // Triples
+	if (uids_.size() == 3) 	gamemode_ = 1;  // Triples
 	if (potholes) 			gamemode_ = 2;	// Potholes	
 
-	generate_game(potholes);	// CLASSIC / POTHOLES / ETC
-	 
-	if (computer_) {
-		create_socket_ai(app);
-	}
-	else { // Versing a human player
-		create_socket_player_verse_player(app);
-	}
-	std::cout << "\t\tGAME FULLY CREATED\n";
+	// Simple flags
+	ranked_ = ranked;
+	computer_ = computer;
+	
+	generate_game(potholes);	// CLASSIC / POTHOLES / ETC	
 }
 
 auto Room::generate_game(bool potholes) -> void {
@@ -65,6 +53,26 @@ auto Room::generate_game(bool potholes) -> void {
 	this->game_ = std::make_unique<Game>(nplayers, uids_, missing_tiles);
 	this->aigame_ = std::make_unique<AIGame>(nplayers, missing_tiles);
 	std::cout << "\t\tDEBUG: Generated room\n";
+}
+
+Room::Room(uWS::App &app, DatabaseManager *db, bool ranked, bool computer, bool potholes, std::string room_id, std::vector<int> uids)
+: room_id_{room_id}
+, gamemode_{0} // CLASSIC = 0, TRIPLES = 1, POTHOLES = 2
+, uids_{uids}
+, game_{nullptr}
+, aigame_{nullptr}
+, db_{db}
+, ranked_{ranked}
+, computer_{computer}
+{
+	InitRoom(ranked, computer, potholes);
+	if (computer_) {
+		create_socket_ai(app);
+	}
+	else { // Versing a human player
+		create_socket_player_verse_player(app);
+	}
+	std::cout << "\t\tGAME FULLY CREATED\n";
 }
 
 auto Room::on_connect_match_info(uWS::WebSocket<false, true, SocketData> *ws) -> void {
