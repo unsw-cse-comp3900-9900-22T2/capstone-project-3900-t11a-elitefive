@@ -1,18 +1,20 @@
 import React, { SetStateAction } from 'react'
 import styled from 'styled-components';
 import { Box } from '@mui/material';
+import ReplayImage from './ReplayImage';
 
 type Props = {
   gamemode: string;
   date: string;
   img: string;
+  "svg_data": string;
   setSideBarData: () => void;
 }
 
 const Container = styled.div`
-  width: 200px;
-  height: 180px;
-  background: var(--accent-darker);
+  width: 320px;
+  height: 320px;
+  background: var(--accent-dark);
   border-radius: 5px;
   
   display: flex;
@@ -24,6 +26,7 @@ type TagProp = {
   padding?: string;
   color?: string;
 }
+
 const Tag = styled.div<TagProp>`
   border-radius: 20px;
   max-height: 25px;
@@ -34,11 +37,11 @@ const Tag = styled.div<TagProp>`
   text-align: center;
 `;
 
-const ImagePlaceholder = styled.div`
-  width: 100%;
-  height: 200px;
-  background: var(--accent-dark);
-`
+// const ImagePlaceholder = styled.div`
+//   width: 100%;
+//   height: 200px;
+//   background: var(--accent-dark);
+// `
 
 const BottomTags = styled.div`
   display: flex;
@@ -46,19 +49,16 @@ const BottomTags = styled.div`
 `;
 
 export default function ReplayPreview(props: Props) {
-  const { gamemode, date, img, setSideBarData } = props
+  const { gamemode, date, svg_data, setSideBarData } = props
+
+  console.log(svg_data);
+
   return (
     <Container onClick={setSideBarData}>
       <Box display="flex" justifyContent="flexStart" margin="10px">
         <Tag color="grey">{gamemode}</Tag>
       </Box>
-      <ImagePlaceholder/>
-      {/* <BottomTags> */}
-        {/* <Box marginRight="auto"> */}
-          {/* <Tag color={ result=="win" ? "green": "red" } padding="1px 15px">{result}</Tag> */}
-        {/* </Box> */}
-        {/* <Tag color="grey" padding="1px 15px">{date}</Tag> */}
-      {/* </BottomTags> */}
+      <ReplayImage svg_data={svg_data}/>
     </Container>
   )
 }
