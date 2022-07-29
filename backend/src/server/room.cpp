@@ -87,7 +87,6 @@ auto Room::generate_game(bool potholes) -> void {
 		auto e1 = std::default_random_engine(now);
 		auto d1 = std::uniform_int_distribution<int>(6, 13);
 		auto r1 = d1(e1);
-		std::cout << r1 << std::endl;
 
 		auto potholes = std::vector<int>(61, 0);
 		for (int i = 1; i <= r1; i++) {
@@ -95,7 +94,6 @@ auto Room::generate_game(bool potholes) -> void {
 			auto d2 = std::uniform_int_distribution<int>(0, 60);
 			auto r2 = d2(e2);
 			potholes.at(r2) = 1;
-			std::cout << r2 << std::endl;
 		}
 
 		auto pots = std::string();
