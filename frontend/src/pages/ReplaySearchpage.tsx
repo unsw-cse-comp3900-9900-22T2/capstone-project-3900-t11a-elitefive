@@ -20,6 +20,7 @@ export type replayDataType = {
   date: string;
   img: string;
   players: any[]; // todo
+  "svg_data": string;
 }
 
 // const mockData: replayDataType[] = [
