@@ -121,11 +121,26 @@ auto resetPass(uWS::App &app, DatabaseManager &db) -> void {
 				
 				// Read message
 				auto res_json = json::parse(data);
-				std::string uid = res_json["uid"];
+				std::string suid = res_json["uid"];
+				auto uid = atoi(suid.c_str());
 				std::string oldpass = res_json["oldpass"];
 				std::string newpass = res_json["newpass"];
 				
 				// Check if old password is correct 
+				auto user = db.get_user(uid);
+				if (hash_password(oldpass) != user->password_hash){
+					payload["payload"]["outcome"] = "failure";
+					payload["payload"]["message"] = "incorrect password";
+				}else if(newpass.length() < 8 ){
+					payload["payload"]["outcome"] = "failure";
+					payload["payload"]["message"] = "new password must be at least 8 characters";
+				}else if (db.change_password(user->id, hash_password(newpass))){
+					payload["payload"]["outcome"] = "sucess";
+					payload["payload"]["message"] = "sucess";
+				}else{
+					payload["payload"]["outcome"] = "failure";
+					payload["payload"]["message"] = "database error";
+				}
 				
 				res->end(payload.dump());
 			}
