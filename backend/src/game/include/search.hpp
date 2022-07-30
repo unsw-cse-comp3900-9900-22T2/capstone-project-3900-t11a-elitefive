@@ -23,23 +23,27 @@ class Search : public BaseGame {
     private:
         terminal reason_;   // Board state reached final position
         int score_;         // Heuristic Score
+        int difficulty_;    // 
     public:
-        Search(int nplayers, BitBoard potholes = BitBoard()) 
+        Search(int nplayers, int difficulty, BitBoard potholes = BitBoard()) 
         : BaseGame{nplayers, potholes}
         , reason_{terminal::NONE}
         , score_{0} // Assume even
+        , difficulty_{difficulty}
         {}
 
         Search(Search const& position, int score = 0)
         : BaseGame{position.board(), position.whose_turn(), position.num_moves()}
         , score_{ score }
         , reason_{ position.reason() }
+        , difficulty_{position.diff() }
         {}
 
         ~Search() = default;
 
         auto score() const -> int { return score_; }
         auto reason() const -> terminal { return reason_; }
+        auto diff() const -> int { return difficulty_; }
 
         auto play(std::string move) -> bool {
 	        auto position = BaseGame::coordToIndex(move);
@@ -75,9 +79,22 @@ class Search : public BaseGame {
 	        pass_turn();
         }
 
+        auto minmax() -> int;
+
         auto run_minmax(int depth, int player, SearchMemo &memo, int alpha, int beta) -> std::pair<int, int>;
 
-        int heuristic(int const player) {
+        // =======================================
+        int heuristic();
+        // =======================================
+        
+        int random_eval() {
+            std::random_device dev;
+            std::mt19937 rng(dev());
+            std::uniform_int_distribution<std::mt19937::result_type> values(-50,50);
+            return values(rng);
+        }
+
+        int strat_simple_line(int const player) {
             // Assume current player is trying to win
             Board const &board = this->board();
             BitBoard const free_spaces = board.free_tiles();

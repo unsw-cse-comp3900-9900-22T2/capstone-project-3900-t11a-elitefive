@@ -19,29 +19,37 @@ auto computer_verse_computer() -> void;
 
 auto main(void) -> int {
 	// Search game = Search(2, BitBoard(288230376151711743));
-	Search game = Search(2);
+	Search game = Search(2, 0);
 	game.play(30);
 	game.play(39);
 	game.play(31);
 	game.play(46);
-	game.play(28);
+	// game.play(28);
 	// game.play(60);
+
+	// game.play(30);
+	// game.play(38);
+	// game.play(31);
+	// game.play(12);
+	std::cout << game << '\n';
+	int move = game.minmax();
+	game.play(move);
 	std::cout << game << '\n';
 
-
 	// int depth = 3;
-	auto memo = SearchMemo();
-	for (int depth = 1; depth < 6; ++depth) {
-		std::cout << game << '\n';
-		std::cout << "Depth: " << depth << '\n';
-		std::pair<int, int> res = game.run_minmax(depth, game.whose_turn(), memo, -99999, 99999);
-		memo.clear();
-		int score = res.first;
-		int move = res.second;
-		std::cout << "Minmax finished\n";
-		std::cout << "Score: " << score << '\n';
-		std::cout << "Move: " << move << '\n';
-	}
+	// auto memo = SearchMemo();
+	// for (int depth = 1; depth <= 2; ++depth) {
+	// 	std::cout << game << '\n';
+	// 	std::cout << "Depth: " << depth << '\n';
+	// 	std::pair<int, int> res = game.run_minmax(depth, game.whose_turn(), memo, -99999, 99999);
+	// 	memo.clear();
+	// 	int score = res.first;
+	// 	int move = res.second;
+	// 	std::cout << "Minmax finished\n";
+	// 	std::cout << "Score: " << score << '\n';
+	// 	std::cout << "Move: " << move << '\n';
+	// 	if (std::abs(score) >= 1000) break;
+	// }
 
 	// auto memo = Memo();
 	// int score = game.minmax(5, 0);
