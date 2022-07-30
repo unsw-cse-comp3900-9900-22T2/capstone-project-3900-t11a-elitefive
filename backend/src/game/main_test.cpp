@@ -29,18 +29,23 @@ auto main(void) -> int {
 	std::cout << game << '\n';
 
 
-	std::cout << game << '\n';
+	// int depth = 3;
 	auto memo = SearchMemo();
-	std::pair<int, int> res = game.run_minmax(3, game.whose_turn(), memo, -99999, 99999);
-	int score = res.first;
-	int move = res.second;
+	for (int depth = 1; depth < 6; ++depth) {
+		std::cout << game << '\n';
+		std::cout << "Depth: " << depth << '\n';
+		std::pair<int, int> res = game.run_minmax(depth, game.whose_turn(), memo, -99999, 99999);
+		memo.clear();
+		int score = res.first;
+		int move = res.second;
+		std::cout << "Minmax finished\n";
+		std::cout << "Score: " << score << '\n';
+		std::cout << "Move: " << move << '\n';
+	}
 
 	// auto memo = Memo();
 	// int score = game.minmax(5, 0);
 
-	std::cout << "Minmax finished\n";
-	std::cout << "Score: " << score << '\n';
-	std::cout << "Move: " << move << '\n';
 
 	// auto game = generate_test_game();
 	// ai_play_game(game);

@@ -152,9 +152,10 @@ class SearchMemo {
 	};
 	private:
 		std::unordered_map<std::vector<BitBoard>, std::unique_ptr<Search>, BoardHash, BoardEqual> map_;
-        std::unordered_map<std::vector<BitBoard>, std::vector<int>, BoardHash, BoardEqual> p0_order_;
-        std::unordered_map<std::vector<BitBoard>, std::vector<int>, BoardHash, BoardEqual> p1_order_;
 	public:
+        std::unordered_map<std::vector<BitBoard>, std::vector<int>, BoardHash, BoardEqual> p1_order_;
+        std::unordered_map<std::vector<BitBoard>, std::vector<int>, BoardHash, BoardEqual> p0_order_;
+
 		SearchMemo() 
 		: map_{} 
         , p0_order_{}
@@ -185,15 +186,36 @@ class SearchMemo {
 			return map_.find(boards)->second.get();
 		}
 
+        auto clear() -> void {
+            map_.clear();
+        }
+
+        // ------------
+        // For ordering
+        // -------------
+        auto has_order(std::vector<BitBoard> const& boards, int player) -> bool {
+			if (player == 0) return (p0_order_.find(boards) != p0_order_.end());
+			if (player == 1) return (p1_order_.find(boards) != p1_order_.end());
+            std::cout << "Player doesn't exist\n";
+            exit(1);
+        }
+
         auto get_order(std::vector<BitBoard> const& boards, int player) -> std::vector<int> {
-			if (player == 0) return p0_order_.find(boards)->second;
+			// std::cout << "Getting ORDER\n";
+            if (player == 0) return p0_order_.find(boards)->second;
 			if (player == 1) return p1_order_.find(boards)->second;
         }
 
-        auto store_order(Search const& game, std::vector<int> order, int player) -> std::vector<int> {
-			std::cout << "RETRIEVING ORDER\n";
-            if (player == 0) p0_order_.insert({ game.board().all_boards(), order });
-			if (player == 1) p1_order_.insert({ game.board().all_boards(), order });
+        auto store_order(std::vector<BitBoard> const& boards, std::vector<int> const order, int player) -> void {
+			// std::cout << "store ORDER\n\t";
+            // for (auto move : order) {
+            //     std::cout << move << ' ';
+            // }
+            // std::cout << '\n';
+            if (player == 0) { p0_order_.insert({ boards, order }); return; }
+			if (player == 1) { p1_order_.insert({ boards, order }); return; }
+            std::cout << "Couldn't insert order\n";
+            exit(1);
         }
 };
 

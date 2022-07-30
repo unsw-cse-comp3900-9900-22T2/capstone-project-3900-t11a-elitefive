@@ -64,12 +64,13 @@ auto Search::run_minmax(int depth, int player, SearchMemo &memo, int alpha, int 
 
         // std::cout << "Searching at depth: " << depth << "\n"; 
         // Search each position in this state
-        auto tiles = board().all_boards();
-        std::vector<int> tmp = board().free_tiles().binary_to_vector();
-        memo.store_order(search, tmp, 0);
-        std::cout << "stored\n";
-        std::vector<int> ordering = (memo.contains(tiles)) ? memo.get_order(tiles, 0) : board().free_tiles().binary_to_vector();
+        auto const tiles = this->board().all_boards();
+        std::vector<int> ordering = (memo.has_order(tiles, player)) ? memo.get_order(tiles, player) : board().free_tiles().binary_to_vector();
+        
+        std::vector<std::pair<int, int>> candidate_order = {};
+        int index = 0;
         for (auto const& move : ordering) {
+            ++index;
             // std::cout << "Considering move: " << move  << '\n';
             search.play(move);
             int search_evaluation;
@@ -88,7 +89,8 @@ auto Search::run_minmax(int depth, int player, SearchMemo &memo, int alpha, int 
                 
                 search_evaluation = precomputed_score;
             }
-            
+
+            candidate_order.push_back({search_evaluation, move});
             // Decide if this is a better move
             if (search_evaluation > maxEval) {
                 maxEval = search_evaluation;
@@ -99,6 +101,23 @@ auto Search::run_minmax(int depth, int player, SearchMemo &memo, int alpha, int 
 
             search.unplay(move);
         }
+
+        // ================ For later look ups ===================
+        // Sort higher scoring positions first
+		for (; index < ordering.size(); index++) {
+            candidate_order.push_back({-10000, ordering[index]});   // De-priotize states we didn't look at
+        }
+        std::stable_sort(candidate_order.begin(), candidate_order.end(), [](std::pair<int, int> const& a, std::pair<int, int> const& b) {
+            return a.first > a.second;
+		});
+        std::vector<int> search_order = {};
+        std::transform(candidate_order.begin(), 
+                candidate_order.end(), 
+                std::back_inserter(search_order), 
+                [](const std::pair<int, int>& d){return d.second;});
+        
+        memo.p0_order_[tiles] = search_order;
+        // ================ For later look ups ===================
 
         // std::cout << "Best move: " << bestmove << " with score " << maxEval << '\n';
         return {maxEval, bestmove};
@@ -113,7 +132,14 @@ auto Search::run_minmax(int depth, int player, SearchMemo &memo, int alpha, int 
 
         // std::cout << "Searching at depth: " << depth << "\n"; 
         // Search each position in this state
-        for (auto const& move : board().free_tiles().binary_to_vector()) {
+
+        auto const tiles = this->board().all_boards();
+        std::vector<int> ordering = (memo.has_order(tiles, player)) ? memo.get_order(tiles, player) : board().free_tiles().binary_to_vector();
+        
+        std::vector<std::pair<int, int>> candidate_order = {};
+        int index = 0;
+        for (auto const& move : ordering) {
+            ++index;
             search.play(move);
             int search_evaluation;
             if (!memo.contains(search.board().all_boards())) {
@@ -131,6 +157,7 @@ auto Search::run_minmax(int depth, int player, SearchMemo &memo, int alpha, int 
                 
                 search_evaluation = precomputed_score;
             }
+            candidate_order.push_back({search_evaluation, move});
 
             // Decide if this is a better move
             if (search_evaluation < minEval) {
@@ -142,6 +169,25 @@ auto Search::run_minmax(int depth, int player, SearchMemo &memo, int alpha, int 
 
             search.unplay(move);
         }
+
+        // ================ For later look ups ===================
+        // Sort higher scoring positions first
+		for (; index < ordering.size(); index++) {
+            candidate_order.push_back({10000, ordering[index]});    // De-priotize states we didn't look at
+        }
+        std::stable_sort(candidate_order.begin(), candidate_order.end(), [](std::pair<int, int> const& a, std::pair<int, int> const& b) {
+            return a.first < a.second;
+		});
+        std::vector<int> search_order = {};
+        std::transform(candidate_order.begin(), 
+                candidate_order.end(), 
+                std::back_inserter(search_order), 
+                [](const std::pair<int, int>& d){return d.second;});
+        
+        memo.p1_order_[tiles] = search_order;
+        // ================ For later look ups ===================
+
+
         // std::cout << "Best (worst) move: " << worstmove << " with score " << minEval << '\n';
         return {minEval, worstmove};
     }
