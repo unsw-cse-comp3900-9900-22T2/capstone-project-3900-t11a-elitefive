@@ -10,7 +10,7 @@
 #include "aigame.hpp"
 #include "metadatagen.hpp"
 
-using json = nlohmann::json;
+using json = nlohmann::ordered_json;
 
 // Helper functions
 auto parse_move(std::string_view message) -> std::string;

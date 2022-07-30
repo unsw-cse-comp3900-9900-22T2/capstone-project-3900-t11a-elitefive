@@ -3,7 +3,7 @@
 
 #include <string>
 
-using json = nlohmann::json;
+using json = nlohmann::ordered_json;
 
 auto generate_session_token(int id) -> std::string;
 

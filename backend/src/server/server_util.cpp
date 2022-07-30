@@ -5,7 +5,7 @@
 #include <nlohmann/json.hpp>
 #include <random>
 
-using json = nlohmann::json;
+using json = nlohmann::ordered_json;
 
 auto generate_session_token(int id) -> std::string {
 
@@ -77,7 +77,7 @@ auto send_email_temp_password(std::string email, std::string username, std::stri
 
 auto profile_to_json(User *user, PlayerStats *stats, std::map<std::string, int> elos,
     std::map<std::string, std::vector<int>> elohistory, std::vector<Match*> matchhistory, std::vector<User*> friends) -> json {
-    json result;
+    nlohmann::ordered_json result;
     result["event"] = "profile";
     result["action"] = "get";
     result["payload"]["uid"] = user->id;
@@ -116,6 +116,11 @@ auto elo_history_to_json(std::map<std::string, std::vector<int>> elohistory) -> 
 }
 
 auto match_history_filtered_to_json(std::vector<Match*> matchhistory) -> json { 
+    // Sort by showing most recent matches first
+    std::stable_sort(matchhistory.begin(), matchhistory.end(), [](Match *const& a, Match *const& b) {
+        return a->id > b->id;
+    });
+    
     // FILTERED
     json result;
     result["CLASSIC"] = {};
@@ -132,7 +137,11 @@ auto match_history_filtered_to_json(std::vector<Match*> matchhistory) -> json {
 
 auto match_history_to_json(std::vector<Match*> matchhistory) -> json {
     // TODO: DELETE BASIC
-    json result = {};
+    // Sort by showing most recent matches first
+    std::stable_sort(matchhistory.begin(), matchhistory.end(), [](Match *const& a, Match *const& b) {
+        return a->id > b->id;
+    });
+    nlohmann::ordered_json result = {};
     for (auto const& match : matchhistory) {
         result.push_back(match->to_json());
     }

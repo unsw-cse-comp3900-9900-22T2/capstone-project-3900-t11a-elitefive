@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <cstdlib>
 
-using json = nlohmann::json;
+using json = nlohmann::ordered_json;
 
 // POST REQUESTS
 auto registerPage(uWS::App &app, DatabaseManager &db) -> void {

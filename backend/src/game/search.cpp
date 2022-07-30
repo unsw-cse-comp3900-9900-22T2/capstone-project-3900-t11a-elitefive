@@ -14,7 +14,7 @@ auto Search::minmax(int todepth) -> int {
     // Since easy difficulty is randomness with a lookup, limit the depth of minmax agressively
     if (diff() == 0) {
         max_depth = 3;
-        if (this->board().num_spaces() - this->num_moves() <= 50) {
+        if (this->num_moves() >= 10 && this->board().num_spaces() - this->num_moves() <= 40) {
             std::cout << "Letting random be even more random\n";
             max_depth = 5;
         }
