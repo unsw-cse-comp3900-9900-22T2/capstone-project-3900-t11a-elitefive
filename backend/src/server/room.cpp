@@ -32,7 +32,7 @@ auto Room::publish(WebSocket ws, std::string const& message, uWS::OpCode opCode)
 // 			Class implementation
 // ======================================
 
-auto Room::InitRoom(bool ranked, bool computer, bool potholes) -> void {
+auto Room::InitRoom(bool ranked, bool computer, bool potholes, int difficulty) -> void {
 	// What is the gamemode?
 	if (uids_.size() == 3) 	gamemode_ = 1;  // Triples
 	if (potholes) 			gamemode_ = 2;	// Potholes	
@@ -44,7 +44,7 @@ auto Room::InitRoom(bool ranked, bool computer, bool potholes) -> void {
 	generate_game(potholes);	// CLASSIC / POTHOLES / ETC	
 }
 
-Room::Room(uWS::App &app, DatabaseManager *db, bool ranked, bool computer, bool potholes, std::string room_id, std::vector<int> uids)
+Room::Room(uWS::App &app, DatabaseManager *db, bool ranked, bool computer, bool potholes, std::string room_id, std::vector<int> uids, int difficulty)
 : room_id_{room_id}
 , gamemode_{0} // CLASSIC = 0, TRIPLES = 1, POTHOLES = 2
 , uids_{uids}
@@ -54,7 +54,7 @@ Room::Room(uWS::App &app, DatabaseManager *db, bool ranked, bool computer, bool 
 , ranked_{ranked}
 , computer_{computer}
 {
-	InitRoom(ranked, computer, potholes);
+	InitRoom(ranked, computer, potholes, difficulty);
 	if (computer_) {
 		create_socket_ai(app);
 	}
@@ -194,7 +194,7 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 		.message = [this](WebSocket ws, std::string_view message, uWS::OpCode opCode) {
 			std::cout << "Recieved message\n";
 			if (player_resigned(message)) {
-				std::string winner = game_result(6);
+				std::string winner = game_result(this->game_->give_uid(1)); // Give uid of bot assuming it goes second
 				publish(ws, json_game_winner(winner), opCode);
 				save_match(1);
 				return;
