@@ -6,7 +6,7 @@
 #include "basegame.hpp"
 
 
-auto Search::minmax() -> int {
+auto Search::minmax(int todepth) -> int {
 	auto memo = SearchMemo();
     
     int max_depth = 3;
@@ -79,7 +79,15 @@ auto Search::run_minmax(int depth, int player, SearchMemo &memo, int alpha, int 
 
         // Search each position in this state
         auto const tiles = this->board().all_boards();
-        std::vector<int> ordering = (memo.has_order(tiles, player)) ? memo.get_order(tiles, player) : board().free_tiles().binary_to_vector();
+        std::vector<int> ordering;
+        if (memo.has_order(tiles, player)) ordering = memo.get_order(tiles, player);
+        else {
+            // First time we have had this position. Mix it up a bit for each game
+            ordering = board().free_tiles().binary_to_vector();
+            std::random_device dev;
+            std::mt19937 rng(dev());
+            std::shuffle(ordering.begin(), ordering.end(), rng);
+        }
         
         std::vector<std::pair<int, int>> candidate_order = {};
         int index = 0;
@@ -148,7 +156,15 @@ auto Search::run_minmax(int depth, int player, SearchMemo &memo, int alpha, int 
 
         // Search each position in this state based on promising move order
         auto const tiles = this->board().all_boards();
-        std::vector<int> ordering = (memo.has_order(tiles, player)) ? memo.get_order(tiles, player) : board().free_tiles().binary_to_vector();
+        std::vector<int> ordering;
+        if (memo.has_order(tiles, player)) ordering = memo.get_order(tiles, player);
+        else {
+            // First time we have had this position. Mix it up a bit for each game
+            ordering = board().free_tiles().binary_to_vector();
+            std::random_device dev;
+            std::mt19937 rng(dev());
+            std::shuffle(ordering.begin(), ordering.end(), rng);
+        }
         for (auto const& move : ordering) {
             ++index;
             search.play(move);

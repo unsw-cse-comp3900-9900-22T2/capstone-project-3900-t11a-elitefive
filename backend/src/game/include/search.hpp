@@ -79,7 +79,7 @@ class Search : public BaseGame {
 	        pass_turn();
         }
 
-        auto minmax() -> int;
+        auto minmax(int todepth) -> int;
 
         auto run_minmax(int depth, int player, SearchMemo &memo, int alpha, int beta) -> std::pair<int, int>;
 

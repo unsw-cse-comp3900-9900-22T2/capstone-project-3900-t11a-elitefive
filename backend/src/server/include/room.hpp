@@ -7,6 +7,7 @@
 #include "game.hpp"
 #include "aigame.hpp"
 #include "db_manager.hpp"
+#include "search.hpp"
 
 
 class Room {
@@ -19,7 +20,7 @@ class Room {
         int gamemode_;
         std::vector<int> uids_; 
         std::unique_ptr<Game> game_;
-        std::unique_ptr<AIGame> aigame_;
+        std::unique_ptr<Search> search_;
         DatabaseManager *db_;
         bool ranked_;
         bool computer_;
@@ -59,7 +60,7 @@ class Room {
         auto create_socket_ai(uWS::App &app) -> void;    // Create room to verse ai
         auto create_socket_player_verse_player(uWS::App &app) -> void;
 
-        auto ai_response(std::string move, AIGame *aigame, Game *game, void *ws) -> std::string;
+        auto ai_response(std::string move, Search *search, Game *game, void *ws) -> std::string;
         auto json_confirm_move(std::string const& move) -> std::string;
         auto json_player3(std::string const& move) -> std::string;
         auto json_pothole(std::string const& move) -> std::string;
