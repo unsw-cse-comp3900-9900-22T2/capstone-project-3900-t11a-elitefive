@@ -40,7 +40,8 @@ auto Room::InitRoom(bool ranked, bool computer, bool potholes, int difficulty) -
 	// Simple flags
 	ranked_ = ranked;
 	computer_ = computer;
-	
+	difficulty_ = difficulty;
+
 	generate_game(potholes);	// CLASSIC / POTHOLES / ETC	
 }
 
@@ -53,6 +54,7 @@ Room::Room(uWS::App &app, DatabaseManager *db, bool ranked, bool computer, bool 
 , db_{db}
 , ranked_{ranked}
 , computer_{computer}
+, difficulty_{difficulty}
 {
 	InitRoom(ranked, computer, potholes, difficulty);
 	if (computer_) {
@@ -194,7 +196,7 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 		.message = [this](WebSocket ws, std::string_view message, uWS::OpCode opCode) {
 			std::cout << "Recieved message\n";
 			if (player_resigned(message)) {
-				std::string winner = game_result(this->game_->give_uid(1)); // Give uid of bot assuming it goes second
+				std::string winner = game_result(6 + this->difficulty()); // uid 6 is the easiest difficulty
 				publish(ws, json_game_winner(winner), opCode);
 				save_match(1);
 				return;
@@ -255,7 +257,7 @@ auto Room::ai_response(std::string move, AIGame *aigame, Game *game, void *ws) -
 	// AIGame &aigame = *aigame_;	
 	aigame->play(move);
 	// std::cout << *aigame << '\n';
-	auto const response_move = aigame->minmax(7); // depth 3 (could increase but test with that)
+	auto const response_move = aigame->minmax(7, this->difficulty()); // depth 3 (could increase but test with that)
 	aigame->play(response_move);
 	aigame->clear();
 	game->play(response_move);

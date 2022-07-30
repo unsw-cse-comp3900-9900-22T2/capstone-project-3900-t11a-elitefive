@@ -125,7 +125,7 @@ auto AIGame::states() const -> std::vector<std::vector<BitBoard>> const& {
 // 	return *index;
 // }
 
-auto AIGame::minmax(int depth) -> int {
+auto AIGame::minmax(int depth, int difficulty) -> int {
 	auto memo = Memo();
 	int final_move = -1;
 	std::cout << "Minmax at: " << this->num_moves() << '\n';

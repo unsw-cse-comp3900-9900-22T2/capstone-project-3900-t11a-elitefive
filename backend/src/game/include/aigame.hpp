@@ -65,7 +65,7 @@ class AIGame : public BaseGame {
 			states_ = std::vector<std::vector<BitBoard>>{};
 		}
 
-		auto minmax(int depth) -> int;
+		auto minmax(int depth, int difficulty) -> int;
 
 	private:
 		auto run_minmax(int depth, int player, Memo &memo, int alpha, int beta) -> int;

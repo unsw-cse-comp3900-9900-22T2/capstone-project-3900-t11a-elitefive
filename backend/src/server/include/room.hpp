@@ -23,6 +23,7 @@ class Room {
         DatabaseManager *db_;
         bool ranked_;
         bool computer_;
+        int difficulty_;
 
     public:
         Room(uWS::App &app, DatabaseManager *db, bool ranked, bool computer, bool potholes, std::string room_id, std::vector<int> uids, int difficulty = -1);
@@ -30,6 +31,8 @@ class Room {
         
         auto room_id() const -> std::string { return room_id_; }
         auto room_code() const -> std::string { return std::string{"/ws/game/" + this->room_id()}; }
+        auto difficulty() const -> int { return difficulty_; }
+
         auto play_move(std::string const& move) -> bool { return this->game_->play(move); }
         auto gamemode() const -> std::string { 
             if (gamemode_ == 0) return "CLASSIC"; 
@@ -56,7 +59,7 @@ class Room {
         auto create_socket_ai(uWS::App &app) -> void;    // Create room to verse ai
         auto create_socket_player_verse_player(uWS::App &app) -> void;
 
-        auto static ai_response(std::string move, AIGame *aigame, Game *game, void *ws) -> std::string;
+        auto ai_response(std::string move, AIGame *aigame, Game *game, void *ws) -> std::string;
         auto json_confirm_move(std::string const& move) -> std::string;
         auto json_player3(std::string const& move) -> std::string;
         auto json_pothole(std::string const& move) -> std::string;
