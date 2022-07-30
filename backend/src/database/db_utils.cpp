@@ -7,7 +7,7 @@
 #include <pqxx/pqxx>
 #include <openssl/sha.h>
 
-using json = nlohmann::json;
+using json = nlohmann::ordered_json;
 
 auto hash_password(std::string password) -> std::string {
 	// TODO: figure out how to add this lib

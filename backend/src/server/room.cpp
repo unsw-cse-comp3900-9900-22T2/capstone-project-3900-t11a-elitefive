@@ -10,7 +10,7 @@
 #include "aigame.hpp"
 #include "metadatagen.hpp"
 
-using json = nlohmann::json;
+using json = nlohmann::ordered_json;
 
 // Helper functions
 auto parse_move(std::string_view message) -> std::string;
@@ -32,7 +32,7 @@ auto Room::publish(WebSocket ws, std::string const& message, uWS::OpCode opCode)
 // 			Class implementation
 // ======================================
 
-auto Room::InitRoom(bool ranked, bool computer, bool potholes) -> void {
+auto Room::InitRoom(bool ranked, bool computer, bool potholes, int difficulty) -> void {
 	// What is the gamemode?
 	if (uids_.size() == 3) 	gamemode_ = 1;  // Triples
 	if (potholes) 			gamemode_ = 2;	// Potholes	
@@ -40,21 +40,23 @@ auto Room::InitRoom(bool ranked, bool computer, bool potholes) -> void {
 	// Simple flags
 	ranked_ = ranked;
 	computer_ = computer;
-	
+	difficulty_ = difficulty;
+
 	generate_game(potholes);	// CLASSIC / POTHOLES / ETC	
 }
 
-Room::Room(uWS::App &app, DatabaseManager *db, bool ranked, bool computer, bool potholes, std::string room_id, std::vector<int> uids)
+Room::Room(uWS::App &app, DatabaseManager *db, bool ranked, bool computer, bool potholes, std::string room_id, std::vector<int> uids, int difficulty)
 : room_id_{room_id}
 , gamemode_{0} // CLASSIC = 0, TRIPLES = 1, POTHOLES = 2
 , uids_{uids}
 , game_{nullptr}
-, aigame_{nullptr}
+, search_{nullptr}
 , db_{db}
 , ranked_{ranked}
 , computer_{computer}
+, difficulty_{difficulty}
 {
-	InitRoom(ranked, computer, potholes);
+	InitRoom(ranked, computer, potholes, difficulty);
 	if (computer_) {
 		create_socket_ai(app);
 	}
@@ -92,7 +94,7 @@ auto Room::generate_game(bool potholes) -> void {
 		missing_tiles = BitBoard(generated_potholes);
 	}
 	this->game_ = std::make_unique<Game>(nplayers, uids_, missing_tiles);
-	this->aigame_ = std::make_unique<AIGame>(nplayers, missing_tiles);
+	this->search_ = std::make_unique<Search>(nplayers, this->difficulty_, missing_tiles);
 	std::cout << "\t\tDEBUG: Generated room\n";
 }
 
@@ -194,7 +196,7 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 		.message = [this](WebSocket ws, std::string_view message, uWS::OpCode opCode) {
 			std::cout << "Recieved message\n";
 			if (player_resigned(message)) {
-				std::string winner = game_result(6);
+				std::string winner = game_result(6 + this->difficulty()); // uid 6 is the easiest difficulty
 				publish(ws, json_game_winner(winner), opCode);
 				save_match(1);
 				return;
@@ -219,7 +221,7 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 			if (game_->status() == Game::state::ONGOING) {	// TODO: Change this to a native call
 				//  std::future<std::string> reply_future = std::async(Room::ai_response, move, *aigame_);
 				// std::string reply = Room::ai_response(move, *aigame_);
-				auto reply = Room::ai_response(move, aigame_.get(), game_.get(), ws);
+				auto reply = Room::ai_response(move, search_.get(), game_.get(), ws);
 				// auto reply_future = std::async(Room::test, 3);
 				// auto function = static_cast<std::string(*)(std::string &move, AIGame &aigame)>(Room::ai_response);
 				// auto reply_future = std::thread(Room::ai_response, move, aigame_.get(), game_.get(), ws);
@@ -250,14 +252,14 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 	});
 }
 
-auto Room::ai_response(std::string move, AIGame *aigame, Game *game, void *ws) -> std::string {
+auto Room::ai_response(std::string move, Search *aigame, Game *game, void *ws) -> std::string {
 	std::cout << "\t\tStarted calculating\n";
 	// AIGame &aigame = *aigame_;	
 	aigame->play(move);
 	// std::cout << *aigame << '\n';
 	auto const response_move = aigame->minmax(7); // depth 3 (could increase but test with that)
 	aigame->play(response_move);
-	aigame->clear();
+	// aigame->clear();
 	game->play(response_move);
 	// std::cout << "\t\tEnding calculating\n";
 	// std::cout << *aigame << '\n';
