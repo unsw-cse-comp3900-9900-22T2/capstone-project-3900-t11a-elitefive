@@ -33,6 +33,11 @@ export default function Resetpasswordpage({}: Props) {
   const { getUID } = useAuth();
   const uid = window.localStorage.getItem("username")
   
+  const navigate = useNavigate();
+  const navigateToDashboard = () => {
+    navigate('/dashboard');
+  };
+  
   const handleClick = async () => {
     //setInfo('Registering user, please wait', 5000);
     const uid = String(getStoredUID())
@@ -40,6 +45,7 @@ export default function Resetpasswordpage({}: Props) {
     const { outcome, message } = response.payload
     if(outcome == 'success') {
       setInfo("Your password has been changed!", 5000);
+      navigateToDashboard();
     } else {
       console.log('register error');
       setError(message)
