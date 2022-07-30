@@ -16,35 +16,6 @@ auto ai_play_game(AIGame &game) -> void;
 auto computer_verse_computer() -> void;
 
 
-// struct BoardHashTEST
-// {
-// 	std::size_t operator()(std::vector<BitBoard> const& key) const
-// 		{
-// 		BitBoard seed = BitBoard();
-// 		for (auto const& i : key) {
-// 			seed = seed | i;
-// 		}
-// 		return seed.value();
-// 	}
-// };
-
-// struct BoardEqualTEST
-// {
-// 	bool operator()(std::vector<BitBoard> const& lhs, std::vector<BitBoard> const& rhs) const {	
-// 		if (lhs.size() != rhs.size()) return false;
-// 		return std::equal(lhs.begin(), lhs.end(), rhs.begin());
-// 	}
-// };
-// 	auto map = std::unordered_map<std::vector<BitBoard>, std::unique_ptr<AIGame>, BoardHashTEST, BoardEqualTEST> {
-// 		// {{3,4}, "There"}
-// 	};
-
-// 	// map.insert({game.board().all_boards(), std::make_unique<AIGame>(game, 3)});
-
-// 	// if(map.find(game.board().all_boards()) != map.end()) {
-// 	// 	std::cout <<  *map[game.board().all_boards()];
-// 	// }
-
 auto main(void) -> int {
 	// Game game = Game(2);
 	// game.play("a1");
@@ -105,7 +76,7 @@ auto generate_test_game() -> AIGame {
 	// // game.play(48); game.pass_turn();
 	// return game;
 	
-	auto game = AIGame(3);
+	auto game = AIGame(2);
 	// game.pass_turn();
 	game.play(30);
 	game.play(38);
@@ -142,11 +113,11 @@ auto ai_play_game(AIGame &game) -> void {
 		// std::cout << "Generating moves ...\n";
 		// game.generate_to_depth(depth);
 		std::cout << "Minmax" << '\n';
-		auto move = game.minmax(depth);
+		auto move = game.minmax(depth, 0);
 		std::cout << "Move: " << move << '\n';
 		game.play(move);
 		game.clear();
 		std::cout << game << '\n'; 
-		// break;
+		break;
 	}
 }

@@ -15,6 +15,7 @@ AIGame::AIGame(int nplayers, BitBoard potholes)
 , eval_depth_{-1}
 , score_{0}		// TODO: CHANGE TO UNSET
 , states_{}
+// , difficulty_{difficulty}
 {}
 
 AIGame::AIGame(AIGame const& position, int move)
@@ -24,6 +25,7 @@ AIGame::AIGame(AIGame const& position, int move)
 , score_{position.score()}		// TODO: CHANGE FOR NO SCORE
 , eval_depth_{position.evalDepth()}
 , states_{}
+// , difficulty_{difficulty}
 {}
 
 auto AIGame::play(std::string move) -> bool {
@@ -265,7 +267,7 @@ auto straight_line(axial::vector const& dir, int tile, BitBoard const& player_ti
 	return count;
 }
 
-auto AIGame::heuristic(int const player) -> int {
+int AIGame::heuristic(int const player) {
 	// Assume current player is trying to win
 	Board const &board = this->board();
 	BitBoard const free_spaces = board.free_tiles();
