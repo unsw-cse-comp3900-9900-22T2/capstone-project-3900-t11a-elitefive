@@ -27,6 +27,11 @@ export default function Forgotpasswordpage({}: Props) {
   const [email, setEmail] = useState<string>("");
   const { setError, setInfo } = useAlert();
   
+  const navigate = useNavigate();
+  const navigateToDashboard = () => {
+    navigate('/dashboard');
+  };
+  
   const handleClick = async () => {
     try {
         const result = await forgotPassword(email)
@@ -36,6 +41,7 @@ export default function Forgotpasswordpage({}: Props) {
         } 
         else{
             setInfo("Check email for your new password", 5000)
+            navigateToDashboard()
         } 
       } catch (err) {
         console.log('an error occured');
