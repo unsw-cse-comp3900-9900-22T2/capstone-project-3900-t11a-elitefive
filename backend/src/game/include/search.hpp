@@ -10,6 +10,7 @@
 
 #include "basegame.hpp"
 #include "bitboard.hpp"
+#include "game.hpp"
 
 class SearchMemo;
 
@@ -38,6 +39,20 @@ class Search : public BaseGame {
         , reason_{ position.reason() }
         , difficulty_{position.diff() }
         {}
+
+        Search(Game const& game, int pothole_player, int difficulty, int score = 0)
+        : BaseGame{2, game.board().player_tiles(pothole_player)}
+        , score_{ score }
+        , reason_{ terminal::NONE }
+        , difficulty_{ difficulty }
+        {
+            int i = -1;
+            for (auto const move : game.all_moves()) {
+                i++;
+                if (i % 3 == pothole_player) continue;
+                this->play(move);
+            }
+        }
 
         ~Search() = default;
 

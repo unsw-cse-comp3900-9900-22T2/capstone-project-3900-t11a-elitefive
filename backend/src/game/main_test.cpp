@@ -17,20 +17,49 @@ auto ai_play_game(AIGame &game) -> void;
 auto computer_verse_computer() -> void;
 
 
+auto select_random_player(std::vector<int> choices) -> int {
+	std::vector<int> out = {};
+	std::sample(
+        choices.begin(),
+        choices.end(),
+        std::back_inserter(out),
+        choices.size(),
+        std::mt19937{std::random_device{}()}
+    );
+	return out.front();
+}
+
 auto main(void) -> int {
 	// Search game = Search(2, BitBoard(288230376151711743));
-	Search game = Search(2, 1);
-	game.play(30);
-		game.play(29);
-	game.play(28);
-		game.play(38);
-	game.play(27);
-		game.play(39);
-	game.play(37);
-		game.play(36);
-	game.play(6);
-		game.play(12);
-	game.play(20);
+	Game game = Game(3);
+	while (game.ongoing()) {
+		int move;
+		std::cin >> move;
+		game.play(move);
+		std::cout << game << "\n";
+		if (game.ongoing() == false) break;
+		Search p1 = Search(game, select_random_player({0, 2}), 1);
+		game.play(p1.minmax(4));
+		std::cout << game << "\n";
+		if (game.ongoing() == false) break;
+		Search p2 = Search(game, 1, 1);
+		game.play(p2.minmax(4));
+		std::cout << game << "\n";
+	}
+
+
+	// Search game = Search(2, 1);
+	// game.play(30);
+	// 	game.play(29);
+	// game.play(28);
+	// 	game.play(38);
+	// game.play(27);
+	// 	game.play(39);
+	// game.play(37);
+	// 	game.play(36);
+	// game.play(6);
+	// 	game.play(12);
+	// game.play(20);
 	// game.pass_turn();
 
 
@@ -42,10 +71,10 @@ auto main(void) -> int {
 	// game.play(38);
 	// game.play(31);
 	// game.play(12);
-	std::cout << game << '\n';
-	int move = game.minmax(7);
-	game.play(move);
-	std::cout << game << '\n';
+	// std::cout << game << '\n';
+	// int move = game.minmax(7);
+	// game.play(move);
+	// std::cout << game << '\n';
 
 	// int depth = 3;
 	// auto memo = SearchMemo();

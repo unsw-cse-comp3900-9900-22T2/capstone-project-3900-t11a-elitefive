@@ -28,7 +28,7 @@ class Room {
 
     public:
         Room(uWS::App &app, DatabaseManager *db, bool ranked, bool computer, bool potholes, std::string room_id, std::vector<int> uids, int difficulty = -1);
-        auto InitRoom(bool ranked, bool computer, bool potholes, int difficulty) -> void;
+        auto InitRoom(bool ranked, bool computer, bool potholes, int difficulty, std::vector<int> uids) -> void;
         
         auto room_id() const -> std::string { return room_id_; }
         auto room_code() const -> std::string { return std::string{"/ws/game/" + this->room_id()}; }

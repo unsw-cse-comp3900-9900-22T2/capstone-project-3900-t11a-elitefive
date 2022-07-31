@@ -171,11 +171,19 @@ auto Pool::start_player_vs_ai_game(std::string const& gamemode, bool ranked_flag
 	// Versing AI
 	int computer_uid = 6 + difficulty; // TODO: HARDCODED AI ID. Need to do selection
 	std::vector<int> uids = {uid, computer_uid};
-	if (difficulty == 2) {
+	if (gamemode != "TRIPLES" && difficulty == 2) {
 		uids = {computer_uid, uid};
 	}
+
+	std::cout << "STARTING A NEW GAME " << gamemode << "\n";
+
 	
 	uint32_t room_id = ((uint32_t) uid << 17) | (uint32_t) computer_uid;
+	if (gamemode == "TRIPLES") {
+		uids.push_back(8);
+		room_id += 8;
+	}
+	
 	bool potholes = false;
 	if (gamemode == "POTHOLES") potholes = true;
 	create_new_room(room_id, ranked_flag, true, potholes, uids, difficulty);

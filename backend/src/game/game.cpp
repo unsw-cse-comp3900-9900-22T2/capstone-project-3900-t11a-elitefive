@@ -14,10 +14,10 @@ Game::Game(int nplayers, std::vector<int> const uids, BitBoard potholes)
 , gamestate_{Game::state::ONGOING}
 , move_sequence_{}
 {
-	// std::cout << "Game: Hello I am making a game for players\n";
-	// for (int i : uids) {
-	// 	std::cout << "\tUID" << i << '\n';
-	// }
+	std::cout << "Game: Hello I am making a game for players\n";
+	for (int i : uids) {
+		std::cout << "\tUID" << i << '\n';
+	}
 }
 
 

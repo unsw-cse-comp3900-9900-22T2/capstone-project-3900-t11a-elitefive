@@ -89,7 +89,7 @@ class Pool {
 			}
 			else {
 				std::cout << "\t\tDEBUG: REPLACE GAMEMODE IN EXISTING ROOM\n";
-				lobby->InitRoom(ranked, ai, potholes, difficulty);
+				lobby->InitRoom(ranked, ai, potholes, difficulty, uids);
 			}
 
 		}
