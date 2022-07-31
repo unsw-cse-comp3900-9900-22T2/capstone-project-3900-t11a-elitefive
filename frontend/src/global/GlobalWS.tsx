@@ -9,6 +9,7 @@ interface payload {
   contents?: string;
   tile?: string;
   winner?: string;
+  turn?: number;
 }
 
 type Props = {
@@ -41,6 +42,7 @@ export const WSProvider = ({ children, gameId }: Props) => {
     setPlayerName, 
     setPlayerElo,
     setNumberPlayers,
+    setCurrentPlayer,
   } = useGameState();
   const { getUID } = useAuth();
   
@@ -58,12 +60,15 @@ export const WSProvider = ({ children, gameId }: Props) => {
     }
     WS.onmessage = (message) => {
       const payload:payload = JSON.parse(message.data) as payload
-      console.log(payload);
+      // console.log(payload);
       switch(payload.event) {
+        // player2 / bot
         case "move": {
           // set gamestate tile to be red
           const move = payload.tile;
-          if(move) {
+          const turn = payload.turn;
+          console.log(turn);
+          if(move && (turn != undefined)) {
             // this is hardcoded for SINGLE PLAYER will need
             // backend player join broadcast to correctly work
             // playerJoin({uid: "BOT", color: "blue"});
@@ -74,6 +79,7 @@ export const WSProvider = ({ children, gameId }: Props) => {
             //   color: playerColor
             // })
             playMove("BOT", move);
+            setCurrentPlayer(turn);
           }
           break;
         }
@@ -81,16 +87,20 @@ export const WSProvider = ({ children, gameId }: Props) => {
         case "moveconfirm": {
           const payload:payload = JSON.parse(message.data) as payload
           const hexKey = payload.tile;
-          if (hexKey) {
+          const turn = payload.turn;
+          if (hexKey && (turn!=undefined)) {
             playMove("abc", hexKey);
+            setCurrentPlayer(turn);
           }
           break;
         }
         case "player3" : {
           const payload:payload = JSON.parse(message.data) as payload
           const hexKey = payload.tile;
-          if (hexKey) {
+          const turn = payload.turn;
+          if (hexKey && (turn!=undefined)) {
             playMove("p3", hexKey);
+            setCurrentPlayer(turn);
           }
           break;
         }

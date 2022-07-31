@@ -32,6 +32,7 @@ type GSType = {
   setPlayerName: (index: number, name: string) => void;
   setPlayerElo: (index: number, elo: string) => void;
   getCurrentPlayer: () => number;
+  setCurrentPlayer: (number: number) => void;
   setNumberPlayers: (number: number) => void;
   getNumberPlayers: () => number;
 }
@@ -59,6 +60,7 @@ export const GSContext = React.createContext<GSType>({
   setPlayerName: (index: number, name: string) => {},
   setPlayerElo: (index: number, elo: string) => {},
   getCurrentPlayer: () => 0,
+  setCurrentPlayer: (number: number) => {},
   setNumberPlayers: (number: number) => {},
   getNumberPlayers: () => 2,
 });
@@ -126,7 +128,7 @@ export const GSProvider = ({ children }: Props) => {
       color: player.color,
     })
 
-    setCurrentPlayerMove(prev => ((prev+1) % numberOfPlayers));
+    // setCurrentPlayerMove(prev => ((prev+1) % numberOfPlayers));
   }
 
   const setWinner = (user: string) => {
@@ -151,6 +153,9 @@ export const GSProvider = ({ children }: Props) => {
   const getCurrentPlayer = () => {
     return currentPlayerMove;
   }
+  const setCurrentPlayer = (number: number) => {
+    setCurrentPlayerMove(number);
+  }
 
   const setNumberPlayers = (number: number) => {
     setNumberOfPlayers(number);
@@ -174,6 +179,7 @@ export const GSProvider = ({ children }: Props) => {
         setPlayerName,
         setPlayerElo,
         getCurrentPlayer,
+        setCurrentPlayer,
         setNumberPlayers,
         getNumberPlayers
       }}
