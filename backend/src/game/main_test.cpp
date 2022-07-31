@@ -19,12 +19,23 @@ auto computer_verse_computer() -> void;
 
 auto main(void) -> int {
 	// Search game = Search(2, BitBoard(288230376151711743));
-	Search game = Search(2, 0);
+	Search game = Search(2, 1);
 	game.play(30);
-	game.play(39);
-	game.play(31);
-	game.play(46);
-	// game.play(28);
+		game.play(29);
+	game.play(28);
+		game.play(38);
+	game.play(27);
+		game.play(39);
+	game.play(37);
+		game.play(36);
+	game.play(6);
+		game.play(12);
+	game.play(20);
+	// game.pass_turn();
+
+
+
+
 	// game.play(60);
 
 	// game.play(30);
@@ -32,7 +43,7 @@ auto main(void) -> int {
 	// game.play(31);
 	// game.play(12);
 	std::cout << game << '\n';
-	int move = game.minmax();
+	int move = game.minmax(7);
 	game.play(move);
 	std::cout << game << '\n';
 

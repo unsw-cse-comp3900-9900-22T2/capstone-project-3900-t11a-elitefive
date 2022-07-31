@@ -10,13 +10,17 @@ auto Search::minmax(int todepth) -> int {
 	auto memo = SearchMemo();
     
     int max_depth = 3;
+    // if (this->num_moves() <= 12) max_depth = 4;
+    // if (this->num_moves() <= 8) max_depth = 3;
+
     
     // Since easy difficulty is randomness with a lookup, limit the depth of minmax agressively
     if (diff() == 0) {
         max_depth = 3;
-        if (this->num_moves() >= 10 && this->board().num_spaces() - this->num_moves() <= 40) {
+        if (this->num_moves() >= 20 && this->board().num_spaces() - this->num_moves() <= 40) {
             std::cout << "Letting random be even more random\n";
-            max_depth = 5;
+            max_depth = 4;
+            if (this->num_moves() >= 35) max_depth = 5;
         }
     }
     
@@ -41,7 +45,9 @@ int Search::heuristic() {
         return random_eval();
     }
     if (diff() == 1) {
-        return strat_simple_line(0) - strat_simple_line(1);
+        int triangle = triangle_strat(0) - triangle_strat(1);
+        int line = strat_simple_line(0) - strat_simple_line(1);
+        return triangle + line;
     }
     std::cout << "Difficulty no implemented yet\n";
     exit(1);
