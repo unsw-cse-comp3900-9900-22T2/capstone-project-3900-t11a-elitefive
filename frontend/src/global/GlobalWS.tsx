@@ -68,13 +68,15 @@ export const WSProvider = ({ children, gameId }: Props) => {
             // playerJoin({uid: "BOT", color: "blue"});
             const playerColor = getPlayerInfo("BOT")?.color;
             if(!playerColor) break;
-            setHexTileState(move, {
-              user: "BOT",
-              color: playerColor
-            })
+            // setHexTileState(move, {
+            //   user: "BOT",
+            //   color: playerColor
+            // })
+            playMove("BOT", move);
           }
           break;
         }
+        // player 1
         case "moveconfirm": {
           const payload:payload = JSON.parse(message.data) as payload
           const hexKey = payload.tile;
