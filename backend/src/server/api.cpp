@@ -366,16 +366,22 @@ auto api_replay(uWS::App &app, DatabaseManager &db) -> void {
 			payload["nplayers"] = nplayers;
 			payload["holes"] = {};
 
+			// Potholes.
 			for (int i = 0; i < match->potholes.size(); i = i + 2) {
 				std::string hole = match->potholes.substr(i, 2);
 				payload["holes"].push_back(hole);
 			}
 						
 			auto meta = MetaDataGenerator(moves, nplayers);
+			// Moves by player.
 			payload["move_seq"] = {};
 			for (int player = 0; player < nplayers; ++player) {
 				payload["move_seq"][player] = meta.moves_by(player);
 			}
+
+			// Turn Array.
+			auto turn_array = meta.turn_array();
+			payload["turns"] = turn_array;
 		}
 		res->end(payload.dump());
 	});
