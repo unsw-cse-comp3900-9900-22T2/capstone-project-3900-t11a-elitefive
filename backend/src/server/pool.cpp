@@ -50,7 +50,6 @@ Pool::Pool(uWS::App *app, DatabaseManager *db)
 			std::string suid = data["uid"];
 			int uid = atoi(suid.c_str());
 
-
 			if (ai_flag == false) {
 				std::cout << "\tPool: User selected pvp\n";
 				json payload = player_vs_player_waiting_lobby(gamemode, ranked_flag, uid);
@@ -171,11 +170,24 @@ auto Pool::player_vs_player_waiting_lobby(std::string const& gamemode, bool rank
 auto Pool::start_player_vs_ai_game(std::string const& gamemode, bool ranked_flag, int uid, int difficulty) -> json {
 	// Versing AI
 	int computer_uid = 6 + difficulty; // TODO: HARDCODED AI ID. Need to do selection
+	std::vector<int> uids = {uid, computer_uid};
+	if (gamemode != "TRIPLES" && difficulty == 2) {
+		uids = {computer_uid, uid};
+	}
+
+	std::cout << "STARTING A NEW GAME " << gamemode << "\n";
+
+	
 	uint32_t room_id = ((uint32_t) uid << 17) | (uint32_t) computer_uid;
+	if (gamemode == "TRIPLES") {
+		uids.push_back(8);
+		room_id += 8;
+	}
+	
 	bool potholes = false;
 	if (gamemode == "POTHOLES") potholes = true;
-	create_new_room(room_id, ranked_flag, true, potholes, {uid, computer_uid}, difficulty);
-	return make_json_game_selection({computer_uid, uid}, std::to_string(room_id), gamemode, ranked_flag, true);
+	create_new_room(room_id, ranked_flag, true, potholes, uids, difficulty);
+	return make_json_game_selection(uids, std::to_string(room_id), gamemode, ranked_flag, true);
 }
 
 // === Local Helper functions ===

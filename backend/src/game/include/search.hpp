@@ -10,6 +10,7 @@
 
 #include "basegame.hpp"
 #include "bitboard.hpp"
+#include "game.hpp"
 
 class SearchMemo;
 
@@ -38,6 +39,20 @@ class Search : public BaseGame {
         , reason_{ position.reason() }
         , difficulty_{position.diff() }
         {}
+
+        Search(Game const& game, int pothole_player, int difficulty, int score = 0)
+        : BaseGame{2, game.board().player_tiles(pothole_player)}
+        , score_{ score }
+        , reason_{ terminal::NONE }
+        , difficulty_{ difficulty }
+        {
+            int i = -1;
+            for (auto const move : game.all_moves()) {
+                i++;
+                if (i % 3 == pothole_player) continue;
+                this->play(move);
+            }
+        }
 
         ~Search() = default;
 
@@ -92,6 +107,61 @@ class Search : public BaseGame {
             std::mt19937 rng(dev());
             std::uniform_int_distribution<std::mt19937::result_type> values(-50,50);
             return values(rng);
+        }
+
+        int triangle_strat(int const player) {
+            // Assume current player is trying to win
+            Board const &board = this->board();
+            BitBoard const free_spaces = board.free_tiles();
+            BitBoard const player_tiles = board.player_tiles(player);
+            BitBoard const opponent_tiles = board.opponent_tiles(player);
+
+            std::vector<int> const& tiles = player_tiles.binary_to_vector();
+            int triangle_score = 0;
+            for (int const& tile : tiles) {
+                {
+                    // Upright triangle
+                    axial::vector lvec = axial::vector(tile) + axial::vector::us() * 3;
+                    axial::vector rvec = axial::vector(tile) + axial::vector::usq() * 3;
+                    if (lvec.distance() > 4) continue; // Ignore tiles outside the board
+                    if (rvec.distance() > 4) continue; // Ignore tiles outside the board
+                    if (isSet(player_tiles, lvec) && isSet(player_tiles, rvec)) {
+                        int lpoint = axial::vector::index(lvec);
+                        // int rpoint = axial::vector::index(rvec);
+                        // std::cout << "Found triangle\n";
+                        // std::cout << tile << " " << lpoint << " " << rpoint << '\n';
+                        triangle_score += 15;
+
+                        // Check straight line potential in triangle
+                        triangle_score += straight_line(axial::vector::us(), tile, player_tiles, opponent_tiles);
+                        triangle_score += straight_line(axial::vector::usq(), tile, player_tiles, opponent_tiles);
+                        triangle_score += straight_line(axial::vector::uq(), lpoint, player_tiles, opponent_tiles);
+                        if (triangle_score == 15) triangle_score = 0;
+                    }
+                }
+                {
+                    // Upside down triangle
+                    axial::vector lvec = axial::vector(tile) + axial::vector::ur() * 3;
+                    axial::vector rvec = axial::vector(tile) + axial::vector::uqr() * 3;
+                    if (lvec.distance() > 4) continue; // Ignore tiles outside the board
+                    if (rvec.distance() > 4) continue; // Ignore tiles outside the board
+                    if (isSet(player_tiles, lvec) && isSet(player_tiles, rvec)) {
+                        int lpoint = axial::vector::index(lvec);
+                        int rpoint = axial::vector::index(rvec);
+                        // std::cout << "Found triangle\n";
+                        // std::cout << tile << " " << lpoint << " " << rpoint << '\n';
+                        // exit(1);
+                        triangle_score += 15;
+
+                        // Check straight line potential in triangle
+                        triangle_score += straight_line(axial::vector::ur(), tile, player_tiles, opponent_tiles);
+                        triangle_score += straight_line(axial::vector::uqr(), tile, player_tiles, opponent_tiles);
+                        triangle_score += straight_line(axial::vector::uq(), lpoint, player_tiles, opponent_tiles);
+                        if (triangle_score == 15) triangle_score = 0;
+                    }
+                }
+            }
+            return triangle_score;
         }
 
         int strat_simple_line(int const player) {
