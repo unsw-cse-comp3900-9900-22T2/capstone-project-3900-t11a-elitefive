@@ -18,39 +18,34 @@ const Container = styled.div`
   grid-gap: 30px;
 `;
 
+const Highlight = styled.div<{isHighlighted: boolean}>`
+  ${props => props.isHighlighted && `border: 5px solid var(--accent-blue)`};
+`;
+
 export default function Sidebar({}: Props) {
-  const { setWinner, getPlayers } = useGameState();
+  const { setWinner, getPlayers, getCurrentPlayer, getNumberPlayers } = useGameState();
   const {  emit } = useSocket();
   const { getUID } = useAuth();
 
-  const currPlayer = getPlayers()[0]?.name;
-  const currPlayerElo = getPlayers()[0]?.elo;
-  const otherPlayer = getPlayers()[1]?.name;
-  const otherPlayerElo = getPlayers()[1]?.elo;
-
   return (
     <Container>
-      <Card3>
-        <Typography sx={{ fontSize: 40 }} color="white" gutterBottom>
-          Player { currPlayer }
-        </Typography>
-        <Typography sx={{ fontSize: 20 }} color="white" gutterBottom>
-          {currPlayerElo}
-        </Typography>
-      </Card3>
-      <Card2>
-        <Typography sx={{ fontSize: 40 }} color="white" gutterBottom>
-          Your Turn 
-        </Typography>
-      </Card2>
-      <Card3>
-        <Typography sx={{ fontSize: 40 }} color="white" gutterBottom>
-          Player { otherPlayer }
-        </Typography>
-        <Typography sx={{ fontSize: 20 }} color="white" gutterBottom>
-          {otherPlayerElo}
-        </Typography>
-      </Card3>
+      {getPlayers().slice(0,getNumberPlayers()).map((player, index) => {
+        const currPlayer = player.name;
+        const currPlayerElo = player.elo;
+        return (
+          <Highlight isHighlighted={getCurrentPlayer() === index}>
+          <Card3>
+            {console.log(getCurrentPlayer())}
+            <Typography sx={{ fontSize: 40 }} color="white" gutterBottom>
+              Player { currPlayer }
+            </Typography>
+            <Typography sx={{ fontSize: 20 }} color="white" gutterBottom>
+              {currPlayerElo}
+            </Typography>
+          </Card3>
+          </Highlight>
+        )
+      })}
       <Button 
         width={350} 
         height={40}
