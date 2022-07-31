@@ -23,13 +23,13 @@ const Highlight = styled.div<{isHighlighted: boolean}>`
 `;
 
 export default function Sidebar({}: Props) {
-  const { setWinner, getPlayers, getCurrentPlayer } = useGameState();
+  const { setWinner, getPlayers, getCurrentPlayer, getNumberPlayers } = useGameState();
   const {  emit } = useSocket();
   const { getUID } = useAuth();
 
   return (
     <Container>
-      {getPlayers().slice(0,2).map((player, index) => {
+      {getPlayers().slice(0,getNumberPlayers()).map((player, index) => {
         const currPlayer = player.name;
         const currPlayerElo = player.elo;
         return (

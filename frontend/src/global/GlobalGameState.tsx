@@ -32,7 +32,8 @@ type GSType = {
   setPlayerName: (index: number, name: string) => void;
   setPlayerElo: (index: number, elo: string) => void;
   getCurrentPlayer: () => number;
-
+  setNumberPlayers: (number: number) => void;
+  getNumberPlayers: () => number;
 }
 
 type TileState = {
@@ -58,6 +59,8 @@ export const GSContext = React.createContext<GSType>({
   setPlayerName: (index: number, name: string) => {},
   setPlayerElo: (index: number, elo: string) => {},
   getCurrentPlayer: () => 0,
+  setNumberPlayers: (number: number) => {},
+  getNumberPlayers: () => 2,
 });
 
 export type PlayerType = {
@@ -83,7 +86,6 @@ export const GSProvider = ({ children }: Props) => {
   const [GameOverState, setGameOverState] = useState<WinnerType>({} as WinnerType);
   // for triples or doubles
   const [numberOfPlayers, setNumberOfPlayers] = useState<number>(2);
-
   const [currentPlayerMove, setCurrentPlayerMove] = useState<number>(0);
 
   const setHexTileState = (tile: string, tilestate: TileState) => {
@@ -150,6 +152,14 @@ export const GSProvider = ({ children }: Props) => {
     return currentPlayerMove;
   }
 
+  const setNumberPlayers = (number: number) => {
+    setNumberOfPlayers(number);
+  }
+
+  const getNumberPlayers = () => {
+    return numberOfPlayers;
+  }
+
   return (
     <GSContext.Provider
       value={{
@@ -164,6 +174,8 @@ export const GSProvider = ({ children }: Props) => {
         setPlayerName,
         setPlayerElo,
         getCurrentPlayer,
+        setNumberPlayers,
+        getNumberPlayers
       }}
     >
       {children}

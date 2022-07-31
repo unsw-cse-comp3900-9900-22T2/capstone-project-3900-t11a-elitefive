@@ -39,7 +39,8 @@ export const WSProvider = ({ children, gameId }: Props) => {
     getPlayerInfo, 
     setWinner, 
     setPlayerName, 
-    setPlayerElo
+    setPlayerElo,
+    setNumberPlayers,
   } = useGameState();
   const { getUID } = useAuth();
   
@@ -117,10 +118,11 @@ export const WSProvider = ({ children, gameId }: Props) => {
           const payload = JSON.parse(message.data);
           console.log(payload)
           const { player_name, elos } = payload;
-          setPlayerName(0, player_name[0]);
-          setPlayerElo(0, elos[0])
-          setPlayerName(1, player_name[1]);
-          setPlayerElo(1, elos[1])
+          for(let i = 0; i < player_name.length; i++) {
+            setPlayerName(i, player_name[i]);
+            setPlayerElo(i, elos[i]);
+          }
+          setNumberPlayers(player_name.length);
           break;
         }
       }
