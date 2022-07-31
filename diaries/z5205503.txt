@@ -55,3 +55,67 @@ Furthermore, I modified some frontend and backend code to fix some issues with s
 For next week:
 - Sprint 1 Demo
 - Continue coding and making progress towards Sprint 2
+
+Week 5
+
+Before our Sprint 1 demonstration on Tuesday, I implemented a fix which required a played move to be checked in the backend before displaying on the frontend. This meant that tiles
+by the opponent could not be overwritten.
+
+On Tuesday, our group demonstrated the available functionalities of our first sprint, which went quite well. Right after our demo, we had a meeting for our Retrospective A
+report where we discussed the positives and drawbacks during the sprint.
+
+For next week:
+- Complete Retrospective A report
+- Make progress towards Sprint 2
+
+Week 6 & 7
+
+I modified the schema file (schema.sql) - specifically added extra field for ranked in Matches and changed start_time to end_time.
+Also changed Friends table to a Friendship table, which acts as a log of all friendship interactions (sending a request, accepting/denying a request, deleting a friend, etc.).
+However, after some discussion, we decided to revert thatchange -  the Friendship table should be separated into two separate tables instead - a friends table and a friend
+requests table. Furthermore, inserted demo test data into the schema.sql file such that data will already exist in the database by the next demonstration.
+
+With regards to the database management system for backend itself, I heavily refactored the main database code into a class and also used Prepared Statements (from db_functions to
+db_manager). This is instantiated at the beginning and then passed around to different parts of the program to be used.
+
+As a core and main focus of Sprint 2 is to demonstrate multiplayer functionality, I implemented all the related database functionality that would be required to do this in the newly
+refactored database manager system with prepared statements. This includes getting matches, inserting matches, getting a particular user's matches, getting matches by snapshot (which was
+another important feature we wanted to demonstrate with this sprint), etc. Furthermore, I created new database classes in order to represent the data returned from the database,
+including Match, Player and PlayerStats for backend to use in db_classes.hpp. I created helper database functions, including a function that would parse matches fetched
+from the database into Match, Player and PlayerStats objects.
+
+Importantly, I created the save_match function, which would batch inserts all the data from a match into the corresponding tables in the database (Matches, Snapshots, Outcomes). This uses the batch_insert function I
+implemented, which uses pqxx's stream. This is particularly useful as it avoids the execution of too many SQL queries at once.
+
+Another key functionality for Sprint 2 was the Friends System, and as such, I also implemented corresponding database functionality to support this - including adding friends, sending
+friend requests, accepting/denying friend requests and deleting friends.
+
+I also implemented the endpoint functions that would convert the match and friends data to JSON to send to frontend.
+
+For next week:
+- Sprint 2 Demo.
+- Make progress towards final sprint.
+
+Week 8
+
+On Tuesday, we did the Sprint 2 demonstration and soon after, we had a meeting for Retrospective B and throughout the week, we completed the Retrospective B report.
+
+Aside from this, I worked towards completing the remaining functionality for our final sprint and made some general changes and fixes to our project:
+- Modified match queries and class to include a list of potholes.
+- A user can no longer add themselves as a friend.
+- Fix database return for stats (ranked games), which would incorrectly return stats for both ranked and unranked games.
+- Implemented database queries for leaderboards.
+- Implemented endpoints and API handlers for leaderboards.
+- Database fetch for ELO history and endpoints/API handlers complete.
+- Several minor changes to the save_match function to account for the changes to the Matches table in the database.
+
+For next week:
+- Continue making progress towards the final sprint.
+
+Week 9
+
+Continues to make progress towards final sprint. This includes:
+- Added extra column for svg_data in the Matches table in the database. This column is used for generating the thumbnail of matches for replays.
+  save_match() function has also been modified to generate svg_data and insert this into the database.
+
+
