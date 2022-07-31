@@ -502,21 +502,51 @@ auto api_social_feed(uWS::App &app, DatabaseManager &db) -> void {
 // Gets all replays
 auto api_search_all(uWS::App &app, DatabaseManager &db) -> void {
 	app.get("/api/search/all", [&app, &db](auto *res, auto *req) {
+		auto filter = std::string(req->getQuery("filter"));
+		auto value = std::string(req->getQuery("value"));
 		json payload;
 		payload["all_matches"] = {};
 		payload["classic"] = {};
 		payload["triples"] = {};
 		payload["potholes"] = {};
+		// Filter.
+		std::function<bool(Match*)> fcheck = [](Match* m) -> bool { return true; };
+		if (filter == "type") {
+			if (value == "ranked") {
+				fcheck = [](Match* m) -> bool { return m->ranked; };
+			} else if (value == "unranked") {
+				fcheck = [](Match* m) -> bool { return !m->ranked; };
+			}
+		} else if (filter == "game") {
+			if (value == "classic") {
+				fcheck = [](Match* m) -> bool { return m->game == "CLASSIC"; };
+			} else if (value == "triples") {
+				fcheck = [](Match* m) -> bool { return m->game == "TRIPLES"; };
+			} else if (value == "potholes") {
+				fcheck = [](Match* m) -> bool { return m->game == "POTHOLES"; };
+			}
+		} else if (filter == "player") {
+			fcheck = [value](Match* m) -> bool {
+				for (auto const &p : m->players) {
+					if (p.username == value) {
+						return true;
+					}
+				}
+				return false;
+			};
+		}
 		// All matches...
 		auto matches = db.get_matches();
 		for (auto const& match : matches) {
-			// Push to mode-specific list.
-			auto game = match->game;
-			std::transform(game.begin(), game.end(), game.begin(),
-				[](unsigned char c) { return std::tolower(c); });
-			payload[game].push_back(match->to_json());
-			// Push back to all matches.
-			payload["all_matches"].push_back(match->to_json());
+			if (fcheck(match)) {
+				// Push to mode-specific list.
+				auto game = match->game;
+				std::transform(game.begin(), game.end(), game.begin(),
+					[](unsigned char c) { return std::tolower(c); });
+				payload[game].push_back(match->to_json());
+				// Push back to all matches.
+				payload["all_matches"].push_back(match->to_json());
+			}
 		}
 
 		res->end(payload.dump());
