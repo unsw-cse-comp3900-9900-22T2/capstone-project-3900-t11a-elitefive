@@ -333,17 +333,22 @@ auto parse_uid(std::string_view message) -> int {
 	return atoi(suid.c_str());
 }
 
+
+// Player 0
 auto Room::json_confirm_move(std::string const& move) -> std::string {
 	json payload;
 	payload["event"] = "moveconfirm";
 	payload["tile"] = move;
+	payload["turn"] = 1;
 	return payload.dump();
 }
 
+// Player 2
 auto Room::json_player3(std::string const& move) -> std::string {
 	json payload;
 	payload["event"] = "player3";
 	payload["tile"] = move;
+	payload["turn"] = 0;
 	return payload.dump();
 }
 
@@ -354,10 +359,12 @@ auto Room::json_pothole(std::string const& move) -> std::string {
 	return payload.dump();
 }
 
+// Player 1
 auto Room::json_board_move(std::string const& move) -> std::string {
 	json payload;
 	payload["event"] = "move";
 	payload["tile"] = move;
+	payload["turn"] = (this->game_->num_players() == 2) ? 0 : 2;
 	return payload.dump();
 }
 
