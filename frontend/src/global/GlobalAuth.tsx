@@ -28,6 +28,11 @@ export const getStoredUID = (): string|null => window.localStorage.getItem("uid"
 export const setStoredUID = (uid: string): void => { window.localStorage.setItem("uid", uid)}
 export const removeStoredUID = () =>  { window.localStorage.removeItem("uid"); }
 
+export const getStoredUsername = (): string|null => window.localStorage.getItem("username")
+export const setStoredUsername = (username: string): void => { window.localStorage.setItem("username", username)}
+export const removeStoredUsername = () =>  { window.localStorage.removeItem("username"); }
+
+
 export const getStoredToken = (): string|null => window.localStorage.getItem("session-token")
 export const setStoredToken = (token: string): void => { window.localStorage.setItem("session-token", token)}
 export const removeStoredToken = () =>  { window.localStorage.removeItem("session-token"); }
@@ -59,10 +64,11 @@ export const AuthProvider = ({ children }: Props) => {
         reject(false);
         return;
       }
-      const {uid, token} = resp;
+      const {uid, token, username} = resp;
       setAuth({uid, sessionToken: token})
       setStoredToken(token)
       setStoredUID(uid)
+      setStoredUsername(username)
       resolve(true);
     })
   }
@@ -71,6 +77,7 @@ export const AuthProvider = ({ children }: Props) => {
     setAuth(defaultAuthState);
     removeStoredToken()
     removeStoredUID()
+    removeStoredUsername()
 
     console.log(auth);
   }

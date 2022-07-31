@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <stdio.h>
 
-using json = nlohmann::json;
+using json = nlohmann::ordered_json;
 
 struct SocketData{
 	//Empty because we don't need any currently.
@@ -41,7 +41,7 @@ Pool::Pool(uWS::App *app, DatabaseManager *db)
 			
 			// Parse data
 			json data = parse_pool_data(message);
-			
+			std::cout << "\tPool: Message -> " << message << '\n';
 			std::string gamemode = data["gamemode"];	// TODO: Need information from frontend
 			bool ranked_flag = data["ranked"];
 			bool ai_flag = data["ai"];
@@ -49,7 +49,6 @@ Pool::Pool(uWS::App *app, DatabaseManager *db)
 			// Player who is selecting option
 			std::string suid = data["uid"];
 			int uid = atoi(suid.c_str());
-
 
 			if (ai_flag == false) {
 				std::cout << "\tPool: User selected pvp\n";
@@ -59,7 +58,8 @@ Pool::Pool(uWS::App *app, DatabaseManager *db)
 				}
 			}
 			else { 
-				json payload = start_player_vs_ai_game(gamemode, ranked_flag, uid);
+				int difficulty = data["ai-difficulty"]; // Either 0, 1, 2
+				json payload = start_player_vs_ai_game(gamemode, ranked_flag, uid, difficulty);
 				publish(ws, payload.dump(), opCode);
 			}
 		},
@@ -167,14 +167,27 @@ auto Pool::player_vs_player_waiting_lobby(std::string const& gamemode, bool rank
 	}
 }
 
-auto Pool::start_player_vs_ai_game(std::string const& gamemode, bool ranked_flag, int uid) -> json {
+auto Pool::start_player_vs_ai_game(std::string const& gamemode, bool ranked_flag, int uid, int difficulty) -> json {
 	// Versing AI
-	int computer_uid = 6; // TODO: HARDCODED AI ID. Need to do selection
+	int computer_uid = 6 + difficulty; // TODO: HARDCODED AI ID. Need to do selection
+	std::vector<int> uids = {uid, computer_uid};
+	if (gamemode != "TRIPLES" && difficulty == 2) {
+		uids = {computer_uid, uid};
+	}
+
+	std::cout << "STARTING A NEW GAME " << gamemode << "\n";
+
+	
 	uint32_t room_id = ((uint32_t) uid << 17) | (uint32_t) computer_uid;
+	if (gamemode == "TRIPLES") {
+		uids.push_back(8);
+		room_id += 8;
+	}
+	
 	bool potholes = false;
 	if (gamemode == "POTHOLES") potholes = true;
-	create_new_room(room_id, ranked_flag, true, potholes, {uid, computer_uid});
-	return make_json_game_selection({computer_uid, uid}, std::to_string(room_id), gamemode, ranked_flag, true);
+	create_new_room(room_id, ranked_flag, true, potholes, uids, difficulty);
+	return make_json_game_selection(uids, std::to_string(room_id), gamemode, ranked_flag, true);
 }
 
 // === Local Helper functions ===

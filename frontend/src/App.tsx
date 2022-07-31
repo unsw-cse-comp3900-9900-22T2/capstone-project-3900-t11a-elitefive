@@ -14,6 +14,8 @@ import ProtectedRoutes from './global/ProtectedRoutes';
 import PageContainer from './pages/PageContainer';
 import Homepage from "./pages/Homepage";
 import Loginpage from "./pages/Loginpage";
+import Forgotpasswordpage from './pages/Forgotpasswordpage';
+import Resetpasswordpage from './pages/Resetpasswordpage';
 import Registerpage from './pages/Registerpage';
 import Dashboard from './pages/Dashboard';
 import Profilepage from './pages/Profilepage';
@@ -40,6 +42,8 @@ function App() {
             <Routes>
               <Route path="/register" element={<Registerpage/>}/>
               <Route path="/login" element={<Loginpage/>}/>
+              <Route path="login/forgotpassword" element={<Forgotpasswordpage/>}/>
+              <Route path="resetpassword" element={<Resetpasswordpage/>}/>
               {/* <Route element={<ProtectedRoutes/>}> */}
                 <Route path="/profile/:uid" element={<Profilepage/>}/>
                 <Route path="/friends" element={<FriendsPage/>}/>

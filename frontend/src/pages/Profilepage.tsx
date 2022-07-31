@@ -185,6 +185,11 @@ export default function Profilepage({}: Props) {
       // 👇️ navigate to /contacts
       navigate('/friends');
   };
+  
+  const navigateToResetPassword = () => {
+    // 👇️ navigate to /contacts
+    navigate('/resetpassword');
+};
 
   useEffect(() => {
     fetch(`/api/profile?uid=${uid}`)
@@ -224,6 +229,7 @@ export default function Profilepage({}: Props) {
           <ProfileCard name={profileData.username}/>
           {/* <CustomizedInputBase/> */}
           <Button align-items="right" onClick={navigateToFriends}>Friends</Button>
+          <Button align-items="right" onClick={navigateToResetPassword}>Reset Password</Button>
         </Container>
         <StatContainer>
           <StatTab value={tabValue} setValue={setTabValue} data={profileData}/>

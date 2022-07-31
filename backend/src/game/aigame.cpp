@@ -15,6 +15,7 @@ AIGame::AIGame(int nplayers, BitBoard potholes)
 , eval_depth_{-1}
 , score_{0}		// TODO: CHANGE TO UNSET
 , states_{}
+// , difficulty_{difficulty}
 {}
 
 AIGame::AIGame(AIGame const& position, int move)
@@ -24,6 +25,7 @@ AIGame::AIGame(AIGame const& position, int move)
 , score_{position.score()}		// TODO: CHANGE FOR NO SCORE
 , eval_depth_{position.evalDepth()}
 , states_{}
+// , difficulty_{difficulty}
 {}
 
 auto AIGame::play(std::string move) -> bool {
@@ -91,7 +93,6 @@ auto AIGame::store_game(std::vector<BitBoard> const& board) -> void {
 auto AIGame::end_turn() -> void {
 	this->increase_move();
 	this->pass_turn();
-	
 }
 
 auto AIGame::move() const -> int {
@@ -125,15 +126,15 @@ auto AIGame::states() const -> std::vector<std::vector<BitBoard>> const& {
 // 	return *index;
 // }
 
-auto AIGame::minmax(int depth) -> int {
+auto AIGame::minmax(int depth, int difficulty) -> int {
 	auto memo = Memo();
 	int final_move = -1;
 	std::cout << "Minmax at: " << this->num_moves() << '\n';
-	if (depth > 6 && this->num_moves() <= 31) depth = 6;
-	if (depth > 5 && this->num_moves() <= 25) depth = 5;
-	if (depth > 4 && this->num_moves() <= 17) depth = 4;
-	if (depth > 3 && this->num_moves() <= 5) depth = 3;
-	for (int inc_depth = 3; inc_depth <= depth; ++inc_depth) {
+	// if (depth > 6 && this->num_moves() <= 31) depth = 6;
+	// if (depth > 5 && this->num_moves() <= 25) depth = 5;
+	// if (depth > 4 && this->num_moves() <= 17) depth = 4;
+	// if (depth > 3 && this->num_moves() <= 5) depth = 3;
+	for (int inc_depth = depth; inc_depth <= depth; ++inc_depth) {
 		std::cout << "\tCalculating depth: " << inc_depth << ' ';
 		auto const score = run_minmax(inc_depth, this->whose_turn(), memo, -99999, 99999);
 		for (auto const& state : this->states()) {
@@ -265,7 +266,7 @@ auto straight_line(axial::vector const& dir, int tile, BitBoard const& player_ti
 	return count;
 }
 
-auto AIGame::heuristic(int const player) -> int {
+int AIGame::heuristic(int const player) {
 	// Assume current player is trying to win
 	Board const &board = this->board();
 	BitBoard const free_spaces = board.free_tiles();

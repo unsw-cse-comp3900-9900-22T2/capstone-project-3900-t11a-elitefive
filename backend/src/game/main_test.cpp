@@ -7,6 +7,7 @@
 #include "game.hpp"
 #include "bitboard.hpp"
 #include "metadatagen.hpp"
+#include "search.hpp"
 
 #include <unordered_map>
 #include <memory.h>
@@ -16,67 +17,86 @@ auto ai_play_game(AIGame &game) -> void;
 auto computer_verse_computer() -> void;
 
 
-// struct BoardHashTEST
-// {
-// 	std::size_t operator()(std::vector<BitBoard> const& key) const
-// 		{
-// 		BitBoard seed = BitBoard();
-// 		for (auto const& i : key) {
-// 			seed = seed | i;
-// 		}
-// 		return seed.value();
-// 	}
-// };
-
-// struct BoardEqualTEST
-// {
-// 	bool operator()(std::vector<BitBoard> const& lhs, std::vector<BitBoard> const& rhs) const {	
-// 		if (lhs.size() != rhs.size()) return false;
-// 		return std::equal(lhs.begin(), lhs.end(), rhs.begin());
-// 	}
-// };
-// 	auto map = std::unordered_map<std::vector<BitBoard>, std::unique_ptr<AIGame>, BoardHashTEST, BoardEqualTEST> {
-// 		// {{3,4}, "There"}
-// 	};
-
-// 	// map.insert({game.board().all_boards(), std::make_unique<AIGame>(game, 3)});
-
-// 	// if(map.find(game.board().all_boards()) != map.end()) {
-// 	// 	std::cout <<  *map[game.board().all_boards()];
-// 	// }
+auto select_random_player(std::vector<int> choices) -> int {
+	std::vector<int> out = {};
+	std::sample(
+        choices.begin(),
+        choices.end(),
+        std::back_inserter(out),
+        choices.size(),
+        std::mt19937{std::random_device{}()}
+    );
+	return out.front();
+}
 
 auto main(void) -> int {
-	// Game game = Game(2);
-	// game.play("a1");
-	// game.play("b1");
-	// game.play("a2");
-	// game.play("b2");
-	// game.play("a4");
-	// game.play("c3");
-	// game.play("a3");
+	// Search game = Search(2, BitBoard(288230376151711743));
+	Game game = Game(3);
+	while (game.ongoing()) {
+		int move;
+		std::cin >> move;
+		game.play(move);
+		std::cout << game << "\n";
+		if (game.ongoing() == false) break;
+		Search p1 = Search(game, select_random_player({0, 2}), 1);
+		game.play(p1.minmax(4));
+		std::cout << game << "\n";
+		if (game.ongoing() == false) break;
+		Search p2 = Search(game, 1, 1);
+		game.play(p2.minmax(4));
+		std::cout << game << "\n";
+	}
+
+
+	// Search game = Search(2, 1);
+	// game.play(30);
+	// 	game.play(29);
+	// game.play(28);
+	// 	game.play(38);
+	// game.play(27);
+	// 	game.play(39);
+	// game.play(37);
+	// 	game.play(36);
+	// game.play(6);
+	// 	game.play(12);
+	// game.play(20);
+	// game.pass_turn();
+
+
+
+
+	// game.play(60);
+
+	// game.play(30);
+	// game.play(38);
+	// game.play(31);
+	// game.play(12);
+	// std::cout << game << '\n';
+	// int move = game.minmax(7);
+	// game.play(move);
 	// std::cout << game << '\n';
 
-	// auto meta = MetaDataGenerator(game);
-	// for (auto pos : meta.db_snapshot()) {
-	// 	std::cout << pos << '\n';
+	// int depth = 3;
+	// auto memo = SearchMemo();
+	// for (int depth = 1; depth <= 2; ++depth) {
+	// 	std::cout << game << '\n';
+	// 	std::cout << "Depth: " << depth << '\n';
+	// 	std::pair<int, int> res = game.run_minmax(depth, game.whose_turn(), memo, -99999, 99999);
+	// 	memo.clear();
+	// 	int score = res.first;
+	// 	int move = res.second;
+	// 	std::cout << "Minmax finished\n";
+	// 	std::cout << "Score: " << score << '\n';
+	// 	std::cout << "Move: " << move << '\n';
+	// 	if (std::abs(score) >= 1000) break;
 	// }
-	
+
+	// auto memo = Memo();
+	// int score = game.minmax(5, 0);
 
 
-	// // auto game = AIGame(2);
-	// // game.play(4);
-	// // game.play(2);
-	// // game.play(1);
-	// // game.play(3);
-
-	// // auto memo = Memo();
-	// // memo.insert(game, 3);
-	// // auto boards = game.board().all_boards();
-	// // std::cout << memo.contains(boards) << '\n';
-	// // std::cout << memo.find(boards) << '\n';
-
-	auto game = generate_test_game();
-	ai_play_game(game);
+	// auto game = generate_test_game();
+	// ai_play_game(game);
 	
 	return 0;
 }
@@ -105,7 +125,7 @@ auto generate_test_game() -> AIGame {
 	// // game.play(48); game.pass_turn();
 	// return game;
 	
-	auto game = AIGame(3);
+	auto game = AIGame(2);
 	// game.pass_turn();
 	game.play(30);
 	game.play(38);
@@ -132,7 +152,7 @@ auto generate_test_game() -> AIGame {
 
 auto ai_play_game(AIGame &game) -> void {
 	std::cout << game << "\nStarting board\n";
-	auto depth = 5;
+	auto depth = 2;
 	while (game.isTerminal() == false) {
 		// int player_move;
 		// std::cin >> player_move;
@@ -142,11 +162,11 @@ auto ai_play_game(AIGame &game) -> void {
 		// std::cout << "Generating moves ...\n";
 		// game.generate_to_depth(depth);
 		std::cout << "Minmax" << '\n';
-		auto move = game.minmax(depth);
+		auto move = game.minmax(depth, 0);
 		std::cout << "Move: " << move << '\n';
 		game.play(move);
 		game.clear();
 		std::cout << game << '\n'; 
-		// break;
+		break;
 	}
 }

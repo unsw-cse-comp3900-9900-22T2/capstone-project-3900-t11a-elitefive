@@ -17,7 +17,7 @@ auto DatabaseManager::insert_user(std::string username, std::string email, std::
 
 auto DatabaseManager::get_user(std::string email) -> User* {
   auto res = execute("email_get_user", email);
-  if (res.size() != 1) {
+  if (res.size() < 1) {
     return NULL;
   }
   return new User(res[0]);

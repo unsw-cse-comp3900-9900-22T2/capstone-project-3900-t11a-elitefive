@@ -124,3 +124,38 @@ Lots of ground work coding to serve functionality in our last sprint.
 - Refactoring the multiplayer socketing code to handle different game modes.
 - Lots of improvements to AI to give settings for difficulty changes.
 - Changed some frontend colours and function calls that handle tile placements.
+
+Week 9
+This week is mainly focus on finishing up all of the functionality for the Yavalath website. Overall I 
+have focused on setting up JSON endpoints for frontend to connect to. I have been delegating tasks to 
+Jacky J and Jacky X to make sure we finish everything.
+In the meantime, sage has been working on account tickets and setting up the project on CSE machines.
+
+This week I worked on a variety of tasks - Here are a few highlights:
+Frontend
+-> Displaying Potholes on frontend
+-> Setting up usestate on frontend to display three player replays
+
+Networking
+-> Networking for Triples
+-> Friend invite system networking and emulation in python for testing
+-> Fixing server crash with AI rooms after multiple play throughs
+
+Backend
+-> Worked on lots of endpoints to give out data on replays and profiles
+-> Worked on social feed 
+
+Game logic
+-> Potholes gamemode added
+-> Tripiles gamemode added
+
+AI changes
+-> Reworked AI to have difficulty adjustments
+    -> Easy is semi-random with win/loss detection.
+    -> Medium is heuristic based.
+    -> Hard lets the bot go first and heuristic based.
+-> Improved Heuristic of AI in classic game for the "hardest" difficulty
+-> Made an AI for Triples that is actually functional.
+
+- Many calls and creating tickets for frontend to organise what functionality
+needed to be worked on.

@@ -24,11 +24,13 @@ class AIGame : public BaseGame {
 	private:
 		int move_;
 		terminal reason_;
-		int eval_depth_;			// Says whether the board has been heuristically evaluated
+		int eval_depth_;	// Says whether the board has been heuristically evaluated
 		int score_;			// The heuristic score
 		std::vector<std::vector<BitBoard>> states_;
+		// int difficulty_;
+
 	public:
-		AIGame(): BaseGame{3}, move_{-1}, reason_{terminal::NONE}, eval_depth_{-1}, score_{0}, states_{}{}	// For the memo class
+		// AIGame(): BaseGame{2}, move_{-1}, reason_{terminal::NONE}, eval_depth_{-1}, score_{0}, states_{}{}	// For the memo class
 		AIGame(int nplayers, BitBoard potholes = BitBoard());
 		AIGame(AIGame const& position, int move);
 
@@ -65,11 +67,11 @@ class AIGame : public BaseGame {
 			states_ = std::vector<std::vector<BitBoard>>{};
 		}
 
-		auto minmax(int depth) -> int;
+		auto minmax(int depth, int difficulty) -> int;
 
 	private:
 		auto run_minmax(int depth, int player, Memo &memo, int alpha, int beta) -> int;
-		auto heuristic(int const player) -> int;
+		int heuristic(int const player);
 
 		auto end_turn() -> void;
 		auto undo_turn() -> void;

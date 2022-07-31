@@ -35,12 +35,13 @@ export default function Registerpage({}: Props) {
   
   const handleClick = async () => {
     setInfo('Registering user, please wait', 5000);
-    const success = await register(username, password, email)
-    if(success) {
+    const response = await register(username, password, email)
+    const { outcome, message } = response.payload
+    if(outcome == 'success') {
       navigate("/login");
     } else {
       console.log('register error');
-      setError('error registering user')
+      setError(message)
     }
   }
 

@@ -12,7 +12,7 @@
 #include <algorithm>
 
 
-using json = nlohmann::json;
+using json = nlohmann::ordered_json;
 
 struct SocketData{
 	//Empty because we don't need any currently.
