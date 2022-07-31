@@ -23,6 +23,9 @@ auto Search::minmax(int todepth) -> int {
             if (this->num_moves() >= 35) max_depth = 5;
         }
     }
+    if (diff() == 2 && this->num_moves() >= 10) {
+        max_depth = 4;
+    }
     
     int move = 0;
     for (int depth = 1; depth <= max_depth; ++depth) {
@@ -45,6 +48,11 @@ int Search::heuristic() {
         return random_eval();
     }
     if (diff() == 1) {
+        int triangle = triangle_strat(0) - triangle_strat(1);
+        int line = strat_simple_line(0) - strat_simple_line(1);
+        return triangle + line;
+    }
+    if (diff() == 2) {
         int triangle = triangle_strat(0) - triangle_strat(1);
         int line = strat_simple_line(0) - strat_simple_line(1);
         return triangle + line;

@@ -83,6 +83,7 @@ auto Room::generate_game(bool potholes) -> void {
 			auto e2 = std::default_random_engine(now * i);
 			auto d2 = std::uniform_int_distribution<int>(0, 60);
 			auto r2 = d2(e2);
+			if (r2 == 30) continue; // Never get rid of the center tile because BOT3 assumes it's there lol
 			potholes.at(r2) = 1;
 		}
 
@@ -117,6 +118,18 @@ auto Room::on_connect_match_info(uWS::WebSocket<false, true, SocketData> *ws) ->
 	// Send potholes information if any
 	for (auto const& pothole : this->game_->list_potholes()) {
 		ws->send(json_pothole(pothole), uWS::OpCode::TEXT);
+	}
+
+	if (this->game_->num_moves() == 0 && this->difficulty() == 2) {
+		// this->game_->pass_turn();
+		// this->search_->pass_turn();
+		this->search_->play(30);
+		this->game_->play(30);
+		ws->send(json_confirm_move("e5"), uWS::OpCode::TEXT);
+	}
+	else if (this->difficulty() == 2) {
+		auto move = this->game_->all_moves().front();
+		ws->send(json_confirm_move("e5"), uWS::OpCode::TEXT);
 	}
 }
 
@@ -212,25 +225,17 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 			
 			// Make the move in game
 			if (play_move(move) == false) return; 	// Ignore illegal player move
-			publish(ws, json_confirm_move(move), opCode);
+			if (this->difficulty() != 2) 	publish(ws, json_confirm_move(move), opCode);
+			else { 							publish(ws, json_board_move(move), opCode); }
 			// publish(ws, json_player3("a1"), opCode);
 
 			std::cout << "Made a valid move\n";
 
 			// Handle AI moves
 			if (game_->status() == Game::state::ONGOING) {	// TODO: Change this to a native call
-				//  std::future<std::string> reply_future = std::async(Room::ai_response, move, *aigame_);
-				// std::string reply = Room::ai_response(move, *aigame_);
 				auto reply = Room::ai_response(move, search_.get(), game_.get(), ws);
-				// auto reply_future = std::async(Room::test, 3);
-				// auto function = static_cast<std::string(*)(std::string &move, AIGame &aigame)>(Room::ai_response);
-				// auto reply_future = std::thread(Room::ai_response, move, aigame_.get(), game_.get(), ws);
-				// reply_future.join();
-				// std::string reply = reply_future.get();
-				// game_->play(reply);
-				// aigame_->play(reply);
-				publish(ws, json_board_move(reply), opCode);
-				// gameover = (game_->status() == Game::state::ONGOING);
+				if (this->difficulty() != 2) 	publish(ws, json_board_move(reply), opCode);
+				else { 							publish(ws, json_confirm_move(reply), opCode); }
 			}
 			
 			// Postgame
