@@ -8,6 +8,7 @@ MetaDataGenerator::MetaDataGenerator(Game game)
 , move_sequence_{game.all_moves()}
 , moves_by_player_(game.num_players())
 , positions_{}
+, turn_array_{std::vector<int>{}}
 {
 	// // Generate moves per player
 	// auto player = 0;
@@ -22,7 +23,8 @@ MetaDataGenerator::MetaDataGenerator(Game game)
 	for (auto const& move: move_sequence_) {
 		auto player = simgame.whose_turn();
 		moves_by_player_[player].push_back(move); // Generating moves by player
-		
+		turn_array_.push_back(player);
+
 		auto result = simgame.play(move);
 		auto board = simgame.board().player_tiles(player);
 		positions_.push_back(board);
@@ -65,4 +67,8 @@ auto MetaDataGenerator::db_snapshot() const -> std::vector<uint64_t> {
 		positions.push_back(board.value());
 	}
 	return positions;
+}
+
+auto MetaDataGenerator::turn_array() const -> std::vector<int> {
+	return turn_array_;
 }

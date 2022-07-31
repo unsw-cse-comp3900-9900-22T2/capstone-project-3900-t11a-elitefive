@@ -10,6 +10,7 @@ class MetaDataGenerator {
 		std::vector<std::string> move_sequence_;
 		std::vector<std::vector<std::string>> moves_by_player_;
 		std::vector<BitBoard> positions_;
+		std::vector<int> turn_array_;
 	public:
 		MetaDataGenerator(Game game);
 		MetaDataGenerator(std::string moves, int players);
@@ -17,6 +18,7 @@ class MetaDataGenerator {
 		auto num_players() const -> int;
 		auto db_snapshot() const -> std::vector<uint64_t>;
 		auto moves_by(int player) const -> std::vector<std::string>;
+		auto turn_array() const -> std::vector<int>;
 
 };
 
