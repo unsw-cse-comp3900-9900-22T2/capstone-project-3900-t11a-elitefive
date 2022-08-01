@@ -20,6 +20,9 @@ import Tab from '@mui/material/Tab';
 import StatTab from '../components/Tab';
 import Modal from '@mui/material/Modal';
 import ReactEcharts from 'echarts-for-react';
+import Classic from '../assets/classic.svg';
+import Triples from '../assets/triples.svg';
+import Potholes from '../assets/potholes.svg';
 
 
 
@@ -82,6 +85,10 @@ const Match = styled.div`
   justify-content: space-evenly;
   align-items: center;
 `
+
+const ImgStyled = styled.img`
+  object-fit: cover;
+`;
 
 
 export type profileDataType = {
@@ -342,6 +349,24 @@ export default function Profilepage({}: Props) {
       {renderFilteredReplay()?.map((replay: replayType) => {
         return (
           <Match onClick={() => {navigate(replay.link)}}>
+              <div style={{
+                display: "flex",
+                height: "80%"
+              }}>
+                {(() => {
+                  switch (tabMap[tabValue]) {
+                    case "CLASSIC" : {
+                      return <ImgStyled src={Classic}/>
+                    }
+                    case "TRIPLES" : {
+                      return <ImgStyled src={Triples}/>
+                    }
+                    case "Potholes" : {
+                      return <ImgStyled src={Potholes}/>
+                    }
+                  }
+                })()}
+              </div>
               <Box display="inline-flex" flexDirection="column"> 
                 {replay.players.map((player) => (
                     <Typography variant="h4">

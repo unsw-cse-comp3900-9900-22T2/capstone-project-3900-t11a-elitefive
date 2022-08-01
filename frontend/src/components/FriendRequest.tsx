@@ -34,7 +34,7 @@ export default function FriendRequest({ id, name, variant, refresh }: Props) {
     })
     .then(resp => resp.json())
     .then(data => {
-      console.log(data);
+      // console.log(data);
       //forces a refresh
       refresh();
     })

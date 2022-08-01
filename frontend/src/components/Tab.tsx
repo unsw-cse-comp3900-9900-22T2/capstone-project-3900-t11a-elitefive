@@ -63,7 +63,7 @@ export default function StatTab({ data, value, setValue }: {
   };
 
   const renderTab = (type: string) => {
-    console.log(data.ranked["CLASSIC"])
+    // console.log(data.ranked["CLASSIC"])
     return(
       <Box display="flex">
         <Box width="400px" margin = "0 20px">
@@ -151,7 +151,7 @@ export function LeaderTab({ data }: { data: leaderDataType}) {
 
 
   const renderTab = (type: string) => {
-    console.log(data["triples"])
+    // console.log(data["triples"])
     return(
         <Box width="1000px" margin = "0 20px" id="abc">
           {/* <Typography variant="h4">Elo</Typography>
