@@ -194,7 +194,7 @@ const modalStyle = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 400,
+  width: 600,
   bgcolor: 'var(--accent-dark)',
   border: '2px solid #000',
   boxShadow: 50,
@@ -230,7 +230,7 @@ export default function Profilepage({}: Props) {
     .then(resp => resp.json())
     .then(data => {
       const payload = data.payload;
-      const eloPayload = data.elo_history;
+      const eloPayload = data.payload.elo_history;
       setProfileData(payload);
       setEloData(eloPayload);
     })
@@ -258,12 +258,6 @@ export default function Profilepage({}: Props) {
   
 
   const options = {
-    title: {
-      text: 'Elo History Chart',
-      textStyle: {
-        color: '#C45AEC'
-      }
-    },
     tooltip: {
       trigger: 'axis'
     },
@@ -287,28 +281,31 @@ export default function Profilepage({}: Props) {
     xAxis: {
       type: 'category',
       boundaryGap: false,
-      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+      nameTextStyle: {
+        color: '#E9CFEC'
+      }
+      
     },
     yAxis: {
-      type: 'value'
+      type: 'value',
+      nameTextStyle: {
+        color: '#E9CFEC'
+      }
     },
     series: [
       {
         name: 'Classic',
         type: 'line',
-        stack: 'Total',
         data: eloData.CLASSIC
       },
       {
         name: 'Potholes',
         type: 'line',
-        stack: 'Total',
         data: eloData.POTHOLES
       },
       {
         name: 'Triples',
         type: 'line',
-        stack: 'Total',
         data: eloData.TRIPLES
       }
     ]
@@ -333,6 +330,7 @@ export default function Profilepage({}: Props) {
               onClose={handleClose}
             >
               <Box sx={modalStyle}>
+                <Typography variant="h5" color="var(--accent-purple)">{"Elo History"}</Typography>
                 <ReactEcharts
                   option={options}
                 />
