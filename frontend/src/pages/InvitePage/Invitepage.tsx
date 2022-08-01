@@ -1,4 +1,4 @@
-import { Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -36,17 +36,24 @@ const Left = styled.div`
 const Right = styled.div`
   width: 50vw;
   background: var(--accent-dark);
-  padding: 100px 0;
 
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: 50px;
 `;
 
 const FriendsBox = styled.div`
   width: 70%;
   height: 50%;
   background: var(--accent-dark);
+`
+
+const PendingBox = styled.div`
+  width: 70%;
+  height: 50%;
+  background: var(--background-color);
 `
 
 const Friend = styled.div`
@@ -58,6 +65,7 @@ const Friend = styled.div`
 const Pending = styled.div`
   background: var(--background-color);
   display: flex;
+  justify-content: space-between;
   margin: 10px;
 `;
 
@@ -245,15 +253,19 @@ export default function Invitepage({}: Props) {
       </Left>
       <Right>
         <Typography variant="h3">Your current Invites</Typography>
-        {pending?.map((friend: FriendType) => {
-          return (
-            <Pending>
-              <Typography variant="h5">{friend.username}</Typography>
-              <Button onClick={handleAccept(friend.uid)}>accept</Button>
-              <Button onClick={handleReject(friend.uid)}>reject</Button>
-            </Pending>
-          )
-        })}
+        <PendingBox>
+          {pending?.map((friend: FriendType) => {
+            return (
+              <Pending>
+                <Typography variant="h5">{friend.username}</Typography>
+                <Box display="flex" flexDirection="row">
+                  <Button background="#90E39A" onClick={handleAccept(friend.uid)} color="var(--accent-dark)">accept</Button>
+                  <Button background="#CE4760" onClick={handleReject(friend.uid)}>reject</Button>
+                </Box>
+              </Pending>
+            )
+          })}
+        </PendingBox>
       </Right>
     </Container>
   )
