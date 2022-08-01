@@ -154,6 +154,7 @@ export default function ReplaySearchpage({}: Props) {
 
   // when secondary filter value changes
   useEffect(() => {
+    setReplays(undefined);
     fetchFiltered()
   }, [filter, secondaryFilter])
   
