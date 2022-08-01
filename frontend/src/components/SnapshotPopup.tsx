@@ -46,11 +46,14 @@ export default function SnapshotPopup({open, handleClose, setReplayData}: Props)
   const [replayString, setReplayString] = useState<string[]>([]);
 
   const handleSnapshotSearch = async () => {
+    setReplayData(undefined);
     const RString = replayString.join('');
     const results = await API.querySnapShot(RString);
     
     if(results.snapshot_matches == null) {
-      setReplayData(undefined);
+      handleClose();
+      setReplayString([]);
+      return;
     } else {
       setReplayData(results.snapshot_matches);
     }

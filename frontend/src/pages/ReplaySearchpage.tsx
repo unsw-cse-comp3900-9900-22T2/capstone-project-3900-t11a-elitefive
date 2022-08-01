@@ -10,6 +10,8 @@ import * as API from '../api/rest';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/ReusableButton';
 
+import Loading from '../assets/loading.gif';
+
 type Props = {}
 
 export type replayDataType = {
@@ -154,8 +156,9 @@ export default function ReplaySearchpage({}: Props) {
 
   // when secondary filter value changes
   useEffect(() => {
+    setReplays(undefined);
     fetchFiltered()
-  }, [filter, secondaryFilter])
+  }, [secondaryFilter])
   
   const fetchAllMatches = async () => {
     const result = await API.getAllReplays()
@@ -225,6 +228,30 @@ export default function ReplaySearchpage({}: Props) {
       }
     }
   }
+
+  const renderPreview = () => {
+    if(!replays) {
+      return(
+        <Box width="100vw" height="100vh" display="flex" justifyContent="center" alignItems="center">
+          <img src={Loading}/>
+        </Box>
+      )
+    }
+    return (
+      <>
+        {replays && replays.map((data: replayDataType) => (
+          <Highlight isSelected={clickedRef == data.match_id}>
+            <ReplayPreview {...data} setSideBarData={() => {
+              setSideBarData({...data})
+              setClickedRef(data.match_id);
+              console.log(data)
+            }}/>
+          </Highlight>
+        ))
+        }
+      </>
+    )
+  }
   
   return (
     <>
@@ -252,17 +279,7 @@ export default function ReplaySearchpage({}: Props) {
           />
         </Box>
         <ReplaysContainer>
-          {/* {replays && filterData(replays as replayDataType[], filter, secondaryFilter)?.map((data: replayDataType) => ( */}
-          {replays && replays.map((data: replayDataType) => (
-              <Highlight isSelected={clickedRef == data.match_id}>
-                <ReplayPreview {...data} setSideBarData={() => {
-                  setSideBarData({...data})
-                  setClickedRef(data.match_id);
-                  console.log(data)
-                }}/>
-              </Highlight>
-            ))
-          }
+          {renderPreview()}
         </ReplaysContainer>
       </MainContainer>
         <SideBarContainer>
