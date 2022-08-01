@@ -458,9 +458,11 @@ auto api_social_feed(uWS::App &app, DatabaseManager &db) -> void {
 			// 1. Random friend's random match.
 			auto friend1 = friends.at(random_num(friends.size()));
 			auto matches = db.get_matches(friend1->id);
-			auto match = matches.at(random_num(matches.size()));
-			feed.push_back(social_json("/replay/" + std::to_string(match->id),
-				"Click here to watch " + friend1->username + " play a " + match->game + " match!"));
+			if (!matches.empty()) {
+				auto match = matches.at(random_num(matches.size()));
+				feed.push_back(social_json("/replay/" + std::to_string(match->id),
+					"Click here to watch " + friend1->username + " play a " + match->game + " match!"));
+			}
 			// 2. Random friend's latest elo.
 			auto friend2 = friends.at(random_num(friends.size()));
 			auto gamemode2 = gamemodes.at(random_num(gamemodes.size()));

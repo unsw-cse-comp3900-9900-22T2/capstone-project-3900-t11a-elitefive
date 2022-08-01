@@ -13,12 +13,22 @@
 #include <memory.h>
 #include <random>
 #include <chrono>
+#include <map>
+#include <set>
+#include <fstream>
 
 
 auto generate_test_game() -> AIGame;
 auto ai_play_game(AIGame &game) -> void;
 auto computer_verse_computer() -> void;
 
+auto random_num(int bound) -> int {
+    auto seed = std::chrono::steady_clock::now().time_since_epoch().count();
+    auto e = std::default_random_engine(seed);
+    auto distribution = std::uniform_int_distribution<int>(0, bound - 1);
+    auto random = distribution(e);
+    return random;
+}
 
 auto select_random_player(std::vector<int> choices) -> int {
 	std::vector<int> out = {};
@@ -103,8 +113,35 @@ auto select_random(std::vector<int> nums) {
 }
 
 auto main(void) -> int {
+	std::ofstream ofile ("output.txt");
+	// Random
 	srand ( time(NULL) );
-	for (int i = 0; i < 100; i++) {
+	// Output strings.
+	std::vector<std::string> o_users = {};
+	std::vector<std::string> o_matches = {};
+	std::vector<std::string> o_outcomes = {};
+	std::vector<std::string> o_snapshots = {};
+	// Num users & matches.
+	auto n_users = 30;
+	auto n_matches = 300;
+	// Users ELO map.
+	auto elos = std::map<int, std::map<std::string, int>>{};
+
+	// ----- USERS -----
+	// Generating users.
+	for (int i = 11; i < 11 + n_users; i++) {
+		o_users.push_back("('User" + std::to_string(i) + "', 'user" + std::to_string(i) + "@email.com', '619227d5cf63bffd286a6529f58fb3e679169230eb7b0151871b8f6583f24bc6')");
+		elos.insert({i, {
+			{"CLASSIC", 1000},
+			{"TRIPLES", 1000},
+			{"POTHOLES", 1000}
+		}});
+	}
+
+	// ----- MATCHES -----
+	// Generating matches.
+	for (int i = 0; i < n_matches; i++) {
+		auto matchID = 1 + i;
 		// Select random gamemode
 		int gamenum = select_random({0, 0, 0, 0, 1, 2, 2});
 		// int gamenum = 1;
@@ -127,8 +164,7 @@ auto main(void) -> int {
 				game.play(move);
 				// std::cout << game << '\n';
 			}
-		}
-		else {
+		} else {
 			while(true) {
 				int difficulty = 2;
 				while(game.status() == Game::state::ONGOING) {
@@ -149,31 +185,87 @@ auto main(void) -> int {
 				break;
 			}
 		}
-
-		std::cout << "Winner " << game.which_player_won() << " $$$";
+		// Debug:
+		std::cout << std::to_string(matchID) + "/" + std::to_string(n_matches)
+			+ ": Completed " + gamemode + " match!"
+			+ " Winner: " + std::to_string(game.which_player_won()) << std::endl;
+		
+		// Get players
+		auto size = (gamemode == "TRIPLES") ? 3 : 2;
+		std::set<int> players_set = {};
+		while (players_set.size() != size) {
+			auto n = 11 + random_num(n_users);
+			players_set.insert(n);
+		}
+		auto players = std::vector<int>(players_set.begin(), players_set.end());
+		// Populate Outputs
+		// Matches...
 		std::string potholes_str = game.list_potholes_string();
 		std::string svg = create_svg(game);
-		bool ranked = (select_random({0, 1, 1, 1, 1})) ? true : false;
-		output_match(gamemode, ranked, potholes_str, game.move_sequence(), svg);
-		// std::cout << game << '\n';
-		// break;
+		std::string ranked = (select_random({0, 1, 1, 1, 1})) ? "true" : "false";
+		o_matches.push_back("('" + gamemode + "', " + ranked + ", '" + potholes_str
+			+ "', '" + game.move_sequence() + "', '" + svg + "')");
+		// Outcomes...
+		for (int i = 0; i < players.size(); i++) {
+			auto uid = players.at(i);
+			auto elo = elos.at(uid).at(gamemode);
+			if (game.which_player_won() == -1) {
+				o_outcomes.push_back("(" + std::to_string(uid) + ", " + std::to_string(matchID) +
+					", " + std::to_string(elo) + ", 'DRAW')");
+			} else if (game.which_player_won() == i) {
+				auto new_elo = elo + 30;
+				elos.at(uid).at(gamemode) = new_elo;
+				o_outcomes.push_back("(" + std::to_string(uid) + ", " + std::to_string(matchID) +
+					", " + std::to_string(new_elo) + ", 'WIN')");
+			} else {
+				auto new_elo = elo - 30;
+				elos.at(uid).at(gamemode) = new_elo;
+				o_outcomes.push_back("(" + std::to_string(uid) + ", " + std::to_string(matchID) +
+					", " + std::to_string(new_elo) + ", 'LOSS')");
+			}
+		}
+		// Snapshots...
+		auto gen = MetaDataGenerator(game);
+		auto snapshots = gen.db_snapshot();
+		for (int i = 0; i < snapshots.size(); i++) {
+			o_snapshots.push_back("(" + std::to_string(matchID) + ", " +
+				std::to_string(i + 1) + ", " + std::to_string(snapshots.at(i)) + ")");
+		}
 	}
+	// Print Outputs
+	if (ofile.is_open()) {
+		ofile << "-- Extra Demo Data" << std::endl;
+		ofile << std::endl;
 
-	// while (game.ongoing()) {
-	// 	int move;
-	// 	std::cin >> move;
-	// 	game.play(move);
-	// 	std::cout << game << "\n";
-	// 	if (game.ongoing() == false) break;
-	// 	Search p1 = Search(game, select_random_player({0, 2}), 1);
-	// 	game.play(p1.minmax(4));
-	// 	std::cout << game << "\n";
-	// 	if (game.ongoing() == false) break;
-	// 	Search p2 = Search(game, 1, 1);
-	// 	game.play(p2.minmax(4));
-	// 	std::cout << game << "\n";
-	// }
-
+		// Users...
+		ofile << "-- Insert Users." << std::endl;
+		ofile << "insert into users(username, email, password_hash) values " << std::endl;
+		for (auto const &u : o_users) {
+			ofile << u << (&u == &o_users.back() ? ";" : ", ") << std::endl;
+		}
+		ofile << std::endl;
+		// Matches...
+		ofile << "-- Insert Matches." << std::endl;
+		ofile << "insert into matches(game, ranked, potholes, replay, svg_data) values " << std::endl;
+		for (auto const &u : o_matches) {
+			ofile << u << (&u == &o_matches.back() ? ";" : ", ") << std::endl;
+		}
+		ofile << std::endl;
+		// Outcomes...
+		ofile << "-- Insert Outcomes." << std::endl;
+		ofile << "insert into outcomes values " << std::endl;
+		for (auto const &u : o_outcomes) {
+			ofile << u << (&u == &o_outcomes.back() ? ";" : ", ") << std::endl;
+		}
+		ofile << std::endl;
+		// Snapshots...
+		ofile << "-- Insert Snapshots." << std::endl;
+		ofile << "insert into snapshots(match, move_num, boardstate) values " << std::endl;
+		for (auto const &u : o_snapshots) {
+			ofile << u << (&u == &o_snapshots.back() ? ";" : ", ") << std::endl;
+		}
+		ofile << std::endl;
+	}
 	return 0;
 }
 
