@@ -1,10 +1,11 @@
-import React, { SetStateAction, useEffect, useRef, useState } from 'react'
+import React, { SetStateAction, useEffect, useRef, useState, useCallback } from 'react'
 import styled from 'styled-components';
 import Dropdown from './Dropdown';
 
 import StyledInput from './StyledInput';
 import Button from './ReusableButton';
 import { replayDataType } from '../pages/ReplaySearchpage';
+import _debounce from 'lodash/debounce';
 
 type Props = {
   filter: string | undefined;
@@ -47,10 +48,30 @@ export const typeSelections = [
 ]
 
 export default function FilterBar({filter, setFilter, secondaryFilter, setSecondaryFilter, setIsOpen, setReplays}: Props) {
-  
 
-  const handleChange = () => {
-    
+  const [input, setInput] = useState<string>('');
+
+  const clearReplay = () => {
+    return new Promise((resolve, reject) => {
+      setReplays([]);
+      resolve(true );
+    })
+  }
+
+  const handleDebounceFn = async (querystr: string) => {
+    console.log(querystr);
+    const cleared = await clearReplay();
+    const resp = await fetch('/api/search/all?filter=game&value=triples');
+    const data = await resp.json();
+    const { all_matches } = data;
+    setReplays(all_matches);
+  }
+
+  const debounceFn = useCallback(_debounce(handleDebounceFn, 1000),[]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+    debounceFn(e.target.value);
   }
 
   const renderDropDowns = () => {
@@ -96,7 +117,7 @@ export default function FilterBar({filter, setFilter, secondaryFilter, setSecond
 
   return (
     <Container>
-      <StyledInput size="small" disabled={filter!=="player"} onChange={handleChange}/>
+      <StyledInput value={input} size="small" disabled={filter!=="player"} onChange={handleChange}/>
       <Dropdown 
         selected={filter}
         selections={filterSelections} 
