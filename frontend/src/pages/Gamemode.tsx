@@ -15,7 +15,9 @@ import ReusableToggleButton from '../components/ReusableToggleButton';
 import ToggleButton from '@mui/material/ToggleButton';
 import { useAuth } from '../global/GlobalAuth';
 import PopupContainer from '../components/PopupContainer';
-
+import Classic from '../assets/classic.svg';
+import Triples from '../assets/triples.svg';
+import Potholes from '../assets/potholes.svg';
 type Props = {}
 
 const Container  = styled.div`
@@ -208,12 +210,15 @@ export default function Gamemode({}: Props) {
           {renderStepTwo()}
           <Container1>
             <LargeButton onClick={handleJoinWaitingRoom("CLASSIC")}>
+              <img src={Classic}/>
               <Typography variant="h3">{"Classic"}</Typography>
             </LargeButton>
             <LargeButton onClick={handleJoinWaitingRoom("TRIPLES")}>
+              <img src={Triples}/>
               <Typography variant="h3">{"Triples"}</Typography>
             </LargeButton>
             <LargeButton onClick={handleJoinWaitingRoom("POTHOLES")}>
+            <img src={Potholes}/>
               <Typography variant="h3">{"Pothole"}</Typography>
             </LargeButton>
           </Container1>
