@@ -69,7 +69,6 @@ const MainContainer = styled.div`
 const ReplaysContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  overflow-y: scroll;
 `;
 
 const SideBarContainer = styled.div`

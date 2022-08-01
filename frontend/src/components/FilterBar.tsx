@@ -115,7 +115,7 @@ export default function FilterBar({filter, setFilter, secondaryFilter, setSecond
 
   return (
     <Container>
-      <StyledInput value={input} size="small" disabled={filter!=="player"} onChange={handleChange}/>
+      <StyledInput value={input} size="small" disabled={filter!=="player"} onChange={handleChange} isPlaceholder={true}/>
       <Dropdown 
         selected={filter}
         selections={filterSelections} 

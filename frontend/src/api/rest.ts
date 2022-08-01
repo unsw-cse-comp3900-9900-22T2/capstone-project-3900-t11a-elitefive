@@ -29,7 +29,7 @@ export async function login(email: string, password: string): Promise<loginResp|
 
 // Post to server with values from register field
 export async function register(username: string, password: string, email: string){
-  console.log(username)
+  // console.log(username)
    
   const data = { username: username, password: password, email: email };
    
@@ -61,7 +61,7 @@ export async function resetPassword(uid: string, oldpass: string, newpass: strin
   
   const response_json = await response.json()
     
-  console.log(response_json)
+  // console.log(response_json)
     
   return response_json;
 }

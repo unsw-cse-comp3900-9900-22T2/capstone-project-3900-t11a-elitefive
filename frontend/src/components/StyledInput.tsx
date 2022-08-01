@@ -6,6 +6,7 @@ type Props = {
   label?: string;
   password?: boolean;
   value?: string;
+  isPlaceholder?: boolean;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 } & styledProps;
 
@@ -27,7 +28,7 @@ const StyledTextField = styled.div<styledProps>`
 `;
 
 
-export default function({ label, password, value, onChange, ...styledProps }: Props) {
+export default function({ label, password, value, isPlaceholder, onChange, ...styledProps }: Props) {
 
   // TODO make border white
   const inlineStyleOverride = {
@@ -54,7 +55,7 @@ export default function({ label, password, value, onChange, ...styledProps }: Pr
             width: styledProps.width ? styledProps.width : 350
           }}
           disabled={disabled}
-          placeholder="Select Player filter to enable"
+          placeholder={isPlaceholder? "Select Player filter to enable": ""}
         />
       </StyledTextField>
     </Container>
