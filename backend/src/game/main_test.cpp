@@ -215,17 +215,25 @@ auto main(void) -> int {
 		for (int i = 0; i < players.size(); i++) {
 			auto uid = players.at(i);
 			auto elo = elos.at(uid).at(gamemode);
+			auto new_elo = 1000;
 			if (game.which_player_won() == -1) {
+				if (ranked == "true") {
+					new_elo = elo;
+				}
 				o_outcomes.push_back("(" + std::to_string(uid) + ", " + std::to_string(matchID) +
-					", " + std::to_string(elo) + ", 'DRAW')");
+					", " + std::to_string(new_elo) + ", 'DRAW')");
 			} else if (game.which_player_won() == i) {
-				auto new_elo = elo + 30;
-				elos.at(uid).at(gamemode) = new_elo;
+				if (ranked == "true") {
+					new_elo = elo + 30;
+					elos.at(uid).at(gamemode) = new_elo;
+				}
 				o_outcomes.push_back("(" + std::to_string(uid) + ", " + std::to_string(matchID) +
 					", " + std::to_string(new_elo) + ", 'WIN')");
 			} else {
-				auto new_elo = elo - 30;
-				elos.at(uid).at(gamemode) = new_elo;
+				if (ranked == "true") {
+					new_elo = elo - 30;
+					elos.at(uid).at(gamemode) = new_elo;
+				}
 				o_outcomes.push_back("(" + std::to_string(uid) + ", " + std::to_string(matchID) +
 					", " + std::to_string(new_elo) + ", 'LOSS')");
 			}
