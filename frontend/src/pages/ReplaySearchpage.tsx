@@ -285,7 +285,7 @@ export default function ReplaySearchpage({}: Props) {
               return (
                 <>
                   <Typography variant="h5">
-                    {`${sideBarData.players[index].username} : ${sideBarData.players[1].outcome}`}
+                    {`${sideBarData.players[index].username} : ${sideBarData.players[index].outcome}`}
                   </Typography>
                 </>
               )
