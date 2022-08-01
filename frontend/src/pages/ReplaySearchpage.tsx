@@ -272,9 +272,24 @@ export default function ReplaySearchpage({}: Props) {
             {/* <Typography variant="h5">{sideBarData.match_id}</Typography> */}
             <Typography variant="h4">{sideBarData.gamemode}</Typography>
             <Typography variant="h5">{sideBarData.mode}</Typography>
-            <Typography variant="h5">{`${sideBarData.players[0].username} vs ${sideBarData.players[1].username}`}</Typography>
-            <Typography variant="h5">{`${sideBarData.players[0].username} : ${sideBarData.players[0].outcome}`}</Typography>
-            <Typography variant="h5">{`${sideBarData.players[1].username} : ${sideBarData.players[1].outcome}`}</Typography>
+            {sideBarData.players.map((_, index) => {
+              return (
+                <>
+                  <Typography variant="h5">
+                    {`${sideBarData.players[index].username} ${index < 3 ? "vs":""}`}
+                  </Typography>
+                </>
+              )
+            })}
+            {sideBarData.players.map((_, index) => {
+              return (
+                <>
+                  <Typography variant="h5">
+                    {`${sideBarData.players[index].username} : ${sideBarData.players[1].outcome}`}
+                  </Typography>
+                </>
+              )
+            })}
             <Button onClick={() => { navigate(`/replay/${sideBarData.match_id}`)}} background="var(--accent-purple)">
               Watch Replay
             </Button>
