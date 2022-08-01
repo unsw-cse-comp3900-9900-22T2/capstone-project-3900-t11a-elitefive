@@ -41,9 +41,8 @@ class Room {
             if (gamemode_ == 2) return "POTHOLES";
         }
         
-        auto publish_move(std::string const& move) {
+        auto publish_move(std::string const& move, int player) -> std::string {
             if (game_ == nullptr) std::cout << "Lobby: WHAT IS HAPPENING\n";
-            auto player = game_->whose_turn();
             if (player == 0) return json_confirm_move(move);
             if (player == 1) return json_board_move(move);
             if (player == 2) return json_player3(move); // TODO: CHANGE

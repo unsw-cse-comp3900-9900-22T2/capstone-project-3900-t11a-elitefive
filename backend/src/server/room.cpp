@@ -339,7 +339,7 @@ auto Room::json_confirm_move(std::string const& move) -> std::string {
 	json payload;
 	payload["event"] = "moveconfirm";
 	payload["tile"] = move;
-	payload["turn"] = 1;
+	payload["turn"] = this->game_->whose_turn();
 	return payload.dump();
 }
 
@@ -348,7 +348,7 @@ auto Room::json_player3(std::string const& move) -> std::string {
 	json payload;
 	payload["event"] = "player3";
 	payload["tile"] = move;
-	payload["turn"] = 0;
+	payload["turn"] = this->game_->whose_turn();
 	return payload.dump();
 }
 
@@ -364,7 +364,7 @@ auto Room::json_board_move(std::string const& move) -> std::string {
 	json payload;
 	payload["event"] = "move";
 	payload["tile"] = move;
-	payload["turn"] = (this->game_->num_players() == 2) ? 0 : 2;
+	payload["turn"] = this->game_->whose_turn();
 	return payload.dump();
 }
 
@@ -466,7 +466,8 @@ auto Room::game_result(int const uid) -> std::string {
 
 auto Room::click_register_move(std::string const& move, uWS::WebSocket<false, true, SocketData> *ws, uWS::OpCode opCode) -> void {
 	// Make the move in game
-	std::string move_message = publish_move(move);	// Pre-set json string for publish
-	if (this->play_move(move) == false) return; 	// Ignore illegal player move
+	int player_turn = this->game_->whose_turn();				// Need to keep track of current player for message
+	if (this->play_move(move) == false) return; 				// Ignore illegal player move
+	std::string move_message = publish_move(move, player_turn);	// Send to appropriate player
 	publish(ws, move_message, opCode);
 }
