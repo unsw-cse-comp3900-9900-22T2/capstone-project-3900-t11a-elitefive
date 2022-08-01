@@ -129,8 +129,14 @@ auto main(void) -> int {
 
 	// ----- USERS -----
 	// Generating users.
+	std::vector<std::string> names = {
+		"Doormat", "Upscale", "Dora", "Dingus", "Sonar", "Weightlifter", "Solar", "Vimbro", "Virgo", "Cat", "Dog", "God", "Damo427", "Harry",
+		"Guy", "Flushed", "Blushed", "Enclosed", "Superimposed", "TuffGrass", "TheDevGuy", "Latemorning", "Cramp", "Sunrise_tomorrow", "HelloSky", 
+		"Pseudonym", "Forelimb", "Halo", "Portal", "Undergrown", "Plant", "Houseman"
+	};
 	for (int i = 11; i < 11 + n_users; i++) {
-		o_users.push_back("('User" + std::to_string(i) + "', 'user" + std::to_string(i) + "@email.com', '619227d5cf63bffd286a6529f58fb3e679169230eb7b0151871b8f6583f24bc6')");
+
+		o_users.push_back("('Tester-" + names[i - 11] + "-" + std::to_string(i) + "', 'user" + std::to_string(i) + "@email.com', '619227d5cf63bffd286a6529f58fb3e679169230eb7b0151871b8f6583f24bc6')");
 		elos.insert({i, {
 			{"CLASSIC", 1000},
 			{"TRIPLES", 1000},
@@ -153,8 +159,8 @@ auto main(void) -> int {
 		Game game = make_game(gamenum, potholes);
 
 		if (gamemode != "TRIPLES") {
-			Search ai1 = make_ai(gamenum, 1, potholes);
-			Search ai2 = make_ai(gamenum, 2, potholes);
+			Search ai1 = make_ai(gamenum, select_random({0,0,1,2}), potholes);
+			Search ai2 = make_ai(gamenum, select_random({0,0,1,2}), potholes);
 
 			while(game.ongoing()) {
 				Search &ai = (game.whose_turn() == 0) ? ai1 : ai2;
@@ -209,17 +215,25 @@ auto main(void) -> int {
 		for (int i = 0; i < players.size(); i++) {
 			auto uid = players.at(i);
 			auto elo = elos.at(uid).at(gamemode);
+			auto new_elo = 1000;
 			if (game.which_player_won() == -1) {
+				if (ranked == "true") {
+					new_elo = elo;
+				}
 				o_outcomes.push_back("(" + std::to_string(uid) + ", " + std::to_string(matchID) +
-					", " + std::to_string(elo) + ", 'DRAW')");
+					", " + std::to_string(new_elo) + ", 'DRAW')");
 			} else if (game.which_player_won() == i) {
-				auto new_elo = elo + 30;
-				elos.at(uid).at(gamemode) = new_elo;
+				if (ranked == "true") {
+					new_elo = elo + 30;
+					elos.at(uid).at(gamemode) = new_elo;
+				}
 				o_outcomes.push_back("(" + std::to_string(uid) + ", " + std::to_string(matchID) +
 					", " + std::to_string(new_elo) + ", 'WIN')");
 			} else {
-				auto new_elo = elo - 30;
-				elos.at(uid).at(gamemode) = new_elo;
+				if (ranked == "true") {
+					new_elo = elo - 30;
+					elos.at(uid).at(gamemode) = new_elo;
+				}
 				o_outcomes.push_back("(" + std::to_string(uid) + ", " + std::to_string(matchID) +
 					", " + std::to_string(new_elo) + ", 'LOSS')");
 			}
