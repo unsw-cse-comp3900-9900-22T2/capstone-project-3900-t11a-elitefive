@@ -53,15 +53,13 @@ export default function FilterBar({filter, setFilter, secondaryFilter, setSecond
 
   const clearReplay = () => {
     return new Promise((resolve, reject) => {
-      setReplays([]);
+      setReplays(undefined);
       resolve(true );
     })
   }
 
   const handleDebounceFn = async (querystr: string) => {
-    console.log(querystr);
-    const cleared = await clearReplay();
-    const resp = await fetch('/api/search/all?filter=game&value=triples');
+    const resp = await fetch(`/api/search/all?filter=player&value=${querystr}`);
     const data = await resp.json();
     const { all_matches } = data;
     setReplays(all_matches);
