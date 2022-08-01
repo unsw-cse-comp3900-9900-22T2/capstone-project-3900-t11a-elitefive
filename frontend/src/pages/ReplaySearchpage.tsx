@@ -177,7 +177,7 @@ export default function ReplaySearchpage({}: Props) {
         break;
       }
       default: {
-        await fetchAllMatches();
+        break;
       }
     }
   }
@@ -249,6 +249,7 @@ export default function ReplaySearchpage({}: Props) {
             setFilter={setFilter}
             setSecondaryFilter={setSecondaryFilter}
             setIsOpen={setIsOpen}
+            setReplays={setReplays}
           />
         </Box>
         <ReplaysContainer>

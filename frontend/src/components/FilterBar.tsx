@@ -4,6 +4,7 @@ import Dropdown from './Dropdown';
 
 import StyledInput from './StyledInput';
 import Button from './ReusableButton';
+import { replayDataType } from '../pages/ReplaySearchpage';
 
 type Props = {
   filter: string | undefined;
@@ -11,6 +12,7 @@ type Props = {
   secondaryFilter: string | undefined;
   setSecondaryFilter: React.Dispatch<SetStateAction<string|undefined>>;
   setIsOpen: React.Dispatch<SetStateAction<boolean>>;
+  setReplays: React.Dispatch<SetStateAction<replayDataType[]|undefined>>;
 }
 
 const Container = styled.div`
@@ -44,8 +46,13 @@ export const typeSelections = [
   "Potholes"
 ]
 
-export default function FilterBar({filter, setFilter, secondaryFilter, setSecondaryFilter, setIsOpen}: Props) {
+export default function FilterBar({filter, setFilter, secondaryFilter, setSecondaryFilter, setIsOpen, setReplays}: Props) {
   
+
+  const handleChange = () => {
+    
+  }
+
   const renderDropDowns = () => {
     switch(filter) {
       // case "elo":
@@ -89,7 +96,7 @@ export default function FilterBar({filter, setFilter, secondaryFilter, setSecond
 
   return (
     <Container>
-      <StyledInput size="small"/>
+      <StyledInput size="small" disabled={filter!=="player"} onChange={handleChange}/>
       <Dropdown 
         selected={filter}
         selections={filterSelections} 

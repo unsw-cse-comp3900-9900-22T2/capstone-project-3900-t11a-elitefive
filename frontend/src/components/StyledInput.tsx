@@ -13,6 +13,7 @@ type styledProps = {
   background?: string;
   size?: "small" | "medium";
   width?: number;
+  disabled?: boolean;
 }
 
 const Container = styled.div`
@@ -35,6 +36,8 @@ export default function({ label, password, value, onChange, ...styledProps }: Pr
     }
   }
 
+  const { disabled } = styledProps;
+
   return (
     <Container>
       <Typography variant="subtitle1">{label}</Typography>
@@ -50,10 +53,10 @@ export default function({ label, password, value, onChange, ...styledProps }: Pr
           style={{
             width: styledProps.width ? styledProps.width : 350
           }}
+          disabled={disabled}
+          placeholder="Select Player filter to enable"
         />
-      </StyledTextField
-      
-      >
+      </StyledTextField>
     </Container>
   )
 }
