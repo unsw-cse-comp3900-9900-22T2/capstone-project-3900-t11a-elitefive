@@ -22,7 +22,8 @@ const Container = styled.div`
 
 export const filterSelections = [
   "none",
-  "elo",
+  // "elo",
+  "player",
   "mode",
   "type",
   "snapshot"
@@ -47,16 +48,16 @@ export default function FilterBar({filter, setFilter, secondaryFilter, setSecond
   
   const renderDropDowns = () => {
     switch(filter) {
-      case "elo":
-        return (
-          <Dropdown 
-            selected={secondaryFilter}
-            selections={eloSelections} 
-            setSelected={(selection: string) => {
-              setSecondaryFilter(selection);
-            }}
-          />
-        )
+      // case "elo":
+      //   return (
+      //     <Dropdown 
+      //       selected={secondaryFilter}
+      //       selections={eloSelections} 
+      //       setSelected={(selection: string) => {
+      //         setSecondaryFilter(selection);
+      //       }}
+      //     />
+      //   )
       case "mode":
         return (
           <Dropdown 

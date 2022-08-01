@@ -50,8 +50,6 @@ const BottomTags = styled.div`
 export default function ReplayPreview(props: Props) {
   const { gamemode, date, svg_data, setSideBarData } = props
 
-  console.log(svg_data);
-
   return (
     <Container onClick={setSideBarData}>
       <Box display="flex" justifyContent="flexStart" margin="10px">
