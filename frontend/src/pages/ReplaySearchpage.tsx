@@ -232,8 +232,9 @@ export default function ReplaySearchpage({}: Props) {
   const renderPreview = () => {
     if(!replays) {
       return(
-        <Box width="100vw" height="100vh" display="flex" justifyContent="center" alignItems="center">
+        <Box width="100vw" height="100vh" display="flex" justifyContent="center" alignItems="center" flexDirection="column">
           <img src={Loading}/>
+          <Typography>Loading...</Typography>
         </Box>
       )
     }
