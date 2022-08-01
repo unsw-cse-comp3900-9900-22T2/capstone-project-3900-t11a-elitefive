@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Board from '../components/Board';
-import { Typography, Box } from '@mui/material';
+import { Typography, Box} from '@mui/material';
 import StyledInput from '../components/StyledInput';
 import {StyledButton} from '../components/ReusableButton-styled';
 import Button, {Button2, LargeButton} from '../components/ReusableButton';
@@ -18,6 +18,11 @@ import CustomizedInputBase from '../components/SearchBar';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import StatTab from '../components/Tab';
+import Modal from '@mui/material/Modal';
+import ReactEcharts from 'echarts-for-react';
+
+
+
 
 type Props = {}
 
@@ -172,10 +177,39 @@ const tabMap = [
   'POTHOLES'
 ]
 
+export type eloDataType = {
+  CLASSIC: Array<number>;
+  POTHOLES: Array<number>;
+  TRIPLES: Array<number>;
+}
+
+const DefaultEloData = {
+  "CLASSIC": [],
+  "POTHOLES": [],
+  "TRIPLES": []
+}
+
+const modalStyle = {
+  position: 'absolute' as 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 600,
+  bgcolor: 'var(--accent-dark)',
+  border: '2px solid #000',
+  boxShadow: 50,
+  p: 4,
+};
+
 export default function Profilepage({}: Props) {
   const [profileData, setProfileData] = useState<profileDataType>(DefaultProfileData);
   // const [replays, setReplays] = useState<replayType[]>([]);
   const [tabValue, setTabValue] = React.useState(0);
+
+  const [eloData, setEloData] = useState<eloDataType>(DefaultEloData);
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   const navigate = useNavigate();
 
@@ -196,7 +230,9 @@ export default function Profilepage({}: Props) {
     .then(resp => resp.json())
     .then(data => {
       const payload = data.payload;
+      const eloPayload = data.payload.elo_history;
       setProfileData(payload);
+      setEloData(eloPayload);
     })
   },[])
 
@@ -219,6 +255,61 @@ export default function Profilepage({}: Props) {
       }
     }
   }
+  
+
+  const options = {
+    tooltip: {
+      trigger: 'axis'
+    },
+    legend: {
+      data: ['Classic', 'Potholes', 'Triples'],
+      textStyle: {
+        color: '#E9CFEC'
+      }
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      containLabel: true
+    },
+    toolbox: {
+      feature: {
+        saveAsImage: {}
+      }
+    },
+    xAxis: {
+      type: 'category',
+      boundaryGap: false,
+      nameTextStyle: {
+        color: '#E9CFEC'
+      }
+      
+    },
+    yAxis: {
+      type: 'value',
+      nameTextStyle: {
+        color: '#E9CFEC'
+      }
+    },
+    series: [
+      {
+        name: 'Classic',
+        type: 'line',
+        data: eloData.CLASSIC
+      },
+      {
+        name: 'Potholes',
+        type: 'line',
+        data: eloData.POTHOLES
+      },
+      {
+        name: 'Triples',
+        type: 'line',
+        data: eloData.TRIPLES
+      }
+    ]
+  };
 
 
   return (
@@ -227,12 +318,25 @@ export default function Profilepage({}: Props) {
       <Container1>
         <Container>
           <ProfileCard name={profileData.username}/>
-          {/* <CustomizedInputBase/> */}
           <Button align-items="right" onClick={navigateToFriends}>Friends</Button>
           <Button align-items="right" onClick={navigateToResetPassword}>Reset Password</Button>
         </Container>
         <StatContainer>
           <StatTab value={tabValue} setValue={setTabValue} data={profileData}/>
+          <Box margin="40px 30px">
+            <Button background="var(--accent-purple)" width={400} onClick={handleOpen}>Elo History Chart</Button>
+            <Modal
+              open={open}
+              onClose={handleClose}
+            >
+              <Box sx={modalStyle}>
+                <Typography variant="h5" color="var(--accent-purple)">{"Elo History"}</Typography>
+                <ReactEcharts
+                  option={options}
+                />
+              </Box>
+            </Modal>
+          </Box>
         </StatContainer>
       </Container1>
       <TextContainer>

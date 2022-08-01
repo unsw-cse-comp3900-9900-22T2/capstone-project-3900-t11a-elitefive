@@ -71,9 +71,7 @@ export default function StatTab({ data, value, setValue }: {
           <Typography variant="h5">Wins</Typography>
           <Typography variant="h5">Losses</Typography>
           <Typography variant="h5">Draws</Typography>
-          <Box margin="40px 30px">
-            <Button background="var(--accent-purple)" width={400}>Elo History Chart</Button>
-          </Box>
+          
         </Box>
         <Box>
           <Typography variant="h5">{data.ranked[type].elo}</Typography>

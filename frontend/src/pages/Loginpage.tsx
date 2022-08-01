@@ -21,6 +21,11 @@ const Container = styled.div`
   grid-gap: 30px;
 `;
 
+const StyledLink = styled.a`
+  font-size: 20px;
+
+`;
+
 export default function Loginpage({}: Props) {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -58,7 +63,8 @@ export default function Loginpage({}: Props) {
       <StyledInput onChange={(e) => {setEmail(e.currentTarget.value)}} value={email} label="email"/>
       <StyledInput onChange={(e) => {setPassword(e.currentTarget.value)}} value={password} label="password" password/>
       <Button onClick={handleClick}> Submit </Button>
-      <Button onClick={handleForgotPw}> Forgot Password </Button>
+      {/* <Button onClick={handleForgotPw}> Forgot Password </Button> */}
+      <StyledLink href="/login/forgotpassword">forgot password</StyledLink>
     </Container>
   )
 }
