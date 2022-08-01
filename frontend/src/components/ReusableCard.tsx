@@ -43,6 +43,8 @@ const StatContainer = styled.div`
   border-radius: 10px;
 `;
 
+
+
 const bull = (
     <Box
       component="span"

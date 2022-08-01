@@ -22,7 +22,7 @@ const Container  = styled.div`
   display: flex;
   flex-direction: Column;
   
-  justify-content: top;
+  justify-content: center;
   align-items: center;
   grid-gap: 30px;
 `
@@ -127,7 +127,7 @@ export default function Leaderboard({}: Props) {
       <Container1>
         <Box margin="80px 50px">
           <Box>
-            <Button onClick={() => toggleStatus()}>
+            <Button background="var(--accent-purple)" onClick={() => toggleStatus()}>
               {buttonState ? "Toggle Friend" : "Toggle Global"}
             </Button>
           </Box>

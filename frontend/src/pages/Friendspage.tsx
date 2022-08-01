@@ -44,7 +44,7 @@ const BoxContainer = styled.div<BoxContainerProps>`
   background: var(--accent-dark);
   margin: 20px 0;
   border-radius: 5px;
-  padding: 30px 0;
+  padding: 30px 50px;
 
   ${({minHeight}) => minHeight && `
     min-height: ${minHeight}px;
@@ -132,9 +132,6 @@ export default function FriendsPage({}: Props) {
         <Box>
           <Typography variant="h4">Friends</Typography>
           <BoxContainer minHeight={250}>
-            <Box width="350px" margin="0 20px">
-              <StyledInput background="var(--accent-darker)" size="small"/>
-            </Box>
             {
               friends.map((user) => (
                 <FriendListComponent to={user.id} name={user.username} refresh={refresh}/>

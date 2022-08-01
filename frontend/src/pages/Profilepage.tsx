@@ -79,7 +79,7 @@ const Match = styled.div`
   cursor: pointer;
 
   display:flex;
-  justify-content: center;
+  justify-content: space-evenly;
   align-items: center;
 `
 
@@ -164,9 +164,11 @@ const DefaultProfileData = {
 
 type replayType = {
   link: string;
+  ranked: boolean;
   players: {
     username: string;
     elo_start: number;
+    outcome: string;
   }[]
 }
 
@@ -194,11 +196,11 @@ const modalStyle = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 600,
+  width: 1200,
   bgcolor: 'var(--accent-dark)',
   border: '2px solid #000',
   boxShadow: 50,
-  p: 4,
+  p: 8,
 };
 
 export default function Profilepage({}: Props) {
@@ -273,11 +275,6 @@ export default function Profilepage({}: Props) {
       bottom: '3%',
       containLabel: true
     },
-    toolbox: {
-      feature: {
-        saveAsImage: {}
-      }
-    },
     xAxis: {
       type: 'category',
       boundaryGap: false,
@@ -345,13 +342,37 @@ export default function Profilepage({}: Props) {
       {renderFilteredReplay()?.map((replay: replayType) => {
         return (
           <Match onClick={() => {navigate(replay.link)}}>
-            <Box display="flex" flexDirection="column"> 
-              {replay.players.map((player) => (
-                <Typography variant="h4">
-                  {player.username} {player.elo_start}
-                </Typography>
-              ))}
-            </Box>
+              <Box display="inline-flex" flexDirection="column"> 
+                {replay.players.map((player) => (
+                    <Typography variant="h4">
+                      {player.outcome}
+                    </Typography>
+                  ))}
+              </Box>
+              <Box display="inline-flex" flexDirection="column"> 
+                {replay.players.map((player) => (
+                  <Typography variant="h4">
+                    {player.username} {player.elo_start}
+                  </Typography>
+                ))}
+              </Box>
+              <Box>
+                {(() => {
+                  if (replay.ranked) {
+                    return (
+                      <Typography variant="h4">
+                        Ranked
+                      </Typography>
+                    )
+                  } else {
+                    return (
+                      <Typography variant="h4">
+                        Casual
+                      </Typography>
+                    )
+                  }
+                })()}
+              </Box>
           </Match> 
         )
       })}

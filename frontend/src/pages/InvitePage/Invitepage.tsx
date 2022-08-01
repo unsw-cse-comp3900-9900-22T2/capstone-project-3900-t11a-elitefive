@@ -6,6 +6,7 @@ import Button from '../../components/ReusableButton';
 import { useAuth } from '../../global/GlobalAuth';
 import { isEqual } from 'lodash';
 import { PlayerType } from '../../global/GlobalGameState';
+import { YavalathButtonFixed } from '../../components/YavalathButton';
 
 type Props = {}
 
@@ -35,6 +36,7 @@ const Left = styled.div`
 const Right = styled.div`
   width: 50vw;
   background: var(--accent-dark);
+  padding: 100px 0;
 
   display: flex;
   flex-direction: column;
@@ -225,6 +227,7 @@ export default function Invitepage({}: Props) {
 
   return (
     <Container>
+      <YavalathButtonFixed/>
       <Left>
         <Typography variant="h3">Invite Friends</Typography>
         <FriendsBox>

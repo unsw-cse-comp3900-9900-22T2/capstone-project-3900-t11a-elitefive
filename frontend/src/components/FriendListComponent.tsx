@@ -38,9 +38,6 @@ export default function FriendListComponent({ to, name, refresh }: Props) {
   }
   return (
     <Container>
-      <Button background='var(--accent-purple)' width={70}>
-        invite
-      </Button>
       <Typography variant="h5">{name}</Typography>
       <Button background='var(--accent-darker)' onClick={postreq("delete")}>
         remove

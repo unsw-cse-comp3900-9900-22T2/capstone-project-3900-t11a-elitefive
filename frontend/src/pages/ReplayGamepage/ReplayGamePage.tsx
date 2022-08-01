@@ -215,7 +215,7 @@ export function Sidebar({ matchData, currIndex, replayStringArr, setCurrIndex, s
     <Container>
       <Typography sx={{ fontSize: 80 }} color="white" gutterBottom>
           Replay
-        </Typography>
+      </Typography>
       <ReplayPlayerCard>
         {matchData?.players?.map((player) => (
           <div 
@@ -223,15 +223,13 @@ export function Sidebar({ matchData, currIndex, replayStringArr, setCurrIndex, s
             onClick={() => { navigate(`/profile/${player.uid}`)}}
           >
             <Typography sx={{ fontSize: 30 }} color="white" gutterBottom>
-              {player?.username}
+              {player?.username}   | {player?.elo_end}
             </Typography>
           </div>
         ))}
       </ReplayPlayerCard>
       {/* for loop to go through names also add elo*/}
-      <Card2>
-        <StickyHeadTable/>
-      </Card2>
+      <StickyHeadTable/>
       <ContainerArrow>
         <Button onClick={movePrev}>Back</Button>
         <Button onClick={moveNext}>Next</Button>

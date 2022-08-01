@@ -56,7 +56,7 @@ export default function Resetpasswordpage({}: Props) {
     <Container>
       <YavalathButton/>
       <Typography variant="h3">Reset Password</Typography>
-      <Typography variant="h4">hi {uid} </Typography>
+      <Typography variant="h4">Hi {uid}</Typography>
 
       <StyledInput onChange={(e) => {setOldPass(e.currentTarget.value)}} value={oldpass} label="old password"/>
       <StyledInput onChange={(e) => {setNewPass(e.currentTarget.value)}} value={newpass} label="new password"/>

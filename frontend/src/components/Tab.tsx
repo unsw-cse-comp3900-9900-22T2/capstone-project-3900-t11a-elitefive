@@ -153,7 +153,7 @@ export function LeaderTab({ data }: { data: leaderDataType}) {
   const renderTab = (type: string) => {
     console.log(data["triples"])
     return(
-        <Box width="400px" margin = "0 20px" id="abc">
+        <Box width="1000px" margin = "0 20px" id="abc">
           {/* <Typography variant="h4">Elo</Typography>
           <Typography variant="h4">Wins</Typography>
           <Typography variant="h4">Losses</Typography>
@@ -163,26 +163,27 @@ export function LeaderTab({ data }: { data: leaderDataType}) {
             <Table stickyHeader aria-label="sticky table">
               <TableHead>
                 <TableRow>
-                  <StyledTableCell align="right" style={{background: 'var(--accent-darker)'}}>Rank</StyledTableCell>
-                  <StyledTableCell align="right" style={{background: 'var(--accent-darker)'}}>Name</StyledTableCell>
-                  <StyledTableCell align="right" style={{background: 'var(--accent-darker)'}}>Elo</StyledTableCell>
-                  <StyledTableCell align="right" style={{background: 'var(--accent-darker)'}}>Win</StyledTableCell>
-                  <StyledTableCell align="right" style={{background: 'var(--accent-darker)'}}>Losses</StyledTableCell>
+                  <StyledTableCell align="center" style={{background: 'var(--accent-darker)'}}>Rank</StyledTableCell>
+                  <StyledTableCell align="center" style={{background: 'var(--accent-darker)'}}>Name</StyledTableCell>
+                  <StyledTableCell align="center" style={{background: 'var(--accent-darker)'}}>Elo</StyledTableCell>
+                  <StyledTableCell align="center" style={{background: 'var(--accent-darker)'}}>Win</StyledTableCell>
+                  <StyledTableCell align="center" style={{background: 'var(--accent-darker)'}}>Losses</StyledTableCell>
                 </TableRow>
               </TableHead>
               <TableBody style={{verticalAlign:'top'}}>
                   {data[type]?.map((index) => (
                     <StyledTableRow>
-                      <StyledTableCell2>{index.rank}</StyledTableCell2>
-                      <StyledTableCell2 
+                      <StyledTableCell2 align="center">{index.rank}</StyledTableCell2>
+                      <StyledTableCell2
+                        align="center"
                         style={{cursor: 'pointer'}}
                         onClick={() => {
                           navigate(`/profile/${index.uid}`)
                         }}
                       >{index.username}</StyledTableCell2>
-                      <StyledTableCell2>{index.elo}</StyledTableCell2>
-                      <StyledTableCell2>{index.wins}</StyledTableCell2>
-                      <StyledTableCell2>{index.losses}</StyledTableCell2>
+                      <StyledTableCell2 align="center">{index.elo}</StyledTableCell2>
+                      <StyledTableCell2 align="center">{index.wins}</StyledTableCell2>
+                      <StyledTableCell2 align="center">{index.losses}</StyledTableCell2>
                     </StyledTableRow>
                   ))}
               </TableBody>
