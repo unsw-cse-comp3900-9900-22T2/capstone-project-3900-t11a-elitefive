@@ -11,6 +11,10 @@ import ProfileWidget from '../components/ProfileWidget';
 import ScrollWidget from '../components/ScrollWidget';
 import Feedpage from './Feedpage';
 
+import Cube from '../assets/Cube.svg';
+import Leaderboards from '../assets/Leaderboards.png';
+import Replays from '../assets/Replays.png';
+
 type Props = {}
 
 const Container  = styled.div`
@@ -62,7 +66,10 @@ export default function Dashboard({}: Props) {
       <Container1>
         <Box display="flex" flexDirection="column">
           <LargeButton onClick={navigateToGamepage} background="var(--accent-purple)" height={350}>
-            <Typography variant="h3">{"Play"}</Typography>
+            <Box display="flex" justifyContent="center">
+              <img src={Cube} style={{objectFit:"cover"}}/>
+            </Box>
+            <Typography variant="h3">Play</Typography>
           </LargeButton>
           <Button 
             background="var(--accent-blue)" 
@@ -72,9 +79,15 @@ export default function Dashboard({}: Props) {
           >Play with Friends</Button>
         </Box>
         <LargeButton onClick={navigateToLeaderboard}>
+          <Box width="100px" height="100%" display="flex" alignItems="center" justifyContent="center" marginLeft="50%">
+            <img src={Leaderboards} style={{objectFit: "cover"}}/>
+          </Box>
           <Typography variant="h3">{"Leaderboard"}</Typography>
         </LargeButton>
         <LargeButton onClick={navigateToReplays}>
+          <Box width="100px" height="100%" display="flex" alignItems="center" justifyContent="center">
+            <img src={Replays}/>
+          </Box>
           <Typography variant="h3">{"Replays"}</Typography>
         </LargeButton>
       </Container1>
