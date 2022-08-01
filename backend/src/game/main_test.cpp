@@ -241,28 +241,28 @@ auto main(void) -> int {
 		ofile << "-- Insert Users." << std::endl;
 		ofile << "insert into users(username, email, password_hash) values " << std::endl;
 		for (auto const &u : o_users) {
-			ofile << u << (u == o_users.back() ? ";" : ", ") << std::endl;
+			ofile << u << (&u == &o_users.back() ? ";" : ", ") << std::endl;
 		}
 		ofile << std::endl;
 		// Matches...
 		ofile << "-- Insert Matches." << std::endl;
 		ofile << "insert into matches(game, ranked, potholes, replay, svg_data) values " << std::endl;
 		for (auto const &u : o_matches) {
-			ofile << u << (u == o_matches.back() ? ";" : ", ") << std::endl;
+			ofile << u << (&u == &o_matches.back() ? ";" : ", ") << std::endl;
 		}
 		ofile << std::endl;
 		// Outcomes...
 		ofile << "-- Insert Outcomes." << std::endl;
 		ofile << "insert into outcomes values " << std::endl;
 		for (auto const &u : o_outcomes) {
-			ofile << u << (u == o_outcomes.back() ? ";" : ", ") << std::endl;
+			ofile << u << (&u == &o_outcomes.back() ? ";" : ", ") << std::endl;
 		}
 		ofile << std::endl;
 		// Snapshots...
 		ofile << "-- Insert Snapshots." << std::endl;
 		ofile << "insert into snapshots(match, move_num, boardstate) values " << std::endl;
 		for (auto const &u : o_snapshots) {
-			ofile << u << (u == o_snapshots.back() ? ";" : ", ") << std::endl;
+			ofile << u << (&u == &o_snapshots.back() ? ";" : ", ") << std::endl;
 		}
 		ofile << std::endl;
 	}
