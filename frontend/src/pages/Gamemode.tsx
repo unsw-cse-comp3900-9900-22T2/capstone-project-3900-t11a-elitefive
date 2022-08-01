@@ -210,15 +210,21 @@ export default function Gamemode({}: Props) {
           {renderStepTwo()}
           <Container1>
             <LargeButton onClick={handleJoinWaitingRoom("CLASSIC")}>
-              <img src={Classic}/>
+              <Box width="100%" height="150px" display="flex" alignItems="center" justifyContent="center">
+                <img src={Classic}/>
+              </Box>
               <Typography variant="h3">{"Classic"}</Typography>
             </LargeButton>
             <LargeButton onClick={handleJoinWaitingRoom("TRIPLES")}>
-              <img src={Triples}/>
+              <Box width="100%" height="150px" display="flex" alignItems="center" justifyContent="center">
+                <img src={Triples}/>
+              </Box>
               <Typography variant="h3">{"Triples"}</Typography>
             </LargeButton>
             <LargeButton onClick={handleJoinWaitingRoom("POTHOLES")}>
-            <img src={Potholes}/>
+              <Box width="100%" height="150px" display="flex" alignItems="center" justifyContent="center">
+                <img src={Potholes}/>
+              </Box>
               <Typography variant="h3">{"Pothole"}</Typography>
             </LargeButton>
           </Container1>

@@ -15,6 +15,13 @@ const Container = styled.div`
   flex-direction: column;
 `;
 
+const Container1 = styled.div`
+  display:flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
+
  
 
 export default function Button({ children, onClick, ...styleProps }: Props) {
@@ -47,9 +54,9 @@ export function LargeButton({ children, onClick, ...styleProps }: Props) {
         onClick={onClick}
         {...styleProps}
       >
-        <Container>
+        <Container1>
             {children}
-        </Container>
+        </Container1>
       </StyledLargeButton>
     );
 }

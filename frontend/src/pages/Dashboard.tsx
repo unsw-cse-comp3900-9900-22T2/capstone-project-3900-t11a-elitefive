@@ -79,13 +79,13 @@ export default function Dashboard({}: Props) {
           >Play with Friends</Button>
         </Box>
         <LargeButton onClick={navigateToLeaderboard}>
-          <Box width="100px" height="100%" display="flex" alignItems="center" justifyContent="center" marginLeft="50%">
+          <Box width="100%" height="150px" display="flex" alignItems="center" justifyContent="center">
             <img src={Leaderboards} style={{objectFit: "cover"}}/>
           </Box>
           <Typography variant="h3">{"Leaderboard"}</Typography>
         </LargeButton>
         <LargeButton onClick={navigateToReplays}>
-          <Box width="100px" height="100%" display="flex" alignItems="center" justifyContent="center">
+          <Box width="100%" height="150px" display="flex" alignItems="center" justifyContent="center">
             <img src={Replays}/>
           </Box>
           <Typography variant="h3">{"Replays"}</Typography>
