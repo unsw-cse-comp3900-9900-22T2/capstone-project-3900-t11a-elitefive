@@ -122,11 +122,12 @@ type ReplayBoardProps = {
   width?: number;
   height?: number;
   replayStringArr: string[];
+  replayMoveArr: number[];
   potholesStringArr: string[];
   numPlayers : number;
 }
 
-export function ReplayBoard({ width, height, replayStringArr, potholesStringArr, numPlayers}: ReplayBoardProps) {
+export function ReplayBoard({ width, height, replayStringArr, replayMoveArr, potholesStringArr, numPlayers}: ReplayBoardProps) {
 
   const renderBoard = () => {
     const w = width ? width : DEFAULT_BOARD_WIDTH;
@@ -142,7 +143,7 @@ export function ReplayBoard({ width, height, replayStringArr, potholesStringArr,
                 if(potholesStringArr.includes(id)) return (<HexCell fill="var(--background-color)"/>)
                 if(replayStringArr.includes(id)) {
                   console.log(numPlayers);
-                  switch(replayStringArr.indexOf(id) % numPlayers) {
+                  switch(replayMoveArr[replayStringArr.indexOf(id)]) {
                     case 0 : return (<HexCell fill="#f33880"/>)
                     case 1 : return (<HexCell fill="#1de254"/>)
                     case 2 : return (<HexCell fill="#00b9ca"/>)
