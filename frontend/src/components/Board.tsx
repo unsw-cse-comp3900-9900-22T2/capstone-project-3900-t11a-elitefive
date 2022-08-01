@@ -142,7 +142,7 @@ export function ReplayBoard({ width, height, replayStringArr, replayMoveArr, pot
               {row.map((id:string) => {
                 if(potholesStringArr.includes(id)) return (<HexCell fill="var(--background-color)"/>)
                 if(replayStringArr.includes(id)) {
-                  console.log(numPlayers);
+                  // console.log(numPlayers);
                   switch(replayMoveArr[replayStringArr.indexOf(id)]) {
                     case 0 : return (<HexCell fill="#f33880"/>)
                     case 1 : return (<HexCell fill="#1de254"/>)

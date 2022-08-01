@@ -33,7 +33,7 @@ export default function FriendListComponent({ to, name, refresh }: Props) {
     })
     .then(resp => resp.json())
     .then(data => {
-      console.log(data);
+      // console.log(data);
       //forces a refresh
       refresh();
     })
