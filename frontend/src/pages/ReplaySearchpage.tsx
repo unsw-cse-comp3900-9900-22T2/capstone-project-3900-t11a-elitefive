@@ -234,7 +234,7 @@ export default function ReplaySearchpage({}: Props) {
       return(
         <Box width="100vw" height="100vh" display="flex" justifyContent="center" alignItems="center" flexDirection="column">
           <img src={Loading}/>
-          <Typography>Loading...</Typography>
+          <Typography>Loading... or there are no games XD</Typography>
         </Box>
       )
     }
