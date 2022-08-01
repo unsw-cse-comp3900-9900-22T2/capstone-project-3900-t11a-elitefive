@@ -96,27 +96,27 @@ const Highlight = styled.div<{isSelected: boolean}>`
   margin: 50px; /* margin has to be placed in this level otherwise it wont work */
 `;
 
-// helper fnc
-const filterData = (data: replayDataType[], filterType:string|undefined, secondaryFilter:string|undefined) => {
-  if(!data || !filterType || !secondaryFilter) {
-    return data;
-  }
-  switch(filterType) {
-    case "mode": {
-      return data.filter(d => d.mode == secondaryFilter)
-    }
-    case "type": {
-      return data.filter(d => d.gamemode == secondaryFilter)
-    }
-    case "elo": {
-      // return eloFilter(data, secondaryFilter);
-      return data;
-    }
-    default: {
-      return data;
-    }
-  }
-}
+// // helper fnc
+// const filterData = (data: replayDataType[], filterType:string|undefined, secondaryFilter:string|undefined) => {
+//   if(!data || !filterType || !secondaryFilter) {
+//     return data;
+//   }
+//   switch(filterType) {
+//     case "mode": {
+//       return data.filter(d => d.mode == secondaryFilter)
+//     }
+//     case "type": {
+//       return data.filter(d => d.gamemode == secondaryFilter)
+//     }
+//     // case "elo": {
+//     //   // return eloFilter(data, secondaryFilter);
+//     //   return data;
+//     // }
+//     default: {
+//       return data;
+//     }
+//   }
+// }
 
 
 // const eloFilter = (data:replayDataType[], secondaryFilter:string) => {
@@ -152,6 +152,11 @@ export default function ReplaySearchpage({}: Props) {
       fetchAllMatches();
     }
   },[filter])
+
+  // when secondary filter value changes
+  useEffect(() => {
+    fetchFiltered()
+  }, [secondaryFilter])
   
   const fetchAllMatches = async () => {
     const result = await API.getAllReplays()
@@ -159,6 +164,67 @@ export default function ReplaySearchpage({}: Props) {
     const { all_matches: matches } = result;
     setReplays(matches);
     console.log(matches);
+  }
+
+  const fetchFiltered = async () => {
+    switch(filter) {
+      case "mode": {
+        await fetchModeFilter();
+        break;
+      }
+      case "type": {
+        await fetchTypeFilter();
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  }
+
+  const fetchModeFilter = async () => {
+    switch(secondaryFilter) {
+      case "Ranked": {
+        const resp = await fetch('/api/search/all?filter=type&value=ranked');
+        const data = await resp.json();
+        const { all_matches } = data;
+        setReplays(all_matches);
+        break;
+      }
+      case "Casual": {
+        const resp = await fetch('/api/search/all?filter=type&value=casual');
+        const data = await resp.json();
+        const { all_matches } = data;
+        setReplays(all_matches);
+        break;
+      }
+    }
+  }
+
+  const fetchTypeFilter = async () => {
+    switch(secondaryFilter) {
+      case "Classic": {
+        const resp = await fetch('/api/search/all?filter=game&value=classic');
+        const data = await resp.json();
+        const { all_matches } = data;
+        setReplays(all_matches);
+        break;
+      }
+      case "Triples": {
+        const resp = await fetch('/api/search/all?filter=game&value=triples');
+        const data = await resp.json();
+        const { all_matches } = data;
+        setReplays(all_matches);
+        break;
+      }
+      case "Potholes" : {
+        const resp = await fetch('/api/search/all?filter=game&value=potholes');
+        const data = await resp.json();
+        const { all_matches } = data;
+        setReplays(all_matches);
+        break;
+      }
+    }
   }
   
   return (
@@ -183,10 +249,12 @@ export default function ReplaySearchpage({}: Props) {
             setFilter={setFilter}
             setSecondaryFilter={setSecondaryFilter}
             setIsOpen={setIsOpen}
+            setReplays={setReplays}
           />
         </Box>
         <ReplaysContainer>
-          {replays && filterData(replays as replayDataType[], filter, secondaryFilter)?.map((data: replayDataType) => (
+          {/* {replays && filterData(replays as replayDataType[], filter, secondaryFilter)?.map((data: replayDataType) => ( */}
+          {replays && replays.map((data: replayDataType) => (
               <Highlight isSelected={clickedRef == data.match_id}>
                 <ReplayPreview {...data} setSideBarData={() => {
                   setSideBarData({...data})
@@ -204,9 +272,24 @@ export default function ReplaySearchpage({}: Props) {
             {/* <Typography variant="h5">{sideBarData.match_id}</Typography> */}
             <Typography variant="h4">{sideBarData.gamemode}</Typography>
             <Typography variant="h5">{sideBarData.mode}</Typography>
-            <Typography variant="h5">{`${sideBarData.players[0].username} vs ${sideBarData.players[1].username}`}</Typography>
-            <Typography variant="h5">{`${sideBarData.players[0].username} : ${sideBarData.players[0].outcome}`}</Typography>
-            <Typography variant="h5">{`${sideBarData.players[1].username} : ${sideBarData.players[1].outcome}`}</Typography>
+            {sideBarData.players.map((_, index) => {
+              return (
+                <>
+                  <Typography variant="h5">
+                    {`${sideBarData.players[index].username} ${index < 3 ? "vs":""}`}
+                  </Typography>
+                </>
+              )
+            })}
+            {sideBarData.players.map((_, index) => {
+              return (
+                <>
+                  <Typography variant="h5">
+                    {`${sideBarData.players[index].username} : ${sideBarData.players[1].outcome}`}
+                  </Typography>
+                </>
+              )
+            })}
             <Button onClick={() => { navigate(`/replay/${sideBarData.match_id}`)}} background="var(--accent-purple)">
               Watch Replay
             </Button>
