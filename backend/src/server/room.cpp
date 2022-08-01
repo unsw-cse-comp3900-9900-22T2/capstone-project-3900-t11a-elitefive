@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <future>
 #include <random>
+#include <chrono>
+#include <thread>
 
 #include "App.h"
 #include "room.hpp"
@@ -259,6 +261,7 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 					int depth = (this->difficulty() == 0) ? 2 : 3;
 					int ai1_move = p1.minmax(2);
 					this->game_->play(ai1_move);
+					std::this_thread::sleep_for(std::chrono::milliseconds(250));
 					publish(ws, json_board_move(Game::indexToCoord(ai1_move)), opCode);
 
 					if (game_->status() == Game::state::ONGOING) {
@@ -267,6 +270,7 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 						int depth = (this->difficulty() == 0) ? 2 : 3;
 						int ai2_move = p2.minmax(2);
 						this->game_->play(ai2_move);
+						std::this_thread::sleep_for(std::chrono::milliseconds(350));
 						publish(ws, json_player3(Game::indexToCoord(ai2_move)), opCode);
 					}
 				}
