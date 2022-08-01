@@ -48,6 +48,9 @@ auto generate_temporary_password() -> std::string {
 }
 
 auto random_num(int bound) -> int {
+    if (bound <= 0) {
+        return -1;
+    }
     auto seed = std::chrono::steady_clock::now().time_since_epoch().count();
     auto e = std::default_random_engine(seed);
     auto distribution = std::uniform_int_distribution<int>(0, bound - 1);

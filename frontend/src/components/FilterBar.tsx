@@ -1,9 +1,11 @@
-import React, { SetStateAction, useEffect, useRef, useState } from 'react'
+import React, { SetStateAction, useEffect, useRef, useState, useCallback } from 'react'
 import styled from 'styled-components';
 import Dropdown from './Dropdown';
 
 import StyledInput from './StyledInput';
 import Button from './ReusableButton';
+import { replayDataType } from '../pages/ReplaySearchpage';
+import _debounce from 'lodash/debounce';
 
 type Props = {
   filter: string | undefined;
@@ -11,6 +13,7 @@ type Props = {
   secondaryFilter: string | undefined;
   setSecondaryFilter: React.Dispatch<SetStateAction<string|undefined>>;
   setIsOpen: React.Dispatch<SetStateAction<boolean>>;
+  setReplays: React.Dispatch<SetStateAction<replayDataType[]|undefined>>;
 }
 
 const Container = styled.div`
@@ -22,9 +25,10 @@ const Container = styled.div`
 
 export const filterSelections = [
   "none",
-  "elo",
-  "mode",
+  // "elo",
+  "player",
   "type",
+  "game",
   "snapshot"
 ]
 
@@ -43,21 +47,44 @@ export const typeSelections = [
   "Potholes"
 ]
 
-export default function FilterBar({filter, setFilter, secondaryFilter, setSecondaryFilter, setIsOpen}: Props) {
-  
+export default function FilterBar({filter, setFilter, secondaryFilter, setSecondaryFilter, setIsOpen, setReplays}: Props) {
+
+  const [input, setInput] = useState<string>('');
+
+  const clearReplay = () => {
+    return new Promise((resolve, reject) => {
+      setReplays(undefined);
+      resolve(true );
+    })
+  }
+
+  const handleDebounceFn = async (querystr: string) => {
+    const resp = await fetch(`/api/search/all?filter=player&value=${querystr}`);
+    const data = await resp.json();
+    const { all_matches } = data;
+    setReplays(all_matches);
+  }
+
+  const debounceFn = useCallback(_debounce(handleDebounceFn, 1000),[]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+    debounceFn(e.target.value);
+  }
+
   const renderDropDowns = () => {
     switch(filter) {
-      case "elo":
-        return (
-          <Dropdown 
-            selected={secondaryFilter}
-            selections={eloSelections} 
-            setSelected={(selection: string) => {
-              setSecondaryFilter(selection);
-            }}
-          />
-        )
-      case "mode":
+      // case "elo":
+      //   return (
+      //     <Dropdown 
+      //       selected={secondaryFilter}
+      //       selections={eloSelections} 
+      //       setSelected={(selection: string) => {
+      //         setSecondaryFilter(selection);
+      //       }}
+      //     />
+      //   )
+      case "type":
         return (
           <Dropdown 
             selected={secondaryFilter}
@@ -67,7 +94,7 @@ export default function FilterBar({filter, setFilter, secondaryFilter, setSecond
             }}
           />
         )
-      case "type":
+      case "game":
         return (
           <Dropdown 
             selected={secondaryFilter}
@@ -88,7 +115,7 @@ export default function FilterBar({filter, setFilter, secondaryFilter, setSecond
 
   return (
     <Container>
-      <StyledInput size="small"/>
+      <StyledInput value={input} size="small" disabled={filter!=="player"} onChange={handleChange}/>
       <Dropdown 
         selected={filter}
         selections={filterSelections} 

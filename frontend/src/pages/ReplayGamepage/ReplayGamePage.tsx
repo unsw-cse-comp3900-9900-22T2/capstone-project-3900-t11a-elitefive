@@ -119,6 +119,7 @@ export default function ReplayGamepage({}: Props) {
   const { setWinner } = useGameState();
 
   const [replayStringArr, setReplayStringArr] = useState<string[]>([])
+  const [replayMoveArr, setReplayMoveArr] = useState<number[]>([]);
   const [currIndex, setCurrIndex] = useState(0);
 
   const getPotholesStringArr = () => {
@@ -133,6 +134,7 @@ export default function ReplayGamepage({}: Props) {
     .then(data => {
       setGamemode(data.gamemode);
       setMatchData(data);
+      setReplayMoveArr(data.turns);
       // console.log(data);
       // console.log(data.nplayers);
       const nplayers = data.nplayers;
@@ -160,6 +162,7 @@ export default function ReplayGamepage({}: Props) {
                   potholesStringArr={getPotholesStringArr()}
                   replayStringArr={replayStringArr}
                   numPlayers={nplayers}
+                  replayMoveArr={replayMoveArr}
                 />
                 <Sidebar
                   matchData={matchData}
