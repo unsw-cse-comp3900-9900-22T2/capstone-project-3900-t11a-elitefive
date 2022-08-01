@@ -1,5 +1,6 @@
 import { Typography } from '@mui/material';
 import React from 'react'
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAuth } from '../global/GlobalAuth';
 import Button from './ReusableButton';
@@ -19,6 +20,7 @@ const Container = styled.div`
 export default function FriendListComponent({ to, name, refresh }: Props) {
 
   const { getUID } = useAuth();
+  const navigate = useNavigate();
 
   const postreq = (type: string) => () => {
     const data = { action: type, from: getUID(), to: to.toString()}
@@ -41,7 +43,7 @@ export default function FriendListComponent({ to, name, refresh }: Props) {
       <Button background='var(--accent-purple)' width={70}>
         invite
       </Button>
-      <Typography variant="h5">{name}</Typography>
+      <Typography variant="h5" onClick={ () => {navigate(`/profile/${to}`)}}>{name}</Typography>
       <Button background='var(--accent-darker)' onClick={postreq("delete")}>
         remove
       </Button>
