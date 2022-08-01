@@ -32,13 +32,13 @@ auto Search::minmax(int todepth) -> int {
     int move = 0;
     for (int depth = 1; depth <= max_depth; ++depth) {
         // std::cout << game << '\n';
-        std::cout << "\tDepth: " << depth << '\n';
+        // std::cout << "\tDepth: " << depth << '\n';
         std::pair<int, int> res = run_minmax(depth, whose_turn(), memo, -99999, 99999);
         memo.clear();
         int score = res.first;
         move = res.second;
-        std::cout << "\t\tScore: " << score << '\n';
-        std::cout << "\t\tMove: " << move << '\n';
+        // std::cout << "\t\tScore: " << score << '\n';
+        // std::cout << "\t\tMove: " << move << '\n';
         if (std::abs(score) >= 1000) break;
     }
 
