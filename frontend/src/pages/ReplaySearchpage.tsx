@@ -155,7 +155,7 @@ export default function ReplaySearchpage({}: Props) {
   // when secondary filter value changes
   useEffect(() => {
     fetchFiltered()
-  }, [secondaryFilter])
+  }, [filter, secondaryFilter])
   
   const fetchAllMatches = async () => {
     const result = await API.getAllReplays()
