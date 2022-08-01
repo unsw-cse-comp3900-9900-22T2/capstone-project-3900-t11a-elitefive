@@ -63,6 +63,36 @@ create table friendreqs (
 	primary key (from_user, to_user)
 );
 
+-- Demo Data
+
+-- Our passwords are all admin.
+insert into users (username, email, password_hash) values 
+('David', 'david@unsw.edu.au', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'),
+('JackyJ', 'jackyj@unsw.edu.au', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'),
+('JackyX', 'jackyx@unsw.edu.au', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'),
+('Yirong', 'yirong@unsw.edu.au', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'),
+('Sage', 'sage@unsw.edu.au', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918');
+
+-- Bots
+INSERT INTO users (username) values 
+('BOT1'),
+('BOT2'),
+('BOT3');
+
+-- We are all friends.
+insert into friends (friend1, friend2) values 
+(1, 2), (1, 3), (1, 4), (1, 5),
+(2, 3), (2, 4), (2, 5),
+(3, 4), (3, 5),
+(4, 5);
+
+-- Password = meowth
+insert into users (username, email, password_hash) values
+('Jesse', 'jesse@teamrocket.com', '619227d5cf63bffd286a6529f58fb3e679169230eb7b0151871b8f6583f24bc6'),
+('James', 'james@teamrocket.com', '619227d5cf63bffd286a6529f58fb3e679169230eb7b0151871b8f6583f24bc6');
+
+insert into friends (friend1, friend2) values (9, 10);
+
 -- Extra Demo Data
 
 -- Insert Users.
