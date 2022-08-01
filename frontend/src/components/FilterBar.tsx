@@ -27,8 +27,8 @@ export const filterSelections = [
   "none",
   // "elo",
   "player",
-  "mode",
   "type",
+  "game",
   "snapshot"
 ]
 
@@ -84,7 +84,7 @@ export default function FilterBar({filter, setFilter, secondaryFilter, setSecond
       //       }}
       //     />
       //   )
-      case "mode":
+      case "type":
         return (
           <Dropdown 
             selected={secondaryFilter}
@@ -94,7 +94,7 @@ export default function FilterBar({filter, setFilter, secondaryFilter, setSecond
             }}
           />
         )
-      case "type":
+      case "game":
         return (
           <Dropdown 
             selected={secondaryFilter}

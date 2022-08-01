@@ -168,12 +168,12 @@ export default function ReplaySearchpage({}: Props) {
 
   const fetchFiltered = async () => {
     switch(filter) {
-      case "mode": {
-        await fetchModeFilter();
-        break;
-      }
       case "type": {
         await fetchTypeFilter();
+        break;
+      }
+      case "game": {
+        await fetchGameFilter();
         break;
       }
       default: {
@@ -182,7 +182,7 @@ export default function ReplaySearchpage({}: Props) {
     }
   }
 
-  const fetchModeFilter = async () => {
+  const fetchTypeFilter = async () => {
     switch(secondaryFilter) {
       case "Ranked": {
         const resp = await fetch('/api/search/all?filter=type&value=ranked');
@@ -201,7 +201,7 @@ export default function ReplaySearchpage({}: Props) {
     }
   }
 
-  const fetchTypeFilter = async () => {
+  const fetchGameFilter = async () => {
     switch(secondaryFilter) {
       case "Classic": {
         const resp = await fetch('/api/search/all?filter=game&value=classic');
