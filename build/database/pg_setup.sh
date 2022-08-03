@@ -33,6 +33,3 @@ psql -U postgres -c 'create role lubuntu with superuser createdb login createrol
 createdb yavalath
 
 psql yavalath -f schema.sql
-
-
-
