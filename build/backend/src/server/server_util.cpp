@@ -4,6 +4,7 @@
 #include "server_util.hpp"
 #include <nlohmann/json.hpp>
 #include <random>
+#include <filesystem>
 
 using json = nlohmann::ordered_json;
 
@@ -63,7 +64,8 @@ auto send_email_welcome(std::string email, std::string username) -> void{
 	auto message = std::string("Hello ") + username + std::string("!! \\n")
 	+ std::string("Account creation successful.\\nWelcome to Yavalath!!");
 
-	auto cmd = "/app/mail/send_email.sh " + email + " \"Welcome to Yavalath!\" \"" + message + " \"";
+    auto wd = fs::current_path();
+	auto cmd = wd + "/mail/send_email.sh " + email + " \"Welcome to Yavalath!\" \"" + message + " \"";
 		
 	std::system(cmd.c_str());
 }
