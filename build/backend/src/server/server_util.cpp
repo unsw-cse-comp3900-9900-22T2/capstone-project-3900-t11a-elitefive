@@ -64,7 +64,7 @@ auto send_email_welcome(std::string email, std::string username) -> void{
 	auto message = std::string("Hello ") + username + std::string("!! \\n")
 	+ std::string("Account creation successful.\\nWelcome to Yavalath!!");
 
-    auto wd = std::filesystem::current_path().c_str();
+    auto wd = std::filesystem::current_path().u8string();
 	auto cmd = wd + "/mail/send_email.sh " + email + " \"Welcome to Yavalath!\" \"" + message + " \"";
 		
 	std::system(cmd.c_str());
