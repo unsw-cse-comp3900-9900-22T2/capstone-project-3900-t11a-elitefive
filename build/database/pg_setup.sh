@@ -24,15 +24,18 @@ apt install postgresql-13 postgresql-client-13
 
 timeout 2 systemctl status postgresql@13-main.service
 
-cp pg_hba.conf /etc/postgresql/13/main/pg_hba.conf
+wd=$(pwd)
+cp "${wd}/database/pg_hba.conf" /etc/postgresql/13/main/pg_hba.conf
+
 
 service postgresql restart
 
 psql -U postgres -c 'create role lubuntu with superuser createdb login createrole'
+psql -U postgres -c 'create role root with superuser createdb login createrole'
 
 createdb yavalath
 
-psql yavalath -f schema.sql
+psql yavalath -f "${wd}/database/schema.sql"
 
 
 

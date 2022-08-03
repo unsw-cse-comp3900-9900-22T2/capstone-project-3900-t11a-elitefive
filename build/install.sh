@@ -6,9 +6,7 @@ bedir="${wd}/backend"
 dbdir="${wd}/database"
  
 apt-get update
- 
-sh database/pg_setup.sh
- 
+
 apt install -y cmake
 apt install -y libpq-dev
 apt install -y libpqxx-dev
@@ -20,6 +18,17 @@ apt install -y g++
 # Set up database
 cd "$dbdir"
 sh db_setup.sh
+
+# Set up backend
+cd "$bedir"
+apt-get install -y mutt
+apt-get install -y sendmail
+mkdir ~/.mutt
+cp "${bedir}/mail/muttrc" ~/.mutt/muttrc
+chmod +x "${bedir}/mail/send_email.sh"
+cd "$bedir"
+cmake CMakeLists.txt
+make
  
 # Set up frontend
 cd "$fedir"
@@ -28,9 +37,16 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
 source ~/.bashrc
 nvm install node
 npm install
-# npm start
- 
-# Set up backend
+sh qterminal -e npm start
+
+# Run backend 
 cd "$bedir"
-cmake CMakeLists.txt
-make
+qterminal -e ./server &
+
+# Run frontend
+cd "$fedir"
+# has bug atm, idk
+# qterminal -e npm start &
+ 
+
+
