@@ -65,9 +65,11 @@ auto send_email_welcome(std::string email, std::string username) -> void{
 	+ std::string("Account creation successful.\\nWelcome to Yavalath!!");
 
     auto wd = fs::current_path();
-	auto cmd = wd + "/mail/send_email.sh " + email + " \"Welcome to Yavalath!\" \"" + message + " \"";
-		
-	std::system(cmd.c_str());
+	auto cmd = "/mail/send_email.sh " + email + " \"Welcome to Yavalath!\" \"" + message + " \"";
+	
+	auto path = std::filesystem::canonical("/proc/self/exe");
+	auto mail_path = std::string(path).substr(0, std::string(path).size() - 7) + cmd;
+	std::system(mail_path.c_str());
 }
 
 auto send_email_temp_password(std::string email, std::string username, std::string temp_pass) -> void {
@@ -75,9 +77,10 @@ auto send_email_temp_password(std::string email, std::string username, std::stri
 	auto message = std::string("Hi ") + username + std::string("!! \\n")
 	+ std::string("Your temporary Yavalath password is: ") + temp_pass;
 
-	auto cmd = "/app/mail/send_email.sh " + email + " \"Yavalath: Forgotten Password\" \"" + message + " \"";
-		
-	std::system(cmd.c_str());
+	auto cmd = "/mail/send_email.sh " + email + " \"Yavalath: Forgotten Password\" \"" + message + " \"";
+	auto path = std::filesystem::canonical("/proc/self/exe");
+	auto mail_path = std::string(path).substr(0, std::string(path).size() - 7) + cmd;
+	std::system(mail_path.c_str());
 }
 
 auto profile_to_json(User *user, PlayerStats *stats, std::map<std::string, int> elos,
