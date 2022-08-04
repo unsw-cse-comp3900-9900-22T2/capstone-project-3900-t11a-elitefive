@@ -5,7 +5,7 @@
 #include "db_classes.hpp"
 #include <pqxx/pqxx>
 
-auto const DB_STRING = std::string("user=yavalath dbname=yavalath password=yavalath host=postgres port=5432");
+auto const DB_STRING = std::string("user=lubuntu dbname=yavalath host=localhost port=5432");
 
 class DatabaseManager {
   private:
