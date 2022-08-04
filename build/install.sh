@@ -1,4 +1,4 @@
-#!/usr/bin/sh
+#!/usr/bin/bash
  
 wd=$(pwd)
 fedir="${wd}/frontend"
