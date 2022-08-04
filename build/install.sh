@@ -34,7 +34,7 @@ make
 cd "$fedir"
 apt install curl
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-source ~/.bashrc
+source /home/lubuntu/.bashrc
 nvm install node
 npm install
 sh qterminal -e npm start
