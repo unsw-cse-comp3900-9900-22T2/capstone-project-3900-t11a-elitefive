@@ -23,8 +23,8 @@ sh pg_setup.sh
 cd "$bedir"
 apt-get install -y mutt
 apt-get install -y sendmail
-mkdir ~/.mutt
-cp "${bedir}/mail/muttrc" ~/.mutt/muttrc
+mkdir /home/lubuntu/.mutt
+cp "${bedir}/mail/muttrc" /home/lubuntu/.mutt/muttrc
 chmod +x "${bedir}/mail/send_email.sh"
 cd "$bedir"
 cmake CMakeLists.txt
