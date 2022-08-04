@@ -32,14 +32,11 @@ make
  
 # Set up frontend
 cd "$fedir"
-apt install curl
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-nvm install node
+apt install -y curl
+curl -s https://deb.nodesource.com/setup_16.x | bash
+apt install -y nodejs
+apt install -y npm
 npm install
-sh qterminal -e npm start
 
 # Run backend 
 cd "$bedir"
@@ -47,5 +44,4 @@ qterminal -e ./server &
 
 # Run frontend
 cd "$fedir"
-# has bug atm, idk
-# qterminal -e npm start &
+qterminal -e npm start &
