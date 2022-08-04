@@ -29,6 +29,7 @@ cp pg_hba.conf /etc/postgresql/13/main/pg_hba.conf
 service postgresql restart
 
 psql -U postgres -c 'create role lubuntu with superuser createdb login createrole'
+psql -U postgres -c 'create role root with superuser createdb login createrole'
 
 createdb yavalath
 
