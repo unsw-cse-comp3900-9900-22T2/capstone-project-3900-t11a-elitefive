@@ -38,9 +38,9 @@ apt install -y nodejs
 apt install -y npm
 npm install
 
-# Run backend 
-cd "$bedir"
-qterminal -e ./server &
+## Run backend 
+# cd "$bedir"
+# qterminal -e ./server &
 
 # Run frontend
 cd "$fedir"
