@@ -37,8 +37,6 @@ auto Game::play(int index) -> bool {
 	board().set(index, this->whose_turn());
 	end_turn(index);
 	append_move(BaseGame::indexToCoord(index));
-	// std::cout << board() << "DEBUG BOARD PRINT\n";
-	// std::cout << "Game: Spaces - " << board().num_spaces() << " Moves: " << this->num_moves() << "\n";
 	return true;
 }
 

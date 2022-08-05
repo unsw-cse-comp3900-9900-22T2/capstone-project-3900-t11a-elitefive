@@ -21,7 +21,6 @@ auto Computer::make_random_move() const -> int {
 		1,
 		std::mt19937{std::random_device{}()}
 	);
-	// std::cout << "Random selection: " << random_selection.front() << '\n';
 	return random_selection.front();
 }
 
