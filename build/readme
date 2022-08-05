@@ -52,14 +52,18 @@ Note: This is performing a first time setup and installing all relevant packages
    		- mail server
    		- nodejs
 
-6. Once installation is complete run the following command: 
+6. Installation is complete when you see the last few lines in the terminal say:
+	"Shell program: "npm start"
+	("npm", "start")
+
+7. Press enter a few times on the same QTerminal so you can type commands again.
+
+8. Run the following command: 
 	./backend/server
 
-7. Everything should be running.
+9. Open firefox and type 'localhost:3000'
 
-8. Open firefox and type 'localhost:3000'
-
-9. You should see the yavalath website. 
+10. You should see the yavalath website. 
 Otherwise npm is still launching setup scripts in the new window.
 
 INSTALLATION FAQ & ADVICE:
