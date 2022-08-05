@@ -1,38 +1,52 @@
 ENVIRONMENT
 ===========
-Our project uses the provided LUBUNTU image using a VM. We verified the build using VMware Workstation 16 player.
+Our project uses the provided Lubuntu 20.4.1 LTS image using a VM. 
+We verified the build using VMware Workstation 16 player.
 
-You can locate the project on our github:
+Note: the VM runs everything our website slower then running the project natively in docker or on a computer.
+
+You can also locate the project on our github here:
 https://github.com/unsw-cse-comp3900-9900-22T2/capstone-project-3900-t11a-elitefive
-The relevant folder for lubuntu is "build"
+
+All the src code for lubuntu is inside the build folder. You can also find it in the "build.zip" folder.
 
 DOWNLOAD PROJECT
 =================
 Extract the `build` folder onto the desktop.
-
+In the build folder you should have the following files:
+	backend/
+	database/
+	frontend/
+	install.sh
+	restart.sh
+	readme
 
 INSTALLATION (How to run the project)
 ======================================
 Note: This is performing a first time setup and installing all relevant packages on lubuntu
 
-0. Log into lubuntu. Password: lubuntu
+0. Log into Lubuntu 20.4.1 LTS.
+	Virtual Machine Credentials:
+		Username: lubuntu
+		Password: lubuntu
 
 1. Open QTerminal
 
-2. cd to the directory where you extracted the build folder.
+2. cd to the directory where you extracted the `build` folder.
 
 3. In the build folder you should have the following files:
 	backend/
 	database/
 	frontend/
-	install.sh
+	restart.sh
+	readme
 
 4. Run the following command: 
 	sudo sh install.sh
-	enter password 'lubuntu'
+	enter password 'lubuntu' if prompted
 
-5. Wait for installation and build to complete. (Approxiately 15-20 minutes)
-   This will take approximately 20 minutes because it installs and configures the following
+5. Wait for installation and build to complete. (This will take approxiately 15-20 minutes)
+   This script installs and configures the following:
    		- postgresql
    		- c++ and cmake
    		- mail server
@@ -45,19 +59,22 @@ Note: This is performing a first time setup and installing all relevant packages
 
 8. Open firefox and type 'localhost:3000'
 
+9. You should see the yavalath website. 
+Otherwise npm is still launching setup scripts in the new window.
+
 INSTALLATION FAQ & ADVICE:
 ===========================
-- During setup a new terminal will be opened. This is the frontend server. 
+- During setup a new terminal window will be opened. This is the frontend server. 
 Do not close this window.
-
-- You need to wait for the script to finish entirely. 
-Installation is complete when a new terminal is opened. 
 
 - You can safey IGNORE the following firefox prompt popups:
 "Your Firefox profile cannot be loaded. It may be missing or inaccessible."
 (This error pops up 3 times, just hit okay each time and it will stop)
 
 - If you see the Firefox warning above that means that the frontend server is being built.
+
+- You need to wait for the script to finish entirely before the project will work. 
+Installation is complete when a new terminal is opened. 
 
 - If you accidently close all terminals after installation you can set up the frontend server and backend server as follows.
 1. Open two seperate QTerminal in the same build folder as before
