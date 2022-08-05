@@ -105,7 +105,7 @@ auto Room::generate_game(bool potholes) -> void {
 			auto e2 = std::default_random_engine(now * i);
 			auto d2 = std::uniform_int_distribution<int>(0, 60);
 			auto r2 = d2(e2);
-			if (r2 == 30) continue; // Never get rid of the center tile because BOT3 assumes it's there lol
+			if (r2 == 30) continue; 
 			potholes.at(r2) = 1;
 		}
 
@@ -211,8 +211,6 @@ auto Room::create_socket_player_verse_player(uWS::App &app) -> void {
 		},
 		.close = [this](WebSocket ws, int x , std::string_view str) {
 			ws->unsubscribe(this->room_id());
-			// ws->close();
-			// ws->end();
 			std::cout << "Room: Player left lobby\n";
 		}
 	});
@@ -249,14 +247,13 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 			if (play_move(move) == false) return; 	// Ignore illegal player move
 			if (this->gamemode() == "TRIPLES" || this->difficulty() != 2) 	publish(ws, json_confirm_move(move), opCode);
 			else { 															publish(ws, json_board_move(move), opCode); }
-			// publish(ws, json_player3("a1"), opCode);
 
 			std::cout << "Made a valid move\n";
 
 			if (game_->status() == Game::state::ONGOING) {
 				// ONLY FOR TRIPLES: Handle AI moves
 				std::cout << "WHAT GAMEMODE? " << this->gamemode() << '\n';
-				if (this->gamemode() == "TRIPLES") {	// TODO: Change this to a native call
+				if (this->gamemode() == "TRIPLES") {
 					Search p1 = Search(*this->game_, select_random_player({2, 2, 0}), this->difficulty());
 					int depth = (this->difficulty() == 0) ? 2 : 3;
 					int ai1_move = p1.minmax(2);
@@ -281,8 +278,6 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 					else { 							publish(ws, json_confirm_move(reply), opCode); } // When difficulty 2 is selected
 				}
 			}
-
-
 			
 			// Postgame
 			auto const state = game_->status();
@@ -296,8 +291,6 @@ auto Room::create_socket_ai(uWS::App &app) -> void {
 		},
 		.close = [this](WebSocket ws, int x , std::string_view str) {
 			ws->unsubscribe(this->room_id());
-			// ws->close();
-			// ws->end();
 			std::cout << "Left ai room\n";
 		}
 	});
@@ -385,7 +378,6 @@ auto Room::save_match(int winning_player) -> void {
 	auto snapshots = gen.db_snapshot();
 	// True/False flag for elo
 	int const winning_uid = this->game_->give_uid(winning_player);
-	// std::cout << "Room: Winning player - " << winning_player << " with uid: " << winning_uid << '\n';
 	
 	auto playersELO = calc_elos(winning_player);
 	// 0 -> Background
@@ -415,7 +407,6 @@ auto Room::save_match(int winning_player) -> void {
 		svg_data.append(std::to_string(t));
 	}
 	// Save Match to DB.
-	// TODO: WIN LOSS DRAW MAP in the event of a draw
 	auto const match_id = db_->save_match(this->gamemode(), this->ranked_, playersELO, winning_uid,
 		game_->list_potholes_string() ,game_->move_sequence(), svg_data, snapshots);
 	std::cout << "Match ID: " << match_id << '\n';

@@ -324,7 +324,6 @@ auto api_profile(uWS::App &app, DatabaseManager &db, std::unordered_map<int, std
 		auto suid = std::string(req->getQuery("uid")); 
 		auto uid = atoi(suid.c_str());
 
-		// hard coded user for functionality 
 		auto user = db.get_user(uid);
 		auto stats = db.get_stats(uid);
 		auto elos = std::map<std::string, int>{
@@ -561,7 +560,7 @@ auto api_search_snapshot(uWS::App &app, DatabaseManager &db) -> void {
 
 		// Get given snapshot move sequence from frontend get query
 		auto moves = std::string(req->getQuery("moves")); 
-		auto metadata = MetaDataGenerator(moves, 2); 		// TODO: Hardcoded snapshot search for 2 players only
+		auto metadata = MetaDataGenerator(moves, 2); 
 		auto const positions = metadata.db_snapshot();
 		
 		// Get all matches that match the given snapshot
@@ -583,36 +582,6 @@ auto api_search_snapshot(uWS::App &app, DatabaseManager &db) -> void {
 	});
 }
 
-/*
-auto api_resetpass(uWS::App &app, DatabaseManager &db) -> void {
-	app.get("/api/resetpassword", [&app, &db](auto *res, auto *req) {
-	
-		std::cout << "reset pass\n\n";
-	
-		auto suid = std::string(req->getQuery("uid")); 
-		auto uid = atoi(suid.c_str());
-		auto oldpass = std::string(req->getQuery("oldpass")); 
-		auto newpass = std::string(req->getQuery("newpass")); 
-		
-		auto new_pass_hash = hash_password(newpass);
-		
-		json payload;
-		payload["event"] = "password";
-		payload["action"] = "reset";
-
-		
-		if (db.change_password(uid, new_pass_hash)){
-			payload["payload"]["outcome"] = "success";
-		}else{
-			payload["payload"]["outcome"] = "failure";
-
-		}
-		
-		res->end(payload.dump());
-	});
-}
-*/
-
 
 
 // TESTING ENDPOINTS
@@ -625,10 +594,6 @@ auto api_david(uWS::App &app) -> void {
 auto api_db(uWS::App &app, DatabaseManager &db) -> void {
   app.get("/db", [&db](auto *res, auto *req) {
 	// Testing Database Functionality.
-		// Inserting new user
-		// db.insert_user("new_user", "email", "password");
-		// auto user = db.get_user("email");
-		// std::cout << user->password_hash << std::endl;
 		// Inserting match.
 		auto playersELO = std::map<int, int>{
 			{1, 1000},
@@ -673,10 +638,6 @@ auto api_db(uWS::App &app, DatabaseManager &db) -> void {
 		
 		// testing get friends 
 		auto friends = db.get_friends(1);
-		// auto friends_json = friends_to_json(1, friends);
-		// std::cout << " ***** friends to json\n";
-		// std::cout << friends_json;
-		// std::cout <<  "\n *****\n";
 		
 		// testing add friend
 		auto add = db.accept_friend_req(1,6);

@@ -58,34 +58,16 @@ void BackendServer() {
 	api_friends(app, db, tokens);
 	api_leaderboards(app, db);
 	api_social_feed(app, db);
-	//api_resetpass(app,db);
 
-	// Test functionality (REMOVE LATER)
+	// Test functionality
 	api_david(app);
 	api_db(app, db);
 
-	// Room room = Room(app, &db, "4732432", {1, 2});
-	// Room *room = nullptr;
-	// std::vector<Room *> rooms = std::vector<Room *>{};
-	// printf("Pointer: %p\n", &rooms);
 	printf("DB Pointer: %p\n", &database_connection);
 
 	Pool pool = Pool(&app, &database_connection);
 	Invite invite = Invite(&app, &database_connection);
 	
-	// auto playersELO = std::map<int, int>{
-	// 	{1, 100},
-	// 	{2, 200}
-	// };
-
-	// Game game = Game(2);
-	// game.play("a1");
-	// game.play("a2");
-	// auto gen = MetaDataGenerator(game);
-	// auto snapshots = gen.db_snapshot();
-	// auto const match_id = db.save_match("CLASSIC", false, playersELO, -1,
-	// 				game.move_sequence(), snapshots);
-
 	app.run();
 }
 
