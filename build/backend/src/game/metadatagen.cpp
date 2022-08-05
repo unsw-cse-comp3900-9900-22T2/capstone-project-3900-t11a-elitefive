@@ -10,12 +10,6 @@ MetaDataGenerator::MetaDataGenerator(Game game)
 , positions_{}
 , turn_array_{std::vector<int>{}}
 {
-	// // Generate moves per player
-	// auto player = 0;
-	// for (auto const& move : move_sequence_) {
-	// 	moves_by_player_[player].push_back(move);
-	// 	player = (player + 1) % nplayers_;
-	// }
 
 	// Generate all unique position
 	auto simgame = Game(nplayers_);

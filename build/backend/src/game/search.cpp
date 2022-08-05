@@ -11,9 +11,6 @@ auto Search::minmax(int todepth) -> int {
     
     int max_depth = todepth;
     if (max_depth > 3) max_depth = 3;
-    // if (this->num_moves() <= 12) max_depth = 4;
-    // if (this->num_moves() <= 8) max_depth = 3;
-
     
     // Since easy difficulty is randomness with a lookup, limit the depth of minmax agressively
     if (todepth > 3) {
@@ -31,14 +28,10 @@ auto Search::minmax(int todepth) -> int {
     
     int move = 0;
     for (int depth = 1; depth <= max_depth; ++depth) {
-        // std::cout << game << '\n';
-        // std::cout << "\tDepth: " << depth << '\n';
         std::pair<int, int> res = run_minmax(depth, whose_turn(), memo, -99999, 99999);
         memo.clear();
         int score = res.first;
         move = res.second;
-        // std::cout << "\t\tScore: " << score << '\n';
-        // std::cout << "\t\tMove: " << move << '\n';
         if (std::abs(score) >= 1000) break;
     }
 
@@ -84,11 +77,6 @@ auto Search::run_minmax(int depth, int player, SearchMemo &memo, int alpha, int 
         return { 1000 + depth, -1};
     }
     if (this->board().num_spaces() == this->num_moves()) {
-        // TODO: NEED TO CHECK IF WON FIRST
-        // this->reason_ = Search::terminal::DRAW;
-        // this->score_ = 0;
-        // std::string output = simple_state(*this);
-        // return {atoi(output.c_str()), -1};
         return {0, -1}; // DRAW
     }
 

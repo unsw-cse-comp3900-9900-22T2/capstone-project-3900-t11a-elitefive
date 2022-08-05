@@ -12,10 +12,6 @@ BitBoard::BitBoard(std::bitset<64> const& board)
 : board_{board.to_ulong()}
 {}
 
-// BitBoard::BitBoard(uint64_t state)
-// : board_{state}
-// {}
-
 auto BitBoard::value() const -> uint64_t {
 	return board_;
 }

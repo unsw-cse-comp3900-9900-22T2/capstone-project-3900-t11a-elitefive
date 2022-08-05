@@ -182,7 +182,6 @@ auto main(void) -> int {
 					Search player = Search(game, select_random(targets), difficulty);
 					int move = player.minmax(2);
 					game.play(move);
-					// std::cout << game << '\n';
 				}
 				if (game.which_player_won() == -1) {
 					game = make_game(gamenum, potholes);
@@ -295,40 +294,13 @@ auto computer_verse_computer() -> void {
 	}
 }
 
-auto generate_test_game() -> AIGame {
-	// auto game = AIGame(2);
-	// game.pass_turn();
-	// game.play(1); game.pass_turn();
-	// game.play(3); game.pass_turn();
-	// game.play(4); //game.pass_turn();
-
-	// // game.play(45); game.pass_turn();
-	// // game.play(46); game.pass_turn();
-	// // game.play(48); game.pass_turn();
-	// return game;
-	
+auto generate_test_game() -> AIGame {	
 	auto game = AIGame(2);
-	// game.pass_turn();
 	game.play(30);
 	game.play(38);
 	game.play(31);
 	game.play(12);
-	// game.play(28);
 
-	// game.play(6);
-	// game.play(5)
-	// game.play(19);
-	// game.play(12);
-	// game.play(21);
-	// game.play(29);
-	// game.play(7);
-	// game.play(8);
-	// game.play(9);
-
-	// game.play(5);
-	// game.play(7);
-	// game.play(6);
-	// game.play(20);
 	return game;
 }
 
@@ -336,13 +308,7 @@ auto ai_play_game(AIGame &game) -> void {
 	std::cout << game << "\nStarting board\n";
 	auto depth = 2;
 	while (game.isTerminal() == false) {
-		// int player_move;
-		// std::cin >> player_move;
-		// game.play(player_move);
-		// std::cout << game << '\n'; 
-		
-		// std::cout << "Generating moves ...\n";
-		// game.generate_to_depth(depth);
+
 		std::cout << "Minmax" << '\n';
 		auto move = game.minmax(depth, 0);
 		std::cout << "Move: " << move << '\n';

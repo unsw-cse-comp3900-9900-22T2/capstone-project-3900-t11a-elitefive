@@ -36,7 +36,6 @@ auto AIGame::play(std::string move) -> bool {
 auto AIGame::generate_all_moves(Memo &memo) -> void {
 	if (states_.size() != 0) return; // Already generated
 	auto const previous_score = score();
-	// auto const nplayers = board().num_players();
 	for (auto const& move : board().free_tiles().binary_to_vector()) {
 		play(move);
 		store_game(this->board().all_boards());
@@ -110,30 +109,10 @@ auto AIGame::states() const -> std::vector<std::vector<BitBoard>> const& {
 	return states_;
 }
 
-// auto AIGame::find_best() -> AIGame& {
-// 	// TODO: If it's all a tie, pick from the bucket of ties instead of defaulting to start
-// 	auto const &index = std::max_element(states().begin(), states().end(), [](AIGame const& a1, AIGame const& a2) {
-// 		return a1.score_ < a2.score_;
-// 	});
-// 	return *index;
-// }
-
-// auto AIGame::find_worst() -> AIGame& {
-// 	// TODO: If it's all a tie, pick from the bucket of ties instead of defaulting to start
-// 	auto const &index = std::min_element(states().begin(), states().end(), [](AIGame const& a1, AIGame const& a2) {
-// 		return a1.score_ < a2.score_;
-// 	});
-// 	return *index;
-// }
-
 auto AIGame::minmax(int depth, int difficulty) -> int {
 	auto memo = Memo();
 	int final_move = -1;
 	std::cout << "Minmax at: " << this->num_moves() << '\n';
-	// if (depth > 6 && this->num_moves() <= 31) depth = 6;
-	// if (depth > 5 && this->num_moves() <= 25) depth = 5;
-	// if (depth > 4 && this->num_moves() <= 17) depth = 4;
-	// if (depth > 3 && this->num_moves() <= 5) depth = 3;
 	for (int inc_depth = depth; inc_depth <= depth; ++inc_depth) {
 		std::cout << "\tCalculating depth: " << inc_depth << ' ';
 		auto const score = run_minmax(inc_depth, this->whose_turn(), memo, -99999, 99999);

@@ -1,4 +1,4 @@
-#include <assert.h> // TODO: REMOVE
+#include <assert.h> 
 #include "basegame.hpp"
 
 BaseGame::BaseGame(int players, BitBoard potholes)
