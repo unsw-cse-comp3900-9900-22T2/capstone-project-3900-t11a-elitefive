@@ -1,0 +1,113 @@
+ENVIRONMENT
+===========
+Our project uses the provided LUBUNTU image using a VM. We verified the build using VMware Workstation 16 player.
+
+You can locate the project on our github:
+https://github.com/unsw-cse-comp3900-9900-22T2/capstone-project-3900-t11a-elitefive
+The relevant folder for lubuntu is "build"
+
+DOWNLOAD PROJECT
+=================
+Extract the `build` folder onto the desktop.
+
+
+INSTALLATION (How to run the project)
+======================================
+Note: This is performing a first time setup and installing all relevant packages on lubuntu
+
+0. Log into lubuntu. Password: lubuntu
+
+1. Open QTerminal
+
+2. cd to the directory where you extracted the build folder.
+
+3. In the build folder you should have the following files:
+	backend/
+	database/
+	frontend/
+	install.sh
+
+4. Run the following command: 
+	sudo sh install.sh
+	enter password 'lubuntu'
+
+5. Wait for installation and build to complete. (Approxiately 15-20 minutes)
+   This will take approximately 20 minutes because it installs and configures the following
+   		- postgresql
+   		- c++ and cmake
+   		- mail server
+   		- nodejs
+
+6. Once installation is complete run the following command: 
+	./backend/server
+
+7. Everything should be running.
+
+8. Open firefox and type 'localhost:3000'
+
+INSTALLATION FAQ & ADVICE:
+===========================
+- During setup a new terminal will be opened. This is the frontend server. 
+Do not close this window.
+
+- You need to wait for the script to finish entirely. 
+Installation is complete when a new terminal is opened. 
+
+- You can safey IGNORE the following firefox prompt popups:
+"Your Firefox profile cannot be loaded. It may be missing or inaccessible."
+(This error pops up 3 times, just hit okay each time and it will stop)
+
+- If you see the Firefox warning above that means that the frontend server is being built.
+
+- If you accidently close all terminals after installation you can set up the frontend server and backend server as follows.
+1. Open two seperate QTerminal in the same build folder as before
+	Terminal (1): Run `sudo sh restart.sh` 
+	Terminal (2): Run `./backend/server`
+
+
+ACCESSING THE YAVALATH WEBSITE
+===============================
+0: Verify that the new frontend terminal window is open. 
+1: ./backend/server (if you haven't already)
+2: Open firefox and type in the url - `localhost:3000`
+
+If you accidently closed the new terminal window, open a new instance and navigate to build/frontend. Type `npm start`
+
+
+USAGE
+=====
+We have included a 'Yavaleth Website User Tutorial' in our final report.
+
+You can also use the following admin logins.
+Accounts: Password for each acount is "admin"
+--------------------
+david@unsw.edu.au
+jackyj@unsw.edu.au
+jackyx@unsw.edu.au
+yirong@unsw.edu.au
+sage@unsw.edu.au
+--------------------
+or register your own account.
+
+
+
+MULTIPLAYER INSTRUCTIONS
+==========================
+To test a multiplayer game open a new private window in firefox by pressing:
+CTRL + SHIFT + P
+Navigate to localhost:3000
+
+You should have two browser windows open
+1. Firefox
+2. Firefox in a private window (CTRL + SHIFT + P)
+Log into two different accounts for both firefox sessions (1) and (2).
+
+
+Note: Session tokens on this website are tied to one browser. If you open multiple tabs in the browser, they will all be logged into the same account. 
+"Icognito" mode make the site think it is in a different browser session. All icognito tabs will be logged into the same account.
+
+
+To simulate a TRIPLES game, you need to open three seperate browser instants.
+1 - Firefox
+2 - Firefox in a private window (CTRL + SHIFT + P)
+3 - Google Chrome (You will have to install this)
