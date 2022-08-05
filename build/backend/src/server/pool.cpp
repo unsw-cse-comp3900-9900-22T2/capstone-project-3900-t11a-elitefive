@@ -33,16 +33,14 @@ Pool::Pool(uWS::App *app, DatabaseManager *db)
 
 	app->ws<SocketData>("/ws/waitingroom",uWS::TemplatedApp<false>::WebSocketBehavior<SocketData> {
 		.open = [this, publish](auto *ws) {
-			// std::cout << "\tPool: Joined room\n";
 			ws->subscribe(this->room_id());
 		},
 		.message = [this, publish](auto *ws, std::string_view message, uWS::OpCode opCode) mutable {
-			// std::cout << "\tPool: Recieved message\n";
 			
 			// Parse data
 			json data = parse_pool_data(message);
 			std::cout << "\tPool: Message -> " << message << '\n';
-			std::string gamemode = data["gamemode"];	// TODO: Need information from frontend
+			std::string gamemode = data["gamemode"];
 			bool ranked_flag = data["ranked"];
 			bool ai_flag = data["ai"];
 
@@ -73,15 +71,6 @@ Pool::Pool(uWS::App *app, DatabaseManager *db)
 // ==== Functions to manage the waiting room ====
 
 auto Pool::replace_room_id(uint32_t roomid) -> Room * {
-	// int i = -1;
-	// for (auto &room : rooms) {
-	// 	++i;
-	// 	if (room == nullptr) {
-	// 		std::cout << "\t\t\t$$DEBUG: ROOM EMPTY - " << i << '\n';
-	// 		continue;
-	// 	}
-	// 	std::cout << "\t\t\t$$DEBUG: ROOM EXISTS - " << room->room_id() << '\n';
-	// }
 	for (auto &room : rooms) {
 		if (room == nullptr) continue;
 		if (room->room_id() == std::to_string(roomid)) {
@@ -89,15 +78,6 @@ auto Pool::replace_room_id(uint32_t roomid) -> Room * {
 		}
 	}
 	return nullptr;
-	// }
-	// for (auto &room : rooms) {
-	// 	++i;
-	// 	if (room == nullptr) {
-	// 		std::cout << "\t\t\t^^DEBUG: ROOM EMPTY - " << i << '\n';
-	// 		continue;
-	// 	}
-	// 	std::cout << "\t\t\t^^DEBUG: ROOM EXISTS - " << room->room_id() << '\n';
-	// }
 }
 
 auto Pool::start_player_vs_player_game(std::string const& gamemode, bool ranked_flag, int uid) -> json {
@@ -110,7 +90,6 @@ auto Pool::start_player_vs_player_game(std::string const& gamemode, bool ranked_
 
 		uint32_t room_id = ((uint32_t) opponent << 16) | (uint32_t) uid;
 		create_new_room(room_id, ranked_flag, false, false, {opponent, uid});
-		// std::cout << "Created room: " << std::to_string(room_id) << " Opp: " << opponent << " Self: " << uid << '\n'; 
 		
 		json payload = make_json_game_selection({opponent, uid}, std::to_string(room_id), gamemode, ranked_flag, false);
 		return payload;
@@ -135,7 +114,6 @@ auto Pool::start_player_vs_player_game(std::string const& gamemode, bool ranked_
 		// ai: false
 		// potholes: true 
 		create_new_room(room_id, ranked_flag, false, true, {opponent, uid});
-		// std::cout << "Created room: " << std::to_string(room_id) << " Opp: " << opponent << " Self: " << uid << '\n'; 
 		
 		json payload = make_json_game_selection({opponent, uid}, std::to_string(room_id), gamemode, ranked_flag, false);
 		return payload;
@@ -143,7 +121,6 @@ auto Pool::start_player_vs_player_game(std::string const& gamemode, bool ranked_
 }
 
 auto Pool::player_vs_player_waiting_lobby(std::string const& gamemode, bool ranked_flag, int uid) -> json {
-	// TODO: Do gamemode flags
 	// Ignore player if they are already in queue
 	if (player_waiting(uid, gamemode)) {
 		std::cout << "\tPool: Already waiting in queue for a match\n";
@@ -169,7 +146,7 @@ auto Pool::player_vs_player_waiting_lobby(std::string const& gamemode, bool rank
 
 auto Pool::start_player_vs_ai_game(std::string const& gamemode, bool ranked_flag, int uid, int difficulty) -> json {
 	// Versing AI
-	int computer_uid = 6 + difficulty; // TODO: HARDCODED AI ID. Need to do selection
+	int computer_uid = 6 + difficulty; 
 	std::vector<int> uids = {uid, computer_uid};
 	if (gamemode != "TRIPLES" && difficulty == 2) {
 		uids = {computer_uid, uid};
